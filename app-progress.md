@@ -1,5 +1,15 @@
 # Avancement
 
+## Sprint 2 — Collecte fiable et consultation hors ligne
+
+Branche : `feature/sprint-2-offline-sync`.
+
+Statut : audit de source terminé ; architecture de synchronisation soumise à validation conformément aux consignes du projet. Aucune modification du collecteur ou du comportement de l’application à ce stade.
+
+Résultats de l’audit et proposition détaillée : [audit de la source](docs/source-audit.md).
+
+Décisions soumises : collecteur Node.js avec analyseur HTML, stockage SQLite et synchronisation manuelle ; présentation prudente des rapprochements de noms abrégés comme repérages à confirmer.
+
 ## Sprint 1 — Architecture statique et SQLite
 
 Branche : `feature/sprint-1-static-architecture`.
