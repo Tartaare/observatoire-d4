@@ -1,4 +1,4 @@
-// Donn?es de d?monstration issues de la page initiale.
+// Données de démonstration issues de la page initiale.
 const lastPlayed = 5;
 const dates = ["2026-09-06","2026-09-20","2026-10-04","2026-10-18","2026-11-01","2026-11-07","2026-11-22","2026-12-06","2027-01-24","2027-02-07","2027-03-07","2027-03-21","2027-04-11","2027-05-02"];
 const clubs = {
