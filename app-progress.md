@@ -1,5 +1,17 @@
 # Avancement
 
+## Sprint 3 — Rapprochements limités au même club
+
+Branche : `feature/sprint-3-same-club-matching`.
+
+Statut : **terminé le 9 novembre 2026**, sans fusion dans `main`.
+
+US-012 : application de la règle métier précisée par l’utilisateur — aucun changement de club en cours de saison. Les antécédents sont indexés par URL de club et nom normalisé. Seules les feuilles dont les clubs sont identifiés et identiques alimentent l’historique et les totaux. L’indicateur interclubs et la mention d’homonymie entre clubs sont retirés du détail.
+
+Vérifications : build réussi, 13 tests réussis. Le nouveau test contrôle un rapprochement du même club, son exclusion pour un autre club, et l’absence de rapprochement si le club manque d’un côté ou de l’autre. Contrôle des données réelles : les 236 antécédents conservés appartiennent tous au même club que leur feuille D4.
+
+Prévention des régressions : comparer l’URL du club, pas le nom de l’équipe ; les équipes réserves du même club restent pertinentes. Les archives collectées restent disponibles hors ligne ; le filtrage est appliqué lors de la construction de la saison et ne nécessite aucune nouvelle collecte.
+
 ## Sprint 2 — Collecte fiable et consultation hors ligne
 
 Branche : `feature/sprint-2-offline-sync`.

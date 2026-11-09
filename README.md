@@ -78,7 +78,7 @@ La collecte découvre les calendriers des clubs référencés par la source, fil
 
 Tous les joueurs publiés sont conservés. Les titulaires et remplaçants dont une entrée ou sortie est attestée sont distingués des remplaçants sans preuve de participation. Une composition partielle ou manquante produit `?`, jamais un faux zéro.
 
-Un repérage est une correspondance exacte de nom normalisé dans une participation D4 attestée et une participation en championnat supérieur **à une date strictement antérieure**, pendant la même saison. Les rencontres du même jour ne servent pas à établir une antériorité. Les liens et compositions locales permettent de contrôler les correspondances ; même club et autre club sont distingués.
+Un repérage est une correspondance exacte de nom normalisé dans une participation D4 attestée et une participation en championnat supérieur **du même club, à une date strictement antérieure**, pendant la même saison. Le club est identifié par son URL source : les homonymes d’autres clubs et les feuilles sans club identifié sont exclus des historiques et des compteurs. Règle métier retenue : aucun changement de club pendant la saison. Les rencontres du même jour ne servent pas à établir une antériorité. Les liens et compositions locales permettent de contrôler les correspondances.
 
 Les noms de la source sont abrégés, sans identifiant individuel exploitable : **un repérage ne certifie pas une identité**. Un zéro signifie aucun repérage dans les feuilles acquises ; des antécédents peuvent manquer si la source est incomplète ou ne couvre pas une compétition. La couverture affichée porte sur cette source, pas sur tous les championnats français.
 
@@ -99,7 +99,7 @@ npm run build
 npm test
 ```
 
-Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 12 tests natifs couvrent notamment les compositions, le filtrage, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 13 tests natifs couvrent notamment les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
 
 Le prototype `collecte_onze_lotois.py` reste disponible comme outil indépendant. Ses sélecteurs ont servi de référence au collecteur Node.js ; Python et `lxml` ne sont pas requis pour l’application.
 

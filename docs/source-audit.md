@@ -43,3 +43,7 @@ Cheerio 1.2.0 a été installé avec un verrou de versions npm. Les quarante cal
 Deux présentations de club ont été vérifiées : sections par équipe pour les clubs multiples et section « Matchs » avec division dans l’en-tête pour les clubs à une équipe. Le cas U.S. Nozacoise expose une incohérence de la source : en-tête D3 mais seules des cartes féminines ; aucune participation n’est retenue. Les forfaits ne sont pas assimilés à une participation jouée.
 
 La reprise immédiate n’a nécessité aucune requête réseau : 258 lectures ont été satisfaites par le cache local. Les feuilles non publiées restent explicitement absentes ; aucune exhaustivité au-delà des informations accessibles sur cette source n’est affirmée.
+
+## Règle de rapprochement précisée au sprint 3
+
+L’utilisateur précise qu’aucun joueur ne change de club en cours de saison dans le périmètre observé. Un historique doit donc associer un même nom normalisé à un même club identifié par son URL source. Les homonymes entre clubs et les clubs non identifiés sont exclus, tout en conservant les archives brutes. Les différentes équipes d’un même club restent comparables.
