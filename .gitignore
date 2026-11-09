@@ -1,0 +1,6 @@
+node_modules/
+data/*.sqlite
+data/*.sqlite-*
+coverage/
+__pycache__/
+*.pyc
