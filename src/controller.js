@@ -1,11 +1,15 @@
 import {createView} from "./view.js";
 import {query} from './dom.js';
+import {bindArchives} from './detail.js';
 
 /** @param {HTMLElement} root @param {import("./types.js").SeasonData} data */
 export function startObservatory(root, data) {
   const {clubs, dates, lastPlayed} = data;
   /** @type {import("./types.js").AppState} */
-  const state = {pool:"a",sort:"rank",day:lastPlayed,selected:null,timer:null};
+  const state = {pool:"a",sort:"rank",day:Math.max(0,lastPlayed),selected:null,timer:null};
+  const lifecycle = new AbortController();
+  /** @template {keyof HTMLElementEventMap} K @param {HTMLElement} target @param {K} type @param {(event: HTMLElementEventMap[K]) => void} listener */
+  const on = (target, type, listener) => target.addEventListener(type, listener, {signal: lifecycle.signal});
   /** @param {string} selector */
   const find = (selector) => query(root, selector, HTMLElement);
   const body = find('tbody'), scroll = find('.od-scroll');
@@ -33,7 +37,7 @@ export function startObservatory(root, data) {
     find("[data-play-label]").textContent = "Lecture";
     play.setAttribute('aria-pressed', 'false');
   }
-  play.addEventListener("click", () => {
+  on(play, "click", () => {
     if (state.timer !== null) { stop(); return; }
     if (state.day >= lastPlayed) setDay(0);
     find("[data-play-icon]").textContent = "Ⅱ";
@@ -47,20 +51,20 @@ export function startObservatory(root, data) {
       }
     }, 780);
   });
-  prev.addEventListener("click", () => { stop(); setDay(state.day - 1, true); });
-  next.addEventListener("click", () => { stop(); setDay(state.day + 1, true); });
-  range.addEventListener("input", () => { stop(); setDay(Number(range.value)); });
-  pool.addEventListener("change", () => {
+  on(prev, "click", () => { stop(); setDay(state.day - 1, true); });
+  on(next, "click", () => { stop(); setDay(state.day + 1, true); });
+  on(range, "input", () => { stop(); setDay(Number(range.value)); });
+  on(pool, "change", () => {
     stop();
     if (pool.value !== 'a' && pool.value !== 'b') return;
     state.pool = pool.value;
-    state.day = lastPlayed;
+    state.day = Math.max(0,lastPlayed);
     state.selected = null;
     renderBoard();
     keepDayVisible(state.day);
     find("[data-announcement]").textContent = pool.selectedOptions[0].textContent + ", " + clubs[state.pool].length + " équipes.";
   });
-  sort.addEventListener("change", () => {
+  on(sort, "change", () => {
     stop();
     const positions = new Map(Array.from(body.querySelectorAll("[data-row]"), (row) => [row.getAttribute('data-row'),row.getBoundingClientRect().top]));
     if (!['rank', 'name', 'total'].includes(sort.value)) return;
@@ -79,7 +83,7 @@ export function startObservatory(root, data) {
     renderDetail();
     query(body, '[data-team="' + team + '"][data-day="' + day + '"]', HTMLButtonElement).focus({preventScroll:true});
   }
-  root.addEventListener("click", (event) => {
+  on(root, "click", (event) => {
     const button = event.target instanceof Element ? event.target.closest('button') : null;
     if (!button || button.disabled) return;
     if (button.hasAttribute("data-jump")) {
@@ -96,12 +100,16 @@ export function startObservatory(root, data) {
     }
     if (button.hasAttribute("data-close")) closeDetail();
   });
-  root.addEventListener("keydown", (event) => {
+  on(root, "keydown", (event) => {
     if (event.key === "Escape" && state.selected) closeDetail();
   });
-  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); }, {signal: lifecycle.signal});
+  bindArchives(root, lifecycle.signal);
 
-  new ResizeObserver(() => root.style.setProperty("--od-view", scroll.clientWidth + "px")).observe(scroll);
+  const resize = new ResizeObserver(() => root.style.setProperty("--od-view", scroll.clientWidth + "px"));
+  resize.observe(scroll);
   renderBoard();
-  requestAnimationFrame(() => keepDayVisible(state.day));
+  play.disabled = lastPlayed < 1;
+  const frame = requestAnimationFrame(() => keepDayVisible(state.day));
+  return () => { stop(); lifecycle.abort(); resize.disconnect(); cancelAnimationFrame(frame); };
 }

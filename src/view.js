@@ -1,5 +1,6 @@
 import {createSeason} from './season.js';
 import {query, escapeHTML} from './dom.js';
+import {liveDetail} from './detail.js';
 
 /** @param {HTMLElement} root @param {import("./types.js").SeasonData} data @param {import("./types.js").AppState} state */
 export function createView(root, data, state) {
@@ -16,7 +17,14 @@ export function createView(root, data, state) {
   /** @param {number} day */
   const dayLabel = (day) => "J" + String(day + 1).padStart(2, "0");
   /** @param {number} day @param {Intl.DateTimeFormat} format */
-  const formatDate = (day, format) => format.format(new Date(dates[day]));
+  const formatDate = (day, format) => dates[day] ? format.format(new Date(dates[day] ?? '')) : 'Date à confirmer';
+  root.style.setProperty('--od-rounds', String(dates.length));
+  range.max = String(dates.length - 1);
+  find('.od-ticks').replaceChildren(...[0, Math.floor((dates.length - 1) / 2), dates.length - 1].map(day => {
+    const tick = document.createElement('span');
+    tick.textContent = dayLabel(day);
+    return tick;
+  }));
   track.replaceChildren(...dates.map(() => document.createElement("span")));
   function renderBoard() {
     const teams = clubs[state.pool];
@@ -59,7 +67,8 @@ export function createView(root, data, state) {
       const team = Number(button.dataset.team);
       const [name,,counts] = clubs[state.pool][team];
       const count = counts[day];
-      const future = day > lastPlayed;
+      const match = data.matches?.[`${state.pool}:${team}:${day}`];
+      const future = data.mode === 'live' ? !match || match.statusLabel !== 'Terminé' : day > lastPlayed;
       const hidden = !future && day > state.day;
       const missing = count === null && !hidden;
       const empty = future || hidden;
@@ -69,7 +78,9 @@ export function createView(root, data, state) {
       button.removeAttribute("data-tone");
       if (!empty && count !== null && count !== undefined) button.dataset.tone = String(Math.min(count,5));
       button.textContent = future ? "—" : hidden ? "·" : missing ? "?" : String(count);
-      const description = future ? "Match à venir" : hidden ? "Après le curseur" : missing ? "Feuille manquante" : count + " joueur" + (count === 1 ? "" : "s");
+      const description = future ? (match?.statusLabel ?? 'Rencontre non indexée') : hidden ? 'Après le curseur' : missing
+        ? match?.sheetState === 'partial' ? 'Composition partielle' : 'Feuille manquante ou non archivée'
+        : count + (data.mode === 'live' ? ' repérage(s) à confirmer' : ' joueur(s)');
       button.setAttribute("aria-label", name + ", journée " + (day + 1) + ", " + description);
     });
   }
@@ -83,6 +94,17 @@ export function createView(root, data, state) {
     });
     if (!state.selected) return;
     const {day,team} = state.selected;
+    if (data.mode === 'live') {
+      const match = data.matches?.[`${state.pool}:${team}:${day}`];
+      if (!match) return;
+      const row = document.createElement('tr');
+      row.className = 'od-detail-row';
+      row.innerHTML = `<td colspan="${dates.length + 1}"><section class="od-detail" aria-labelledby="od-match-title">${liveDetail(match)}</section></td>`;
+      query(body, `[data-row="${team}"]`, HTMLTableRowElement).after(row);
+      find('[data-announcement]').textContent = `${match.home}, ${match.away}. Composition ${match.sheetState === 'published' ? 'publiée' : 'incomplète'}.`;
+      if (returnFocus) query(row, '[data-close]', HTMLButtonElement).focus({preventScroll: true});
+      return;
+    }
     const {count,score,home,away,players,featured,realSheet} = season.matchAt(day,team,state.pool);
     const name = clubs[state.pool][team][0];
     const list = players.map(([player,status,history]) => {
