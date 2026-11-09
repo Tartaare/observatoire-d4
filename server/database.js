@@ -2,6 +2,7 @@ import {DatabaseSync} from 'node:sqlite';
 import {mkdirSync} from 'node:fs';
 import {dirname} from 'node:path';
 import {demo} from './demo.js';
+import {migrateCollection} from './collection-store.js';
 
 /** @param {string} filename */
 export function openDatabase(filename) {
@@ -35,6 +36,7 @@ export function openDatabase(filename) {
         PRIMARY KEY (team_id, day)
       ) STRICT;
     `);
+    migrateCollection(db);
     if (!db.prepare('SELECT id FROM season WHERE id = 1').get()) seedDatabase(db);
     return db;
   } catch (error) {
