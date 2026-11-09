@@ -7,8 +7,25 @@ import {tmpdir} from 'node:os';
 import {demo} from '../server/demo.js';
 import {openDatabase, readSeason} from '../server/database.js';
 import {createApp} from '../server/index.js';
-import {buildSchedule, createSeason, validateSeason} from '../src/season.js';
+import {buildSchedule, createSeason, matchResult, validateSeason} from '../src/season.js';
 import {escapeHTML} from '../src/dom.js';
+
+test('les résultats suivent le côté de l’équipe, sans inventer de score pour les forfaits', () => {
+  const match = {home: 'Équipe A', away: 'Équipe B', score: '2–1', statusLabel: 'Terminé'};
+  assert.deepEqual(matchResult(match, 'Équipe A'), {code: 'V', label: 'Victoire'});
+  assert.deepEqual(matchResult(match, 'Équipe B'), {code: 'D', label: 'Défaite'});
+  for (const score of ['0–0', '12 - 12', '1—1']) {
+    assert.equal(matchResult({...match, score}, 'Équipe B')?.code, 'N');
+  }
+  assert.equal(matchResult({...match, score: '—'}, 'Équipe A'), null);
+  assert.equal(matchResult({...match, statusLabel: 'Reporté'}, 'Équipe A'), null);
+  assert.equal(matchResult(match, 'Autre équipe'), null);
+  const forfeit = {...match, score: '—', statusLabel: 'Forfait Équipe B'};
+  assert.deepEqual(matchResult(forfeit, 'Équipe B'), {code: 'F', label: 'Forfait'});
+  assert.deepEqual(matchResult(forfeit, 'Équipe A'), {code: 'V', label: 'Victoire par forfait'});
+  assert.equal(matchResult({...forfeit, statusLabel: 'Forfait inconnu'}, 'Équipe A'), null);
+  assert.equal(matchResult({...forfeit, statusLabel: 'Forfait Équipe A'}, 'Équipe A')?.code, 'F');
+});
 
 test('le calendrier comporte chaque aller et retour une seule fois', () => {
   for (const pool of ['a', 'b']) {

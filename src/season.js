@@ -1,3 +1,27 @@
+/**
+ * @param {{home: string, away: string, score: string, statusLabel?: string}} match
+ * @param {string} team
+ * @returns {{code: 'V' | 'N' | 'D' | 'F', label: string} | null}
+ */
+export function matchResult(match, team) {
+  const normalize = (/** @type {string} */ name) => name.normalize('NFKC').toLocaleLowerCase('fr').replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+  const name = normalize(team);
+  const home = name === normalize(match.home);
+  if (!home && name !== normalize(match.away)) return null;
+  const forfeiting = match.statusLabel?.match(/^Forfait\s+(.+)$/i)?.[1];
+  if (forfeiting) {
+    const loser = normalize(forfeiting);
+    if (![normalize(match.home), normalize(match.away)].includes(loser)) return null;
+    return loser === name ? {code: 'F', label: 'Forfait'} : {code: 'V', label: 'Victoire par forfait'};
+  }
+  if (match.statusLabel && match.statusLabel !== 'Terminé') return null;
+  const score = match.score.match(/^(\d+)\s*[–—-]\s*(\d+)$/);
+  if (!score) return null;
+  const difference = (Number(score[1]) - Number(score[2])) * (home ? 1 : -1);
+  return difference === 0 ? {code: 'N', label: 'Match nul'} : difference > 0
+    ? {code: 'V', label: 'Victoire'} : {code: 'D', label: 'Défaite'};
+}
+
 /** @param {import("./types.js").Club[]} teams @param {boolean} pinExample @param {number} lastPlayed @returns {[number, number][][]} */
 export function buildSchedule(teams, pinExample, lastPlayed) {
   let rotation = teams.map((_, index) => index);
