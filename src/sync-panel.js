@@ -9,24 +9,16 @@ export function setupSync(root, onUpdated) {
   const progress = query(root, '[data-sync-progress]', HTMLProgressElement);
   const errors = query(root, '[data-sync-errors]', HTMLDetailsElement);
   const errorList = query(root, '[data-sync-error-list]', HTMLUListElement);
-  const panel = query(root, '[data-sync-panel]', HTMLDetailsElement);
-  const summary = query(root, '[data-sync-summary]', HTMLElement);
   const dateFormat = new Intl.DateTimeFormat('fr-FR', {dateStyle: 'short', timeStyle: 'short'});
   let wasRunning = false;
-  let hadErrors = false;
-  let connectionFailed = false;
   /** @type {ReturnType<typeof setTimeout> | null} */
   let timer = null;
 
   /** @param {import('../server/collection-types.js').SyncStatus & {coverage: import('./types.js').Coverage}} state */
   function render(state) {
-    connectionFailed = false;
     button.disabled = state.running;
     force.disabled = state.running;
     button.textContent = state.running ? 'Mise à jour en cours…' : 'Mettre à jour';
-    summary.textContent = state.running ? 'En cours…' : state.errors.length ? 'Erreurs de collecte' : 'Suivi';
-    if ((state.running && !wasRunning) || (state.errors.length > 0 && !hadErrors)) panel.open = true;
-    hadErrors = state.errors.length > 0;
     progress.hidden = !state.running;
     progress.max = Math.max(1, state.total);
     if (state.total) progress.value = state.done; else progress.removeAttribute('value');
@@ -56,9 +48,6 @@ export function setupSync(root, onUpdated) {
       wasRunning = state.running;
       timer = setTimeout(refresh, state.running ? 2000 : 30000);
     } catch {
-      if (!connectionFailed) panel.open = true;
-      connectionFailed = true;
-      summary.textContent = 'Serveur indisponible';
       message.textContent = 'Le serveur local est indisponible. Relancez-le pour accéder aux archives et à la synchronisation.';
       button.disabled = false;
       force.disabled = false;
@@ -72,8 +61,6 @@ export function setupSync(root, onUpdated) {
     if (timer !== null) clearTimeout(timer);
     button.disabled = true;
     force.disabled = true;
-    panel.open = true;
-    summary.textContent = 'Démarrage…';
     message.textContent = 'Démarrage de la mise à jour…';
     try {
       const response = await fetch(`/api/sync${force.checked ? '?force=1' : ''}`, {
@@ -85,7 +72,6 @@ export function setupSync(root, onUpdated) {
       wasRunning = state.running;
       timer = setTimeout(refresh, 1000);
     } catch {
-      summary.textContent = 'Échec de la mise à jour';
       message.textContent = 'Impossible de démarrer la mise à jour. Les données affichées sont conservées.';
       button.disabled = false;
       force.disabled = false;

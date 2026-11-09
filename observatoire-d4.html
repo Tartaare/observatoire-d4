@@ -18,15 +18,6 @@
     <div class="od-sync-actions" role="group" aria-label="Synchronisation des archives">
       <label class="od-refresh-option cursor-interaction"><input type="checkbox" data-sync-force> Revérifier toutes les feuilles</label>
       <button class="od-play cursor-interaction" type="button" data-sync>Mettre à jour</button>
-      <details class="od-sync" data-sync-panel>
-        <summary class="cursor-interaction" data-sync-summary>Suivi<span class="od-sr"> de la synchronisation</span></summary>
-        <div class="od-sync-content">
-          <p data-sync-message role="status" aria-live="polite">Lecture de l’état des archives…</p>
-          <progress data-sync-progress aria-label="Avancement de la synchronisation" hidden></progress>
-          <p class="od-sync-coverage" data-sync-coverage></p>
-          <details class="od-sync-errors" data-sync-errors hidden><summary class="cursor-interaction">Voir les erreurs de collecte</summary><ul data-sync-error-list></ul></details>
-        </div>
-      </details>
     </div>
   </header>
   <main class="od-main" aria-busy="true">
@@ -67,10 +58,18 @@
         <div class="od-ticks" aria-hidden="true"><span>J01</span><span>J07</span><span>J14</span></div>
       </div>
     </section>
-    <footer class="od-footer"><details><summary class="cursor-interaction">Méthode et limites</summary><p data-method-note>Un nom est repéré s’il apparaît dans une participation attestée en D4 et dans une feuille antérieure de championnat supérieur du même club, pendant la même saison. Noms abrégés : identités à confirmer. Les totaux portent sur les feuilles archivées.</p></details></footer>
     </div>
     <span class="od-sr" data-announcement aria-live="polite"></span>
   </main>
+  <footer class="od-footer" aria-label="État des archives et méthode">
+    <div class="od-sync-info">
+      <p data-sync-message role="status" aria-live="polite">Lecture de l’état des archives…</p>
+      <progress data-sync-progress aria-label="Avancement de la synchronisation" hidden></progress>
+      <p class="od-sync-coverage" data-sync-coverage></p>
+      <details class="od-sync-errors" data-sync-errors hidden><summary class="cursor-interaction">Voir les erreurs de collecte</summary><ul data-sync-error-list></ul></details>
+    </div>
+    <details class="od-method"><summary class="cursor-interaction">Méthode et limites</summary><p data-method-note>Un nom est repéré s’il apparaît dans une participation attestée en D4 et dans une feuille antérieure de championnat supérieur du même club, pendant la même saison. Noms abrégés : identités à confirmer. Les totaux portent sur les feuilles archivées.</p></details>
+  </footer>
 </div>
 
 </body>
