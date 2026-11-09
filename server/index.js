@@ -3,19 +3,24 @@ import {readFile} from 'node:fs/promises';
 import {fileURLToPath, pathToFileURL} from 'node:url';
 import {resolve, join} from 'node:path';
 import {openDatabase, readSeason} from './database.js';
+import {readLiveSeason} from './live-season.js';
+import {createSynchronizer} from './synchronize.js';
+import {readArchive} from './collection-store.js';
+import {sourceURL} from './source.js';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const assets = new Map([
   ['/', ['observatoire-d4.html', 'text/html']],
   ['/observatoire-d4.html', ['observatoire-d4.html', 'text/html']],
   ['/assets/css/observatoire.css', ['assets/css/observatoire.css', 'text/css']],
-  ...['app', 'controller', 'view', 'season', 'dom', 'types'].map(name =>
+  ...['app', 'controller', 'view', 'season', 'dom', 'types', 'detail', 'sync-panel'].map(name =>
     [`/src/${name}.js`, [`src/${name}.js`, 'text/javascript']]),
 ]);
 
-/** @param {{databasePath?: string}} [options] */
-export function createApp({databasePath = join(root, 'data', 'observatoire.sqlite')} = {}) {
+/** @param {{databasePath?: string, syncOptions?: Parameters<typeof createSynchronizer>[1]}} [options] */
+export function createApp({databasePath = join(root, 'data', 'observatoire.sqlite'), syncOptions} = {}) {
   const db = openDatabase(databasePath);
+  const sync = createSynchronizer(db, syncOptions);
   const server = createServer(async (request, response) => {
     response.setHeader('X-Content-Type-Options', 'nosniff');
     response.setHeader('Referrer-Policy', 'no-referrer');
@@ -26,16 +31,57 @@ export function createApp({databasePath = join(root, 'data', 'observatoire.sqlit
       response.writeHead(status, {'Content-Type': 'application/json; charset=utf-8'});
       response.end(JSON.stringify({error: message}));
     };
-    // Ce serveur personnel écoute uniquement en boucle locale et ne propose aucune écriture HTTP.
+    const host = request.headers.host;
+    const address = server.address();
+    if (!address || typeof address === 'string' || ![`127.0.0.1:${address.port}`, `localhost:${address.port}`].includes(host ?? '')) {
+      fail(403, 'Hôte local attendu.');
+      return;
+    }
+    let url;
+    try { url = new URL(request.url ?? '/', 'http://localhost'); }
+    catch { fail(400, 'URL locale invalide.'); return; }
+    if (url.pathname === '/api/sync' && request.method === 'POST') {
+      if (request.headers['x-observatoire-sync'] !== '1' || request.headers.origin && request.headers.origin !== `http://${host}`) {
+        fail(403, 'Synchronisation autorisée uniquement depuis cette application locale.');
+        return;
+      }
+      if (Number(request.headers['content-length'] ?? 0) !== 0 || request.headers['transfer-encoding']) {
+        fail(400, 'La synchronisation ne reçoit aucune donnée à importer.');
+        return;
+      }
+      let started;
+      try { started = sync.start(url.searchParams.get('force') === '1'); }
+      catch { fail(503, 'Stockage temporairement indisponible. Réessayez.'); return; }
+      response.writeHead(started ? 202 : 409, {'Content-Type': 'application/json; charset=utf-8'});
+      response.end(JSON.stringify(sync.status()));
+      return;
+    }
     if (!['GET', 'HEAD'].includes(request.method ?? '')) {
       response.setHeader('Allow', 'GET, HEAD');
       fail(405, 'Méthode non autorisée.');
       return;
     }
     try {
-      const pathname = new URL(request.url ?? '/', 'http://localhost').pathname;
+      const pathname = url.pathname;
+      if (pathname === '/api/sync') {
+        response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+        response.end(request.method === 'HEAD' ? undefined : JSON.stringify(sync.status()));
+        return;
+      }
+      if (pathname === '/api/sheet') {
+        let matchURL;
+        try {
+          matchURL = sourceURL(url.searchParams.get('url') ?? '');
+          if (!new URL(matchURL).pathname.startsWith('/matchs/')) throw new Error('Lien de match attendu.');
+        } catch { fail(400, 'URL de feuille invalide.'); return; }
+        const archive = readArchive(db, matchURL);
+        if (!archive) { fail(404, 'Feuille non archivée.'); return; }
+        response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
+        response.end(request.method === 'HEAD' ? undefined : JSON.stringify(archive));
+        return;
+      }
       if (pathname === '/api/season') {
-        const payload = JSON.stringify(readSeason(db));
+        const payload = JSON.stringify(readLiveSeason(db, sync.status().seasonStart) ?? readSeason(db));
         response.writeHead(200, {'Content-Type': 'application/json; charset=utf-8'});
         response.end(request.method === 'HEAD' ? undefined : payload);
         return;
@@ -51,7 +97,7 @@ export function createApp({databasePath = join(root, 'data', 'observatoire.sqlit
       fail(500, 'Impossible de lire les données de l’application.');
     }
   });
-  server.on('close', () => db.close());
+  server.on('close', () => { void sync.close().finally(() => db.close()); });
   return server;
 }
 
