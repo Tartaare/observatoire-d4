@@ -6,7 +6,7 @@
  * @typedef {[name: string, status: string, history: HistoryEntry[]]} Player
  * @typedef {{name: string, status: 'starter' | 'entered' | 'unverified', shirt: number | null,
  *   entry: string | null, exit: string | null, history: {date: string, division: string,
- *   team: string, sourceURL: string, sameClub: boolean}[]}} RosterPlayer
+ *   team: string, sourceURL: string}[]}} RosterPlayer
  * @typedef {{count: number | null, score: string, home: string, away: string, players: Player[],
  *   featured: boolean, realSheet: boolean, sourceURL: string, matchDate: string | null,
  *   statusLabel: string, sheetState: 'published' | 'partial' | 'missing' | 'uncollected',

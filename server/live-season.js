@@ -21,8 +21,8 @@ export function readLiveSeason(db, seasonStart) {
     const key = `${player.match_url}:${player.side}`;
     if (!rosterMap.has(key)) rosterMap.set(key, []);
     rosterMap.get(key).push(player);
-    if (player.division !== 'D4' && player.status !== 'unverified' && player.date) {
-      const name = String(player.name_key);
+    if (player.division !== 'D4' && player.status !== 'unverified' && player.date && player.club_url) {
+      const name = `${player.club_url}\0${player.name_key}`;
       if (!historyMap.has(name)) historyMap.set(name, []);
       historyMap.get(name).push(player);
     }
@@ -49,15 +49,15 @@ export function readLiveSeason(db, seasonStart) {
       const sheet = sheetMap.get(`${fixture.url}:${side}`);
       const players = rosterMap.get(`${fixture.url}:${side}`) ?? [];
       const roster = players.map(player => {
-        const history = (historyMap.get(String(player.name_key)) ?? []).filter(previous =>
+        const historyKey = sheet?.club_url ? `${sheet.club_url}\0${player.name_key}` : null;
+        const history = (historyKey ? historyMap.get(historyKey) ?? [] : []).filter(previous =>
           fixture.date && String(previous.date) < String(fixture.date) && previous.url !== fixture.url);
         const unique = [...new Map(history.map(item => [String(item.url), item])).values()];
         return {name: String(player.name), status: /** @type {import('../src/types.js').RosterPlayer['status']} */ (player.status),
           shirt: player.shirt === null ? null : Number(player.shirt), entry: player.entry ? String(player.entry) : null,
           exit: player.exit ? String(player.exit) : null,
           history: unique.map(previous => ({date: String(previous.date), division: String(previous.division),
-            team: String(sheetMap.get(`${previous.url}:${previous.side}`)?.name ?? ''), sourceURL: String(previous.url),
-            sameClub: Boolean(previous.club_url && previous.club_url === sheet?.club_url)}))};
+            team: String(sheetMap.get(`${previous.url}:${previous.side}`)?.name ?? ''), sourceURL: String(previous.url)}))};
       });
       const candidates = new Set(roster.filter(player => player.status !== 'unverified' && player.history.length).map(player => normalizeName(player.name)));
       const count = sheet?.state === 'published' && fixture.status === 'Terminé' ? candidates.size : null;

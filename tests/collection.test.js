@@ -135,12 +135,42 @@ test('la synchronisation déduplique, reprend depuis le cache et reste lisible s
   } finally { await sync.close(); db.close(); unlinkSync(filename); rmdirSync(directory); }
 });
 
+test('les rapprochements exigent le même club identifié sur les deux feuilles', () => {
+  const db = openDatabase(':memory:');
+  try {
+    putMeta(db, 'standings:2026', [{pool: 'a', rank: 1, name: 'Équipe A', clubURL: `${ORIGIN}/club/test/`},
+      {pool: 'b', rank: 1, name: 'Équipe B', clubURL: `${ORIGIN}/club/test/`}]);
+    const d4 = parseMatch(matchHTML(), d4URL, 2026);
+    const upper = parseMatch(matchHTML('D1', '02/09/2026'), upperURL, 2026);
+    saveMatch(db, 2026, d4);
+    saveMatch(db, 2026, upper);
+    const matching = validateSeason(readLiveSeason(db, 2026)).matches['a:0:0'];
+    assert.equal(matching.count, 12);
+    assert.ok(matching.roster[0].history.length > 0);
+    for (const clubURL of [`${ORIGIN}/club/autre-club/`, null]) {
+      const other = structuredClone(upper);
+      other.sheets.forEach(sheet => { sheet.clubURL = clubURL; });
+      saveMatch(db, 2026, other);
+      const excluded = readLiveSeason(db, 2026).matches['a:0:0'];
+      assert.equal(excluded.count, 0);
+      assert.ok(excluded.roster.every(player => player.history.length === 0));
+      assert.equal(readArchive(db, upperURL).sheets[0].players.length, 13);
+    }
+    saveMatch(db, 2026, upper);
+    d4.sheets.forEach(sheet => { sheet.clubURL = null; });
+    saveMatch(db, 2026, d4);
+    const unknown = readLiveSeason(db, 2026).matches['a:0:0'];
+    assert.equal(unknown.count, 0);
+    assert.ok(unknown.roster.every(player => player.history.length === 0));
+  } finally { db.close(); }
+});
+
 test('le rendu des archives échappe les noms et donne accès aux compositions locales', () => {
   const html = liveDetail({count: 1, score: '2–1', home: '<img src=x onerror=alert(1)>', away: 'Équipe B',
     players: [], featured: false, realSheet: false, sourceURL: d4URL, matchDate: '2026-09-10',
     statusLabel: 'Terminé', sheetState: 'published', retained: false,
     roster: [{name: '<script>bad()</script>', status: 'starter', shirt: 1, entry: null, exit: null,
-      history: [{date: '2026-09-02', division: 'D1', team: 'Équipe supérieure', sourceURL: upperURL, sameClub: false}]}]});
+      history: [{date: '2026-09-02', division: 'D1', team: 'Équipe supérieure', sourceURL: upperURL}]}]});
   const dom = load(html);
   assert.equal(dom('script,img').length, 0);
   assert.ok(dom('h3').text().includes('<img'));

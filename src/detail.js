@@ -13,7 +13,7 @@ export function liveDetail(match) {
       : `${match.count} repérage${match.count === 1 ? '' : 's'} à confirmer parmi les participations attestées.`;
   const roster = match.roster.map(player => {
     const history = player.history.map(item => `<li>${escape(dateLabel(item.date))} · <b>${escape(item.division)}</b> · ${escape(item.team)}
-      <span class="od-evidence">${item.sameClub ? 'Même club' : 'Autre club · homonymie possible'}</span>
+      <span class="od-evidence">Même club</span>
       <details data-archive-url="${escape(item.sourceURL)}"><summary class="cursor-interaction">Composition archivée</summary><div data-archive-content></div></details>
       <a href="${escape(item.sourceURL)}" target="_blank" rel="noopener noreferrer">Source en ligne ↗</a></li>`).join('');
     const movement = [player.entry ? `Entrée ${player.entry}′` : '', player.exit ? `Sortie ${player.exit}′` : ''].filter(Boolean).join(' · ');

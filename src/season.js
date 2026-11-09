@@ -118,7 +118,7 @@ function validateLiveMatches(data) {
       if (!validText(player.name) || !['starter', 'entered', 'unverified'].includes(player.status) || !Array.isArray(player.history)) return invalid();
       for (const history of player.history) {
         if (!validDate(history.date) || !['L1', 'L2', 'N1', 'N2', 'N3', 'R1', 'R2', 'R3', 'D1', 'D2', 'D3'].includes(history.division) ||
-          !validText(history.team) || !validURL(history.sourceURL) || typeof history.sameClub !== 'boolean' ||
+          !validText(history.team) || !validURL(history.sourceURL) ||
           !match.matchDate || history.date >= match.matchDate) return invalid();
       }
     }
