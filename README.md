@@ -50,7 +50,9 @@ jsconfig.json               Vérification stricte du JavaScript dans un IDE comp
 
 Les modules de collecte sont `server/source.js` (analyse HTML), `source-reader.js` (HTTP/cache), `collection-store.js` (archives SQLite), `synchronize.js` (orchestration) et `live-season.js` (projection de la saison réelle). L’interface utilise aussi `src/sync-panel.js` pour la synchronisation et `src/detail.js` pour les compositions archivées.
 
-Parcours : le navigateur charge `GET /api/season`, valide la réponse et initialise la matrice. Les filtres et le curseur fonctionnent en mémoire ; les détails historiques sont lus dans les archives locales. Le contrôleur est nettoyé avant de charger une nouvelle version des données.
+Parcours : le navigateur charge `GET /api/season`, valide la réponse et initialise la matrice. La poule, le tri, la journée et le match ouvert sont mémorisés dans le stockage local du navigateur par `src/navigation.js`, séparément pour chaque saison et pour la démonstration. Ils sont restaurés après rechargement et après mise à jour des données ; la lecture automatique reste en pause. Le match est retrouvé par nom d’équipe, puis vérifié dans les données courantes. Les détails historiques sont lus dans les archives locales. Le contrôleur est nettoyé avant de charger une nouvelle version des données.
+
+Ces préférences sont propres au navigateur et à l’adresse utilisée (hôte et port compris). Si le stockage local est bloqué, plein ou corrompu, la consultation reste disponible ; seules les préférences valides sont restaurées. Les sections dépliées dans les compositions ne sont pas mémorisées.
 
 Le design, les thèmes clair/sombre, les tris, les deux poules, la lecture automatique et le parcours clavier de la page initiale sont conservés. La lecture s’arrête aussi lorsque l’onglet devient invisible.
 
@@ -101,7 +103,7 @@ npm run build
 npm test
 ```
 
-Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 14 tests natifs couvrent notamment les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 15 tests natifs couvrent notamment la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
 
 Le prototype `collecte_onze_lotois.py` reste disponible comme outil indépendant. Ses sélecteurs ont servi de référence au collecteur Node.js ; Python et `lxml` ne sont pas requis pour l’application.
 

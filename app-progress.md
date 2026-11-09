@@ -1,5 +1,17 @@
 # Avancement
 
+## Sprint 5 — Persistance du contexte de consultation
+
+Branche : `feature/sprint-5-persist-navigation`.
+
+Statut : **terminé le 9 novembre 2026**, sans fusion dans `main`.
+
+US-014 : conserver la poule, le tri, le curseur de journée et le match ouvert après rechargement ou actualisation des données. Sauvegarde immédiate dans `localStorage`, clé versionnée distincte par saison et pour la démonstration. Restauration des contrôles avant le premier rendu ; aucune reprise automatique de la lecture. Aucun changement visuel et aucune nouvelle dépendance.
+
+Vérifications : build réussi (23 modules), 15 tests réussis avec `node --preserve-symlinks --preserve-symlinks-main --test`. `npm.cmd test` rencontre la restriction de résolution des chemins du sandbox Windows ; le contournement documenté passe. Contrôle HTTP du nouveau module inclus. Revue du diff sans erreur d’espacement. Parcours visuel dans le navigateur et contrôle TypeScript non exécutés.
+
+Prévention des régressions : retrouver l’équipe sélectionnée par son nom plutôt que par sa position ; écarter les équipes supprimées, rencontres futures ou reportées et sélections après le curseur. Borner la journée au calendrier courant. Ne jamais persister le minuteur. Les erreurs de lecture/écriture du stockage ne doivent pas bloquer l’application. La conservation concerne le contexte principal, pas les sections dépliées des compositions ni la position exacte du défilement.
+
 ## Sprint 4 — Résultats dans la matrice
 
 Branche : `feature/sprint-4-match-results`.
