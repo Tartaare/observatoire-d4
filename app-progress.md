@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 8 — Répartition des hauteurs et footer sur une ligne
+
+Branche : `feature/sprint-8-layout-gaps`.
+
+Statut : **terminé le 10 novembre 2026**, sans fusion dans `main`.
+
+US-017 : corriger l’espace signalé au-dessus du tableau et maintenir le bilan du footer sur une seule ligne. La hauteur globale `100%` du tableau est supprimée pour éviter sa redistribution native entre les groupes de lignes. Un conteneur CSS de taille connue et les unités `cqh` attribuent directement la hauteur restante aux lignes des équipes, après les 40 px de l’en-tête. Le nombre d’équipes est actualisé à chaque rendu de poule ; les minima tactiles et les compositions longues restent pris en compte.
+
+Le footer aligne état, date, couverture et progression. Les libellés sont raccourcis sans retrait de compteur ; une infobulle précise les unités. Le bilan dispose d’un défilement horizontal sur écran étroit, d’un accès clavier et d’un focus visible. Les détails ouverts restent autorisés à se déployer verticalement.
+
+Vérifications : build réussi (24 modules), 17 tests réussis avec `node --preserve-symlinks --preserve-symlinks-main --test`, contrôles du format compact adaptés. Diff vérifié sans erreur d’espacement. L’accès au navigateur reste indisponible : l’élimination visuelle de l’espace signalé n’a pas pu être mesurée dans un moteur de rendu.
+
+Prévention des régressions : ne pas réintroduire une hauteur globale de tableau pour remplir la fenêtre ; répartir l’espace directement entre les équipes et conserver un en-tête borné. Désactiver la contenance de taille quand les détails du footer rendent à la page sa hauteur naturelle. Ne pas remplacer l’absence de retour à la ligne par une troncature des compteurs.
+
 ## Sprint 7 — Hauteur adaptative et bilan permanent
 
 Branche : `feature/sprint-7-responsive-footer`.

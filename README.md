@@ -58,6 +58,8 @@ Le design, les thèmes clair/sombre, les tris, les deux poules, la lecture autom
 
 La vue principale utilise la hauteur disponible : saison et filtres au-dessus de la matrice, commandes de lecture et curseur en dessous, puis bilan des archives dans le footer. Sur les fenêtres d’au moins 900 × 700 px, la matrice s’étend verticalement et ses lignes grandissent pour éviter l’espace inutilisé en bas de page. Les longues compositions défilent dans la matrice avec noms d’équipes et en-tête fixes. Les petites fenêtres gardent un défilement naturel et les cibles tactiles restent accessibles. La largeur maximale est de 1800 px. La méthode et ses limites se consultent à la demande dans le footer ; leur ouverture rend à la page sa hauteur naturelle.
 
+La hauteur supplémentaire est attribuée directement aux lignes des équipes, avec un en-tête de 40 px, plutôt qu’à la hauteur globale du tableau. Le bilan du footer reste sur une seule ligne avec libellés abrégés ; si la largeur manque, il défile horizontalement (zone accessible au clavier). Les compteurs sont tous conservés et leur signification est précisée au survol. La méthode et les erreurs peuvent être dépliées à la demande.
+
 Chaque case visible porte un repère discret si le résultat est connu : **V** (victoire), **N** (nul), **D** (défaite), **F** (forfait de cette équipe). Le résultat complet est disponible au survol et dans le libellé accessible. L’adversaire d’une équipe forfait est indiqué « Victoire par forfait » ; ces rencontres restent sans participation jouée comptabilisée. Les repères suivent le curseur de journée, y compris lorsque le résultat est connu mais la composition manque.
 
 ## Consultation hors ligne et mise à jour
