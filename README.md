@@ -54,6 +54,8 @@ Parcours : le navigateur charge `GET /api/season`, valide la réponse et initial
 
 Le design, les thèmes clair/sombre, les tris, les deux poules, la lecture automatique et le parcours clavier de la page initiale sont conservés. La lecture s’arrête aussi lorsque l’onglet devient invisible.
 
+Chaque case visible porte un repère discret si le résultat est connu : **V** (victoire), **N** (nul), **D** (défaite), **F** (forfait de cette équipe). Le résultat complet est disponible au survol et dans le libellé accessible. L’adversaire d’une équipe forfait est indiqué « Victoire par forfait » ; ces rencontres restent sans participation jouée comptabilisée. Les repères suivent le curseur de journée, y compris lorsque le résultat est connu mais la composition manque.
+
 ## Consultation hors ligne et mise à jour
 
 Après une première synchronisation, conserver le dossier du projet, `node_modules` et `data/observatoire.sqlite`. Lancer `npm start` permet de consulter les données **sans connexion Internet**. Le serveur local doit rester lancé ; aucun service distant n’est nécessaire pour charger l’interface, la saison ou les compositions archivées.
@@ -99,7 +101,7 @@ npm run build
 npm test
 ```
 
-Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 13 tests natifs couvrent notamment les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 14 tests natifs couvrent notamment les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
 
 Le prototype `collecte_onze_lotois.py` reste disponible comme outil indépendant. Ses sélecteurs ont servi de référence au collecteur Node.js ; Python et `lxml` ne sont pas requis pour l’application.
 

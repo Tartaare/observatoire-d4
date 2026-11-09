@@ -1,5 +1,17 @@
 # Avancement
 
+## Sprint 4 — Résultats dans la matrice
+
+Branche : `feature/sprint-4-match-results`.
+
+Statut : **terminé le 9 novembre 2026**, sans fusion dans `main`.
+
+US-013 : repère discret V/N/D/F en bas à droite des cases, légende, infobulle et résultat explicite dans le libellé accessible. Le résultat est calculé du point de vue de chaque équipe, depuis le score archivé ou le calendrier simulé. Le forfait nomme l’équipe concernée : F pour celle-ci, V avec la précision « Victoire par forfait » pour son adversaire. Aucun score ni compteur de participation n’est créé pour un forfait ; son détail explique l’absence de participation jouée.
+
+Vérifications : build réussi et 14 tests réussis avec `node --preserve-symlinks --preserve-symlinks-main --test` (contournement de la résolution des chemins dans le sandbox Windows). Le nouveau test couvre les deux côtés, les nuls, les séparateurs de score, les forfaits et les résultats inconnus. Revue du diff sans erreur d’espacement. Rendu visuel dans un navigateur non vérifié.
+
+Prévention des régressions : ne pas assimiler les forfaits à des matchs futurs ni à des feuilles manquantes ; conserver le masquage des résultats après le curseur et distinguer résultat connu et composition inconnue. Un forfait dont l’équipe ne peut pas être identifiée ne produit aucun résultat déduit.
+
 ## Sprint 3 — Rapprochements limités au même club
 
 Branche : `feature/sprint-3-same-club-matching`.
