@@ -26,8 +26,6 @@ async function loadSeason() {
       return;
     }
     dispose?.();
-    query(root, '[data-pool]', HTMLSelectElement).value = 'a';
-    query(root, '[data-sort]', HTMLSelectElement).value = 'rank';
     content.hidden = false;
     dispose = startObservatory(root, data);
     query(root, '[data-mode-label]', HTMLElement).textContent = data.mode === 'live' ? 'Archives locales' : 'Démonstration';

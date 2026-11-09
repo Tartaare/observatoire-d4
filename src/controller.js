@@ -1,12 +1,14 @@
 import {createView} from "./view.js";
 import {query} from './dom.js';
 import {bindArchives} from './detail.js';
+import {restoreNavigation, saveNavigation} from './navigation.js';
 
 /** @param {HTMLElement} root @param {import("./types.js").SeasonData} data */
 export function startObservatory(root, data) {
   const {clubs, dates, lastPlayed} = data;
   /** @type {import("./types.js").AppState} */
-  const state = {pool:"a",sort:"rank",day:Math.max(0,lastPlayed),selected:null,timer:null};
+  const state = restoreNavigation(data);
+  const persist = () => saveNavigation(data, state);
   const lifecycle = new AbortController();
   /** @template {keyof HTMLElementEventMap} K @param {HTMLElement} target @param {K} type @param {(event: HTMLElementEventMap[K]) => void} listener */
   const on = (target, type, listener) => target.addEventListener(type, listener, {signal: lifecycle.signal});
@@ -17,6 +19,8 @@ export function startObservatory(root, data) {
   const play = query(root, '[data-play]', HTMLButtonElement);
   const prev = query(root, '[data-prev]', HTMLButtonElement), next = query(root, '[data-next]', HTMLButtonElement);
   const pool = query(root, '[data-pool]', HTMLSelectElement), sort = query(root, '[data-sort]', HTMLSelectElement);
+  pool.value = state.pool;
+  sort.value = state.sort;
   const {renderBoard, updateDay, renderDetail, keepDayVisible} = createView(root, data, state);
   /** @param {number} day @param {boolean} announce */
   function setDay(day, announce = false) {
@@ -27,6 +31,7 @@ export function startObservatory(root, data) {
     }
     updateDay();
     keepDayVisible(state.day);
+    persist();
     if (announce) find("[data-announcement]").textContent = range.getAttribute("aria-valuetext");
   }
 
@@ -60,6 +65,7 @@ export function startObservatory(root, data) {
     state.pool = pool.value;
     state.day = Math.max(0,lastPlayed);
     state.selected = null;
+    persist();
     renderBoard();
     keepDayVisible(state.day);
     find("[data-announcement]").textContent = pool.selectedOptions[0].textContent + ", " + clubs[state.pool].length + " équipes.";
@@ -69,6 +75,7 @@ export function startObservatory(root, data) {
     const positions = new Map(Array.from(body.querySelectorAll("[data-row]"), (row) => [row.getAttribute('data-row'),row.getBoundingClientRect().top]));
     if (!['rank', 'name', 'total'].includes(sort.value)) return;
     state.sort = /** @type {import('./types.js').SortMode} */ (sort.value);
+    persist();
     renderBoard();
     if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     body.querySelectorAll("[data-row]").forEach((row) => {
@@ -80,6 +87,7 @@ export function startObservatory(root, data) {
     if (!state.selected) return;
     const {team,day} = state.selected;
     state.selected = null;
+    persist();
     renderDetail();
     query(body, '[data-team="' + team + '"][data-day="' + day + '"]', HTMLButtonElement).focus({preventScroll:true});
   }
@@ -96,6 +104,7 @@ export function startObservatory(root, data) {
       const team = Number(button.dataset.team);
       if (state.selected?.day === day && state.selected?.team === team) { closeDetail(); return; }
       state.selected = {day,team};
+      persist();
       renderDetail(event.detail === 0);
     }
     if (button.hasAttribute("data-close")) closeDetail();
