@@ -28,13 +28,10 @@ async function loadSeason() {
     dispose?.();
     content.hidden = false;
     dispose = startObservatory(root, data);
-    query(root, '[data-mode-label]', HTMLElement).textContent = data.mode === 'live' ? 'Archives locales' : 'Démonstration';
+    query(root, '[data-demo-label]', HTMLElement).hidden = data.mode === 'live';
     if (data.mode === 'live') {
       query(root, '[data-season-label]', HTMLElement).textContent = `SAISON ${data.seasonStart}–${Number(data.seasonStart) + 1}`;
-      query(root, '[data-intro-description]', HTMLElement).textContent = 'Seniors masculins · repérages en division supérieure au sein du même club, à confirmer.';
       query(root, '[data-legend-label]', HTMLElement).textContent = 'Repérages connus';
-    } else {
-      query(root, '[data-intro-description]', HTMLElement).textContent = 'Données de démonstration. Lancez une mise à jour pour afficher les feuilles réelles.';
     }
     status.hidden = true;
   } catch (error) {
