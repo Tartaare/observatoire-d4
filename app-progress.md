@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 7 — Hauteur adaptative et bilan permanent
+
+Branche : `feature/sprint-7-responsive-footer`.
+
+Statut : **terminé le 10 novembre 2026**, sans fusion dans `main`.
+
+US-016 : exploiter l’espace vertical de la fenêtre et déplacer les informations d’acquisition dans le footer. Sur les fenêtres d’au moins 900 × 700 px, la matrice prend la hauteur restante et les lignes s’étirent ; sa zone défile si nécessaire. Les en-têtes et noms restent fixes. La largeur maximale passe à 1800 px. Les petites fenêtres conservent une hauteur naturelle ; les cibles tactiles de 44 px occupent des lignes de 48 px pour éviter leur chevauchement.
+
+Le footer est désormais un enfant direct de l’application, indépendant du chargement de saison : état, dernière mise à jour complète, couverture détaillée, progression et erreurs. Le volet « Suivi » et sa logique d’ouverture sont supprimés. La couverture précédente reste affichée en cas d’échec réseau. Méthode et erreurs se déplient dans le footer, avec retour à une hauteur naturelle de page. Aucun ajout de dépendance ni modification des données archivées.
+
+Vérifications : build réussi (24 modules) et 17 tests réussis avec `node --preserve-symlinks --preserve-symlinks-main --test`. Les contrôles adaptés vérifient le footer hors du contenu masqué, la date et les compteurs de couverture, la progression, le rechargement de saison en fin de collecte, les erreurs, la revérification et la conservation des chiffres pendant une panne. Diff vérifié sans erreur d’espacement. Vérification visuelle aux différentes tailles non réalisée : accès au navigateur et aux applications indisponible après deux tentatives ; absence de défilement et étirement des lignes non mesurés dans un moteur de rendu.
+
+Prévention des régressions : ne pas placer le bilan dans `[data-content]` ou dans un volet fermé ; supprimer les sélecteurs du volet retiré. Les hauteurs de fenêtre utilisent `dvh` et le même token de marge que la page. Les minima tactiles doivent aussi être portés par les cellules du tableau lorsque les boutons remplissent leur surface. L’ouverture d’une composition conserve la hauteur naturelle de ses lignes et un accès par défilement, sans étirer artificiellement le détail.
+
 ## Sprint 6 — Vue principale compacte
 
 Branche : `feature/sprint-6-compact-layout`.
