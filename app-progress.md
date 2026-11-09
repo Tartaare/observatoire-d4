@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 6 — Vue principale compacte
+
+Branche : `feature/sprint-6-compact-layout`.
+
+Statut : **terminé le 9 novembre 2026**, sans fusion dans `main`.
+
+US-015 : déplacer « Mettre à jour » et la case de revérification dans l’en-tête ; retirer le libellé d’archives et la carte de synchronisation ; déplacer la lecture sous le tableau ; retirer les textes introductifs répétitifs. Le suivi devient un volet natif contextuel, replié au repos. La méthode reste accessible à la demande et le mode démonstration reste signalé. La modification HTML préexistante (libellé « DISTRICT 4 DU LOT » et retrait du titre visible) est préservée ; un titre principal masqué visuellement assure la hiérarchie accessible.
+
+La matrice et les espacements sont compactés ; transport, journée et frise partagent une ligne lorsque la largeur le permet. Un mode plus dense s’applique aux fenêtres d’ordinateur de faible hauteur. Les cibles tactiles, les légendes et le défilement des compositions longues restent disponibles. Aucun masquage du débordement vertical ne force artificiellement le contenu à tenir dans la fenêtre.
+
+Vérifications : build réussi (24 modules), 17 tests réussis avec `node --preserve-symlinks --preserve-symlinks-main --test`. Les deux nouveaux contrôles couvrent la structure HTML et les transitions du suivi, y compris l’échec du démarrage, l’option de revérification et le respect de la fermeture manuelle pendant une panne persistante. Revue du diff sans erreur d’espacement. Le serveur existant répond en HTTP 200 avec dix équipes et dix-huit journées. Vérification visuelle et mesure de l’absence de défilement impossibles : accès natif et navigateur indisponible après deux tentatives. Contrôle TypeScript non exécuté.
+
+Prévention des régressions : adapter les sélecteurs du chargement lors du retrait des textes ; maintenir les actions de synchronisation hors du contenu masqué pendant les erreurs de chargement ; rendre progression et erreurs visibles automatiquement sans rouvrir continuellement un volet fermé. Ne pas couper le volet de suivi aux limites du conteneur, y compris quand la saison est indisponible. Conserver le défilement sur mobile, avec zoom ou détail long.
+
 ## Sprint 5 — Persistance du contexte de consultation
 
 Branche : `feature/sprint-5-persist-navigation`.

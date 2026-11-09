@@ -56,13 +56,15 @@ Ces préférences sont propres au navigateur et à l’adresse utilisée (hôte 
 
 Le design, les thèmes clair/sombre, les tris, les deux poules, la lecture automatique et le parcours clavier de la page initiale sont conservés. La lecture s’arrête aussi lorsque l’onglet devient invisible.
 
+La vue principale est compacte : saison et filtres au-dessus de la matrice, commandes de lecture et curseur en dessous. Les textes introductifs répétitifs et la carte d’archives ont été retirés. La méthode et ses limites se consultent dans un volet repliable en pied de page. Une densité supplémentaire s’applique aux fenêtres d’ordinateur de faible hauteur ; les petits écrans et les compositions longues gardent un défilement naturel, sans contenu tronqué.
+
 Chaque case visible porte un repère discret si le résultat est connu : **V** (victoire), **N** (nul), **D** (défaite), **F** (forfait de cette équipe). Le résultat complet est disponible au survol et dans le libellé accessible. L’adversaire d’une équipe forfait est indiqué « Victoire par forfait » ; ces rencontres restent sans participation jouée comptabilisée. Les repères suivent le curseur de journée, y compris lorsque le résultat est connu mais la composition manque.
 
 ## Consultation hors ligne et mise à jour
 
 Après une première synchronisation, conserver le dossier du projet, `node_modules` et `data/observatoire.sqlite`. Lancer `npm start` permet de consulter les données **sans connexion Internet**. Le serveur local doit rester lancé ; aucun service distant n’est nécessaire pour charger l’interface, la saison ou les compositions archivées.
 
-Avec une connexion, cliquer sur **Mettre à jour**. L’interface indique la progression, la couverture du calendrier, les compositions complètes/partielles/absentes et les erreurs. Le bouton **Revérifier toutes les feuilles** contourne la durée de fraîcheur du cache ; les validateurs HTTP restent utilisés si la source en fournit.
+Avec une connexion, cliquer sur **Mettre à jour** dans l’en-tête. La case **Revérifier toutes les feuilles**, au même endroit, contourne la durée de fraîcheur du cache ; les validateurs HTTP restent utilisés si la source en fournit. Le volet **Suivi**, replié au repos, indique la progression, la couverture du calendrier, les compositions complètes/partielles/absentes et les erreurs. Il s’ouvre au lancement ou à la première erreur ; sa fermeture manuelle est respectée pendant les sondages suivants.
 
 La même opération est disponible dans le terminal :
 
@@ -103,7 +105,7 @@ npm run build
 npm test
 ```
 
-Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 15 tests natifs couvrent notamment la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 17 tests natifs couvrent notamment le placement des actions et de la lecture, les transitions du suivi de synchronisation, la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
 
 Le prototype `collecte_onze_lotois.py` reste disponible comme outil indépendant. Ses sélecteurs ont servi de référence au collecteur Node.js ; Python et `lxml` ne sont pas requis pour l’application.
 
