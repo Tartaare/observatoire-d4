@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="referrer" content="no-referrer">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; base-uri 'none'; form-action 'none'">
+<title>Observatoire D4</title>
+<style>
+  :root {color-scheme: light dark; background: light-dark(#fff,#181818)}
+  body {margin: 0 auto; max-width: 1240px; padding: clamp(8px,2.3vw,24px)}
+  .cursor-interaction:not(:disabled) {cursor: pointer}
+</style>
+</head>
+<body>
+<div id="observatoire-d4">
+  <header class="od-top">
+    <div class="od-brand"><span class="od-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span> Observatoire <b>D4</b></div>
+    <span class="od-demo"><span></span> Démonstration</span>
+  </header>
+  <main class="od-main">
+    <div class="od-intro">
+      <div>
+        <div class="od-eyebrow">DISTRICT DU LOT <span>/</span> SAISON 2026–2027</div>
+        <h1>Rejouer la saison</h1>
+        <p>Les joueurs de D4 déjà vus en division supérieure.</p>
+      </div>
+      <div class="od-selects">
+        <label>Poule<select data-pool><option value="a">Poule A</option><option value="b">Poule B</option></select></label>
+        <label>Trier les équipes<select data-sort><option value="rank">Classement</option><option value="name">Nom (A–Z)</option><option value="total">Apparitions cumulées</option></select></label>
+      </div>
+    </div>
+    <section class="od-replay" aria-label="Lecture de la saison">
+      <div class="od-replay-top">
+        <div class="od-transport">
+          <button type="button" class="od-play cursor-interaction" data-play><span data-play-icon aria-hidden="true">▶</span><span data-play-label>Lecture</span></button>
+          <button type="button" class="od-arrow cursor-interaction" data-prev aria-label="Journée précédente">‹</button>
+          <button type="button" class="od-arrow cursor-interaction" data-next aria-label="Journée suivante">›</button>
+        </div>
+        <div class="od-current"><span data-round-label></span><span class="od-dot">·</span><span data-round-date></span></div>
+      </div>
+      <div class="od-track" data-track></div>
+      <input class="od-range cursor-interaction" type="range" min="0" max="13" step="1" aria-label="Journée affichée">
+      <div class="od-ticks" aria-hidden="true"><span>J01</span><span>J07</span><span>J14</span></div>
+    </section>
+    <section class="od-board" aria-labelledby="od-matrix-title">
+      <div class="od-board-head">
+        <div class="od-board-title"><h2 id="od-matrix-title">Équipes par journée</h2><span data-team-count></span></div>
+        <div class="od-legend" aria-label="Nombre de joueurs, de 0 à 5 et plus"><span>Joueurs</span><span class="od-scale"><b data-tone="0">0</b><b data-tone="1">1</b><b data-tone="2">2</b><b data-tone="3">3</b><b data-tone="4">4</b><b data-tone="5">5+</b></span></div>
+      </div>
+      <div class="od-scroll"><table><thead></thead><tbody></tbody></table></div>
+      <div class="od-board-foot"><span><b class="od-missing">?</b> Feuille manquante</span><span><b>—</b> À venir</span><span><b>·</b> Après le curseur</span></div>
+    </section>
+    <footer class="od-footer">Un joueur est compté une fois par feuille D4 s’il figurait déjà sur une feuille de championnat supérieur dans la saison. <span>Données de démonstration.</span></footer>
+    <span class="od-sr" data-announcement aria-live="polite"></span>
+  </main>
+</div>
+<style>
+#observatoire-d4 {
+  color-scheme: light dark;
+  --paper: light-dark(#f5f6f1,#161a17); --surface: light-dark(#fff,#1d221e);
+  --ink: light-dark(#17261f,#e9f0e9); --sub: light-dark(#56655d,#aebcb2);
+  --line: light-dark(#e1e6df,#343e36); --quiet: light-dark(#eff2ed,#282f29);
+  --forest: light-dark(#1b4e3b,#b9dfc9); --on-forest: light-dark(#fff,#172d21);
+  --selected: light-dark(#eaf2ec,#2b3a30); --track: light-dark(#d4ded5,#394940);
+  --high: light-dark(#34745a,#78af91);
+  --tone0: light-dark(#f1f3ef,#2a302b); --tone1: light-dark(#e4f0e8,#283c31);
+  --tone2: light-dark(#cce5d5,#304d3e); --tone3: light-dark(#a6d2b8,#416751);
+  --tone4: light-dark(#448466,#8cbea1); --tone5: light-dark(#205b43,#b7dcc4);
+  --tone4-ink: light-dark(#fff,#172d21); --tone5-ink: light-dark(#fff,#142b1e);
+  background:var(--paper);color:var(--ink);border:1px solid var(--line);border-radius:14px;
+  overflow:hidden;font:14px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+#observatoire-d4 *{box-sizing:border-box}
+#observatoire-d4 button,#observatoire-d4 input,#observatoire-d4 select{font:inherit;color:inherit;margin:0}
+#observatoire-d4 :is(button,input,select,summary,a):focus-visible{outline:2px solid var(--high);outline-offset:2px}
+#observatoire-d4 .od-top{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface);border-bottom:1px solid var(--line);padding:12px 26px}
+#observatoire-d4 .od-brand{display:flex;align-items:center;gap:6px;font-weight:650;letter-spacing:-.025em;white-space:nowrap}
+#observatoire-d4 .od-brand b{color:var(--forest);font-weight:750}
+#observatoire-d4 .od-mark{width:27px;height:27px;display:grid;place-items:center;margin-right:3px;background:var(--forest);color:var(--on-forest);border-radius:7px}
+#observatoire-d4 .od-mark svg{width:15px;height:15px}
+#observatoire-d4 .od-demo{display:flex;align-items:center;gap:7px;color:var(--sub);font-size:11px}
+#observatoire-d4 .od-demo span{width:6px;height:6px;border-radius:50%;background:var(--high)}
+#observatoire-d4 .od-main{padding:22px 26px 16px}
+#observatoire-d4 .od-intro{display:flex;align-items:end;justify-content:space-between;gap:14px 22px;flex-wrap:wrap;margin-bottom:17px}
+#observatoire-d4 :is(.od-eyebrow,.od-ticks){font:600 11px/1.3 ui-monospace,monospace;letter-spacing:.045em;color:var(--sub)}
+#observatoire-d4 .od-eyebrow span{padding:0 3px;color:var(--high)}
+#observatoire-d4 h1{font-size:clamp(27px,4.5vw,40px);font-weight:680;line-height:1.08;letter-spacing:-.055em;margin:5px 0 4px;color:var(--ink)}
+#observatoire-d4 p{margin:0;color:var(--sub);font-size:13px}
+#observatoire-d4 .od-selects{display:flex;gap:9px;max-width:100%}
+#observatoire-d4 .od-selects label{display:grid;gap:4px;font-size:11px;font-weight:600;color:var(--sub);min-width:0}
+#observatoire-d4 select{min-height:35px;padding:0 8px;border:1px solid var(--line);border-radius:7px;background:var(--surface);color:var(--ink);font-size:12px;max-width:100%}
+#observatoire-d4 :is(.od-replay,.od-board){background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+#observatoire-d4 .od-replay{padding:11px 14px 9px;margin-bottom:13px;position:relative}
+#observatoire-d4 :is(.od-replay-top,.od-board-head){display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#observatoire-d4 :is(.od-transport,.od-current,.od-board-title,.od-legend,.od-scale){display:flex;align-items:center}
+#observatoire-d4 .od-transport{gap:5px}
+#observatoire-d4 :is(.od-play,.od-arrow){height:33px;border-radius:7px;display:inline-flex;align-items:center;justify-content:center;gap:8px;transition:background .16s,transform .16s}
+#observatoire-d4 .od-play{padding:0 11px;border:1px solid transparent;background:var(--forest);color:var(--on-forest);font-weight:650;font-size:12px;min-width:84px}
+#observatoire-d4 .od-play [data-play-icon]{font-size:11px}
+#observatoire-d4 .od-arrow{width:32px;border:1px solid var(--line);background:var(--surface);font-size:20px;line-height:1}
+#observatoire-d4 .od-arrow:hover:not(:disabled){background:var(--quiet)}
+#observatoire-d4 .od-arrow:disabled{opacity:.4}
+#observatoire-d4 button:active:not(:disabled){transform:translateY(1px)}
+#observatoire-d4 .od-current{gap:7px;font-size:12px;font-variant-numeric:tabular-nums;color:var(--sub)}
+#observatoire-d4 [data-round-label]{color:var(--forest);font-weight:700}
+#observatoire-d4 .od-dot{color:var(--high)}
+#observatoire-d4 .od-track{display:grid;grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;margin-top:12px;position:relative;pointer-events:none}
+#observatoire-d4 .od-track span{height:5px;border-radius:3px;background:var(--quiet);transition:background-color .24s}
+#observatoire-d4 .od-track .od-past{background:var(--track)}
+#observatoire-d4 .od-track .od-reached{background:var(--high)}
+#observatoire-d4 .od-track .od-now{background:var(--forest)}
+#observatoire-d4 .od-range{position:absolute;left:14px;width:calc(100% - 28px);height:24px;bottom:18px;opacity:0;z-index:1}
+#observatoire-d4 .od-replay:has(.od-range:focus-visible) .od-track{outline:2px solid var(--high);outline-offset:4px}
+#observatoire-d4 .od-ticks{display:flex;justify-content:space-between;margin-top:6px}
+#observatoire-d4 .od-board-head{padding:10px 14px}
+#observatoire-d4 .od-board-title{gap:8px}
+#observatoire-d4 h2{font-size:15px;font-weight:700;letter-spacing:-.02em;margin:0;color:var(--ink)}
+#observatoire-d4 :is([data-team-count],.od-legend){font-size:11px;color:var(--sub)}
+#observatoire-d4 .od-legend{gap:7px}
+#observatoire-d4 .od-scale{gap:2px;font-variant-numeric:tabular-nums}
+#observatoire-d4 .od-scale b{width:22px;height:19px;display:grid;place-items:center;border-radius:3px;font-weight:650}
+#observatoire-d4 [data-tone]{background:var(--tone0);color:var(--sub)}
+#observatoire-d4 [data-tone="1"]{background:var(--tone1);color:var(--ink)}
+#observatoire-d4 [data-tone="2"]{background:var(--tone2);color:var(--ink)}
+#observatoire-d4 [data-tone="3"]{background:var(--tone3);color:var(--ink)}
+#observatoire-d4 [data-tone="4"]{background:var(--tone4);color:var(--tone4-ink)}
+#observatoire-d4 [data-tone="5"]{background:var(--tone5);color:var(--tone5-ink)}
+#observatoire-d4 .od-scroll{overflow-x:auto;scrollbar-color:var(--track) var(--surface);scrollbar-width:thin}
+#observatoire-d4 table{width:100%;border-collapse:separate;border-spacing:0;text-align:left;font-variant-numeric:tabular-nums}
+#observatoire-d4 thead th{border-block:1px solid var(--line);background:var(--paper)}
+#observatoire-d4 .od-team{position:sticky;left:0;z-index:2;min-width:193px;width:193px;background:var(--surface);border-right:1px solid var(--line);padding:0 11px}
+#observatoire-d4 thead .od-team{background:var(--paper);color:var(--sub);font-size:11px;font-weight:650}
+#observatoire-d4 .od-day{min-width:59px;text-align:center;padding:0 3px}
+#observatoire-d4 .od-day button{width:100%;min-height:42px;display:grid;align-content:center;justify-items:center;gap:1px;border:0;background:transparent;border-radius:5px;font-size:12px;font-weight:700}
+#observatoire-d4 .od-day button span{font-size:10px;color:var(--sub);font-weight:500;white-space:nowrap}
+#observatoire-d4 .od-day.od-active button{background:var(--selected);color:var(--forest)}
+#observatoire-d4 .od-club{display:flex;align-items:center;gap:7px;font-weight:630;font-size:12px;white-space:nowrap}
+#observatoire-d4 .od-rank{min-width:15px;font:11px ui-monospace,monospace;color:var(--sub)}
+#observatoire-d4 .od-monogram{width:21px;height:21px;display:grid;place-items:center;border-radius:5px;background:var(--quiet);color:var(--forest);font:600 10px ui-monospace,monospace}
+#observatoire-d4 tbody td{height:39px;padding:3px;border-bottom:1px solid var(--line)}
+#observatoire-d4 tbody th{border-bottom:1px solid var(--line)}
+#observatoire-d4 .od-cell{width:100%;min-height:30px;display:grid;place-items:center;border:0;border-radius:5px;font-size:13px;font-weight:680;transition:background-color .22s,box-shadow .15s}
+#observatoire-d4 .od-cell:hover:not(:disabled){box-shadow:inset 0 0 0 1px var(--high)}
+#observatoire-d4 td.od-active{background:var(--selected)}
+#observatoire-d4 .od-cell.od-picked{box-shadow:inset 0 0 0 2px var(--ink)}
+#observatoire-d4 .od-empty{background:transparent;color:var(--sub)}
+#observatoire-d4 .od-cell.od-missing,#observatoire-d4 .od-board-foot .od-missing{background:repeating-linear-gradient(135deg,var(--quiet) 0 4px,var(--surface) 4px 7px);color:var(--sub)}
+#observatoire-d4 .od-board-foot{display:flex;gap:6px 15px;flex-wrap:wrap;padding:8px 14px;font-size:11px;color:var(--sub)}
+#observatoire-d4 .od-board-foot span{display:flex;align-items:center;gap:5px}
+#observatoire-d4 .od-board-foot b{display:grid;place-items:center;width:17px;height:17px;border-radius:4px;color:var(--ink)}
+#observatoire-d4 .od-detail-row td{padding:0;background:var(--paper)}
+#observatoire-d4 .od-detail{position:sticky;left:0;width:var(--od-view, 100%);padding:14px 16px;border-top:2px solid var(--high);animation:od-in .18s ease-out}
+#observatoire-d4 .od-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+#observatoire-d4 .od-match-kicker{font:600 11px ui-monospace,monospace;color:var(--forest);margin-bottom:4px}
+#observatoire-d4 h3{font-size:16px;line-height:1.3;letter-spacing:-.025em;margin:0 0 4px;color:var(--ink)}
+#observatoire-d4 .od-detail-list{margin-top:9px}
+#observatoire-d4 .od-detail-list details{border-top:1px solid var(--line);padding:5px 0}
+#observatoire-d4 .od-detail-list summary{min-height:26px;line-height:26px;font-size:12px;color:var(--ink)}
+#observatoire-d4 .od-detail-list summary strong{font-weight:680;margin-right:8px}
+#observatoire-d4 .od-division{display:inline-block;background:var(--selected);color:var(--forest);font-size:11px;border-radius:4px;margin:0 4px 0 0;padding:0 5px;line-height:18px;font-weight:650}
+#observatoire-d4 .od-detail-list ul{margin:2px 0 6px;padding-left:19px;color:var(--sub);font-size:12px}
+#observatoire-d4 .od-detail a{display:inline-block;margin-top:8px;color:var(--forest);font-size:12px;text-underline-offset:3px}
+#observatoire-d4 .od-footer{font-size:11px;color:var(--sub);margin-top:10px}
+#observatoire-d4 .od-footer span{white-space:nowrap}
+#observatoire-d4 .od-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+@keyframes od-in{from{opacity:.55;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:560px){
+  #observatoire-d4 .od-top{padding:10px 12px}
+  #observatoire-d4 .od-main{padding:15px 10px 12px}
+  #observatoire-d4 .od-intro{margin-bottom:13px}
+  #observatoire-d4 .od-team{min-width:135px;width:135px;padding:0 6px}
+  #observatoire-d4 .od-club{gap:5px;white-space:normal;font-size:11px;line-height:1.2}
+  #observatoire-d4 .od-monogram{display:none}
+  #observatoire-d4 .od-board-head{padding:8px}
+}
+@media(pointer:coarse){
+  #observatoire-d4 :is(.od-arrow,.od-play,select,.od-cell,.od-day button,summary){min-height:44px}
+  #observatoire-d4 .od-arrow{min-width:44px}
+}
+@media(prefers-reduced-motion:reduce){
+  #observatoire-d4 *,#observatoire-d4 *::before,#observatoire-d4 *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+}
+</style>
+<script>
+
+(() => {
+  const root = document.getElementById("observatoire-d4");
+  if (!root || root.dataset.ready) return;
+  root.dataset.ready = "true";
+  const find = (selector) => root.querySelector(selector);
+  const table = find("table");
+  const track = find("[data-track]");
+  const head = find("thead");
+  const body = find("tbody");
+  const scroll = find(".od-scroll");
+  const range = find(".od-range");
+  const play = find("[data-play]");
+  const prev = find("[data-prev]");
+  const next = find("[data-next]");
+  const pool = find("[data-pool]");
+  const sort = find("[data-sort]");
+  const lastPlayed = 5;
+  const dates = ["2026-09-06","2026-09-20","2026-10-04","2026-10-18","2026-11-01","2026-11-07","2026-11-22","2026-12-06","2027-01-24","2027-02-07","2027-03-07","2027-03-21","2027-04-11","2027-05-02"];
+  const longDate = new Intl.DateTimeFormat("fr-FR", {day:"numeric",month:"long",timeZone:"UTC"});
+  const shortDate = new Intl.DateTimeFormat("fr-FR", {day:"numeric",month:"short",timeZone:"UTC"});
+  const dayLabel = (day) => "J" + String(day + 1).padStart(2, "0");
+  const clubs = {
+    a: [
+      ["Élan Marivalois 4","EM",[0,2,1,3,2,5]],["Haut Célé FC 3","HC",[2,1,0,0,3,2]],
+      ["US Béduer-Faycelles","BF",[0,0,1,0,0,0]],["Entente Ségala 3","ES",[3,0,2,4,1,0]],
+      ["FC Cuzance","CZ",[0,null,0,1,0,1]],["FC Bouriane 3","BO",[1,0,0,2,0,2]],
+      ["Causse Limargue 3","CL",[4,2,3,1,2,1]],["US Saint-Germain 2","SG",[0,1,0,null,0,0]]
+    ],
+    b: [
+      ["FC Quercy Sud 3","QS",[1,0,3,3,2,0]],["US Vallée du Lot 2","VL",[0,2,0,0,1,3]],
+      ["AS du Causse 2","AC",[0,1,1,0,0,0]],["Entente des Causses 3","EC",[3,1,0,1,2,2]],
+      ["FC des Vallons","FV",[0,0,0,0,null,0]],["US Basse Vallée 2","BV",[2,2,1,1,2,3]],
+      ["Stade du Quercy 3","SQ",[4,1,0,2,1,1]],["AS des Plateaux","AP",[0,0,null,0,0,0]]
+    ]
+  };
+
+  function buildSchedule(teams, pinExample) {
+    let rotation = teams.map((_, index) => index);
+    const legs = [];
+    for (let round = 0; round < teams.length - 1; round++) {
+      const games = [];
+      for (let position = 0; position < teams.length / 2; position++) {
+        const pair = [rotation[position], rotation[teams.length - 1 - position]];
+        games.push(round % 2 ? pair.reverse() : pair);
+      }
+      legs.push(games);
+      rotation = [rotation[0], rotation.at(-1), ...rotation.slice(1, -1)];
+    }
+    if (pinExample) {
+      const round = legs.findIndex((games) => games.some((pair) => pair.includes(0) && pair.includes(2)));
+      [legs[round], legs[lastPlayed]] = [legs[lastPlayed], legs[round]];
+      const example = legs[lastPlayed].findIndex((pair) => pair.includes(0));
+      legs[lastPlayed][example] = [0, 2];
+    }
+    return [...legs, ...legs.map((games) => games.map(([home, away]) => [away, home]))];
+  }
+  const schedules = {a:buildSchedule(clubs.a, true),b:buildSchedule(clubs.b, false)};
+  const examplePlayers = [
+    ["Benjamin S.","Titulaire",[
+      ["17 oct.","D1","Entente Bouriane · titulaire"],
+      ["3 oct.","D1","Souillac Lachapelle Gignac · titulaire"],
+      ["20 sept.","D3","Entente Ségala Foot 2 · titulaire"],
+      ["5 sept.","R3","US Saint-Sulpice · titulaire"]]],
+    ["Théo P.","Titulaire",[
+      ["24 oct.","D1","Cazals-Montcléra · entré en jeu"],
+      ["17 oct.","D3","Saint-Germain · titulaire"],
+      ["3 oct.","D1","Souillac Lachapelle Gignac · titulaire"],
+      ["19 sept.","D1","Puy-l’Évêque Prayssac · entré en jeu"],
+      ["5 sept.","D1","Causse Limargue · titulaire"]]],
+    ["Ilian C.","Titulaire",[
+      ["24 oct.","D1","Cazals-Montcléra · entré en jeu"],
+      ["17 oct.","D1","Entente Bouriane · titulaire"],
+      ["3 oct.","D1","Souillac Lachapelle Gignac · titulaire"],
+      ["19 sept.","D1","Puy-l’Évêque Prayssac · titulaire"],
+      ["5 sept.","D1","Causse Limargue · titulaire"]]],
+    ["Sacha J.","Titulaire",[
+      ["1 nov.","D3","Entente Bouriane 2 · titulaire"],
+      ["17 oct.","D3","Saint-Germain · entré en jeu"]]],
+    ["Lucas A.","Titulaire",[
+      ["4 oct.","D3","Haut Célé 2 · entré en jeu"]]]
+  ];
+  const exampleURL = "https://epreuves.fff.fr/competition/match/56260272-elan-marivalois-union-sportive-beduer-faycelles/match";
+  const exampleSources = {
+    "17 oct.|D1":"https://leonzelotois.fr/matchs/ent-bouriane-f-c-elan-marivalois-2-2/",
+    "3 oct.|D1":"https://leonzelotois.fr/matchs/elan-marivalois-2-e-s-l-g/",
+    "5 sept.|R3":"https://leonzelotois.fr/matchs/st-sulpice-us-elan-marivalois/",
+    "24 oct.|D1":"https://leonzelotois.fr/matchs/elan-marivalois-2-cazals-montcl/",
+    "17 oct.|D3":"https://leonzelotois.fr/matchs/st-germain-elan-marivalois-3/",
+    "19 sept.|D1":"https://leonzelotois.fr/matchs/puyleveque-prayssac-elan-marivalois-2/",
+    "5 sept.|D1":"https://leonzelotois.fr/matchs/causse-limargue-f-c-elan-marivalois-2/",
+    "1 nov.|D3":"https://leonzelotois.fr/matchs/elan-marivalois-3-ent-bouriane-f-c-2/",
+    "4 oct.|D3":"https://leonzelotois.fr/matchs/elan-marivalois-3-haut-cele-f-c-2-2/"
+  };
+  const mockNames = ["Jules V.","Mathis R.","Noé B.","Éliot D.","Robin F.","Malo L.","Paul T.","Nils P.","Louan M.","Romain V.","Gaël D.","Léo R."];
+  const formatDate = (day, format) => format.format(new Date(dates[day]));
+  const state = {pool:"a",sort:"rank",day:lastPlayed,selected:null,timer:null};
+  track.replaceChildren(...dates.map(() => document.createElement("span")));
+
+  function matchAt(day, team) {
+    const teams = clubs[state.pool];
+    const [home, away] = schedules[state.pool][day].find((pair) => pair.includes(team));
+    const featured = state.pool === "a" && day === lastPlayed && home === 0 && away === 2;
+    const realSheet = featured && team === 0;
+    const count = teams[team][2][day];
+    const score = featured ? "2–2" : ((home + day * 2) % 5) + "–" + ((away + day * 3) % 4);
+    const players = realSheet ? examplePlayers : Array.from({length: count ?? 0}, (_, index) => {
+      const prior = new Date(dates[day]);
+      prior.setUTCDate(prior.getUTCDate() - 7 - index);
+      const level = ["D3","D1","D3","R3"][(team + index) % 4];
+      return [mockNames[(team * 3 + index) % mockNames.length], index % 3 ? "Remplaçant" : "Titulaire", [[shortDate.format(prior),level,"Feuille de championnat · simulation"]]];
+    });
+    return {count,score,home:teams[home][0],away:teams[away][0],players,featured,realSheet};
+  }
+
+  function renderBoard() {
+    const teams = clubs[state.pool];
+    const order = teams.map((_, index) => index);
+    const total = (index) => teams[index][2].reduce((sum, value) => sum + (value ?? 0), 0);
+    if (state.sort === "name") order.sort((a,b) => teams[a][0].localeCompare(teams[b][0],"fr"));
+    if (state.sort === "total") order.sort((a,b) => total(b) - total(a));
+    find("[data-team-count]").textContent = teams.length + " équipes";
+    head.innerHTML = '<tr><th scope="col" class="od-team">Équipe</th>' + dates.map((_, day) =>
+      '<th scope="col" class="od-day" data-column="' + day + '"><button type="button" class="cursor-interaction" data-jump="' + day + '">' + dayLabel(day) + '<span>' + formatDate(day,shortDate) + '</span></button></th>'
+    ).join("") + '</tr>';
+    body.innerHTML = order.map((team) => {
+      const [name, initials] = teams[team];
+      const cells = dates.map((_, day) => '<td data-column="' + day + '"><button type="button" class="od-cell cursor-interaction" data-team="' + team + '" data-day="' + day + '"></button></td>').join("");
+      return '<tr data-row="' + team + '"><th scope="row" class="od-team"><div class="od-club"><span class="od-rank" aria-label="Rang ' + (team + 1) + '">' + (team + 1) + '</span><span class="od-monogram" aria-hidden="true">' + initials + '</span><span>' + name + '</span></div></th>' + cells + '</tr>';
+    }).join("");
+    updateDay();
+    renderDetail();
+  }
+
+  function updateDay() {
+    range.value = state.day;
+    range.setAttribute("aria-valuetext", "Journée " + (state.day + 1) + ", " + formatDate(state.day,longDate));
+    find("[data-round-label]").textContent = "Journée " + (state.day + 1);
+    find("[data-round-date]").textContent = formatDate(state.day,longDate);
+    prev.disabled = state.day === 0;
+    next.disabled = state.day === dates.length - 1;
+    Array.from(track.children).forEach((segment,day) => {
+      segment.className = day === state.day ? "od-now" : day < state.day && day <= lastPlayed ? "od-reached" : day <= lastPlayed ? "od-past" : "";
+    });
+    table.querySelectorAll("[data-column]").forEach((cell) => {
+      const active = Number(cell.dataset.column) === state.day;
+      cell.classList.toggle("od-active", active);
+      if (cell.tagName === "TH") cell.firstElementChild.setAttribute("aria-pressed", String(active));
+    });
+    body.querySelectorAll(".od-cell").forEach((button) => {
+      const day = Number(button.dataset.day);
+      const team = Number(button.dataset.team);
+      const [name,,counts] = clubs[state.pool][team];
+      const count = counts[day];
+      const future = day > lastPlayed;
+      const hidden = !future && day > state.day;
+      const missing = count === null && !hidden;
+      const empty = future || hidden;
+      button.disabled = empty;
+      button.classList.toggle("od-missing", missing);
+      button.classList.toggle("od-empty", empty);
+      button.removeAttribute("data-tone");
+      if (!empty && !missing) button.dataset.tone = Math.min(count,5);
+      button.textContent = future ? "—" : hidden ? "·" : missing ? "?" : count;
+      const description = future ? "Match à venir" : hidden ? "Après le curseur" : missing ? "Feuille manquante" : count + " joueur" + (count === 1 ? "" : "s");
+      button.setAttribute("aria-label", name + ", journée " + (day + 1) + ", " + description);
+    });
+  }
+
+  function renderDetail(returnFocus = false) {
+    body.querySelector(".od-detail-row")?.remove();
+    body.querySelectorAll(".od-cell").forEach((button) => {
+      const picked = state.selected?.day === Number(button.dataset.day) && state.selected?.team === Number(button.dataset.team);
+      button.classList.toggle("od-picked",picked);
+      button.setAttribute("aria-expanded",String(picked));
+    });
+    if (!state.selected) return;
+    const {day,team} = state.selected;
+    const {count,score,home,away,players,featured,realSheet} = matchAt(day,team);
+    const name = clubs[state.pool][team][0];
+    const list = players.map(([player,status,history]) => {
+      const levels = [...new Set(history.map((entry) => entry[1]))].sort((a,b) => ["R3","D1","D2","D3"].indexOf(a) - ["R3","D1","D2","D3"].indexOf(b));
+      return '<details><summary class="cursor-interaction"><strong>' + player + '</strong>' +
+        levels.map((level) => '<span class="od-division">' + level + '</span>').join("") + '</summary><ul>' +
+        '<li>' + formatDate(day,shortDate) + ' · D4 · ' + status + '</li>' +
+        history.map(([date,level,context]) => {
+          const link = realSheet && exampleSources[date + "|" + level];
+          return '<li>' + date + ' · ' + level + ' · ' + context + (link ? ' · <a href="' + link + '" target="_blank" rel="noopener noreferrer">Composition ↗</a>' : "") + '</li>';
+        }).join("") + '</ul></details>';
+    }).join("");
+    const description = count === null ? "Composition indisponible pour cette équipe." :
+      count === 0 ? "Aucun antécédent en division supérieure dans cet exemple." :
+      count + " joueur" + (count === 1 ? "" : "s") + " repéré" + (count === 1 ? "" : "s") + " · " + name;
+    const row = document.createElement("tr");
+    row.className = "od-detail-row";
+    row.innerHTML = '<td colspan="' + (dates.length + 1) + '"><section class="od-detail" aria-labelledby="od-match-title">' +
+      '<div class="od-detail-head"><div><div class="od-match-kicker">' + dayLabel(day) + ' · ' + formatDate(day,longDate) + ' · ' + (realSheet ? "EXEMPLE DOCUMENTÉ" : "SIMULATION") +
+      '</div><h3 id="od-match-title">' + home + ' ' + score + ' ' + away + '</h3><p>' + description +
+      '</p></div><button type="button" class="od-arrow cursor-interaction" data-close aria-label="Fermer le détail">×</button></div>' +
+      (list ? '<div class="od-detail-list">' + list + '</div>' : "") +
+      (featured ? '<a href="' + exampleURL + '" target="_blank" rel="noopener noreferrer">Feuille du match FFF ↗</a>' : "") +
+      '</section></td>';
+    body.querySelector('[data-row="' + team + '"]').after(row);
+    find("[data-announcement]").textContent = name + ". " + description;
+    if (returnFocus) row.querySelector("[data-close]").focus({preventScroll:true});
+  }
+
+  function keepDayVisible(day) {
+    const column = head.querySelector('[data-column="' + day + '"]');
+    const viewport = scroll.getBoundingClientRect();
+    const stickyWidth = head.querySelector(".od-team").offsetWidth;
+    const position = column.getBoundingClientRect();
+    const delta = position.right > viewport.right ? position.right - viewport.right :
+      position.left < viewport.left + stickyWidth ? position.left - viewport.left - stickyWidth : 0;
+    if (delta) scroll.scrollBy({left:delta,behavior:"instant"});
+  }
+
+  function setDay(day, announce = false) {
+    state.day = Math.max(0,Math.min(day,dates.length - 1));
+    if (state.selected && state.selected.day > state.day) {
+      state.selected = null;
+      renderDetail();
+    }
+    updateDay();
+    keepDayVisible(state.day);
+    if (announce) find("[data-announcement]").textContent = range.getAttribute("aria-valuetext");
+  }
+
+  function stop() {
+    clearInterval(state.timer);
+    state.timer = null;
+    find("[data-play-icon]").textContent = "▶";
+    find("[data-play-label]").textContent = "Lecture";
+  }
+  play.addEventListener("click", () => {
+    if (state.timer !== null) { stop(); return; }
+    if (state.day >= lastPlayed) setDay(0);
+    find("[data-play-icon]").textContent = "Ⅱ";
+    find("[data-play-label]").textContent = "Pause";
+    state.timer = setInterval(() => {
+      setDay(state.day + 1);
+      if (state.day >= lastPlayed) {
+        stop();
+        find("[data-announcement]").textContent = "Lecture terminée à la journée " + (lastPlayed + 1);
+      }
+    }, 780);
+  });
+  prev.addEventListener("click", () => { stop(); setDay(state.day - 1, true); });
+  next.addEventListener("click", () => { stop(); setDay(state.day + 1, true); });
+  range.addEventListener("input", () => { stop(); setDay(Number(range.value)); });
+  pool.addEventListener("change", () => {
+    stop();
+    state.pool = pool.value;
+    state.day = lastPlayed;
+    state.selected = null;
+    renderBoard();
+    keepDayVisible(state.day);
+    find("[data-announcement]").textContent = pool.selectedOptions[0].textContent + ", " + clubs[state.pool].length + " équipes.";
+  });
+  sort.addEventListener("change", () => {
+    stop();
+    const positions = new Map(Array.from(body.querySelectorAll("[data-row]"), (row) => [row.dataset.row,row.getBoundingClientRect().top]));
+    state.sort = sort.value;
+    renderBoard();
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    body.querySelectorAll("[data-row]").forEach((row) => {
+      const delta = positions.get(row.dataset.row) - row.getBoundingClientRect().top;
+      if (delta) row.animate([{transform:"translateY(" + delta + "px)"},{transform:"translateY(0)"}], {duration:240,easing:"cubic-bezier(.2,.65,.3,1)"});
+    });
+  });
+  function closeDetail() {
+    const {team,day} = state.selected;
+    state.selected = null;
+    renderDetail();
+    body.querySelector('[data-team="' + team + '"][data-day="' + day + '"]').focus({preventScroll:true});
+  }
+  root.addEventListener("click", (event) => {
+    const button = event.target.closest("button");
+    if (!button || button.disabled) return;
+    if (button.hasAttribute("data-jump")) {
+      stop();
+      setDay(Number(button.dataset.jump),true);
+    }
+    if (button.hasAttribute("data-team")) {
+      stop();
+      const day = Number(button.dataset.day);
+      const team = Number(button.dataset.team);
+      if (state.selected?.day === day && state.selected?.team === team) { closeDetail(); return; }
+      state.selected = {day,team};
+      renderDetail(event.detail === 0);
+    }
+    if (button.hasAttribute("data-close")) closeDetail();
+  });
+  root.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && state.selected) closeDetail();
+  });
+  new ResizeObserver(() => root.style.setProperty("--od-view", scroll.clientWidth + "px")).observe(scroll);
+  renderBoard();
+  requestAnimationFrame(() => keepDayVisible(state.day));
+})();
+</script>
+
+</body>
+</html>
