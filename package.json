@@ -4,10 +4,16 @@
   "private": true,
   "type": "module",
   "description": "Observatoire personnel D4 — HTML, CSS, JavaScript et SQLite",
-  "engines": { "node": ">=22.16.0" },
+  "engines": {
+    "node": ">=22.16.0"
+  },
   "scripts": {
-    "start": "node server/index.js",
+    "start": "node --use-system-ca server/index.js",
+    "sync": "node --use-system-ca scripts/sync.js",
     "test": "node --test",
     "build": "node scripts/check.js"
+  },
+  "dependencies": {
+    "cheerio": "1.2.0"
   }
 }
