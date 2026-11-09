@@ -2,13 +2,14 @@
 
 Projet personnel non commercial pour explorer, par journée de D4, les apparitions de joueurs déjà vus en division supérieure.
 
-L’interface utilise des données de démonstration. Certaines fiches comportent les liens documentaires de la page initiale.
+L’interface affiche les données réelles archivées depuis [Le Onze Lotois](https://leonzelotois.fr/division/d4/). Avant la première synchronisation, la démonstration reste disponible et clairement identifiée.
 
 ## Lancer le projet
 
-Prérequis : **Node.js 22.16 ou supérieur**. Aucune installation npm nécessaire : le serveur, SQLite et les tests utilisent uniquement les modules natifs de Node.js.
+Prérequis : **Node.js 22.16 ou supérieur**. Le serveur et SQLite sont natifs ; Cheerio est l’unique dépendance directe, pour analyser le HTML de la source.
 
 ```powershell
+npm ci --ignore-scripts
 npm start
 ```
 
@@ -47,19 +48,49 @@ tests/observatoire.test.js  Vérifications métier, SQLite et HTTP
 jsconfig.json               Vérification stricte du JavaScript dans un IDE compatible
 ```
 
-Parcours : le navigateur charge `GET /api/season`, valide la réponse et initialise la matrice. Les filtres, le curseur et les détails fonctionnent ensuite en mémoire. Les erreurs de chargement proposent une nouvelle tentative.
+Les modules de collecte sont `server/source.js` (analyse HTML), `source-reader.js` (HTTP/cache), `collection-store.js` (archives SQLite), `synchronize.js` (orchestration) et `live-season.js` (projection de la saison réelle). L’interface utilise aussi `src/sync-panel.js` pour la synchronisation et `src/detail.js` pour les compositions archivées.
+
+Parcours : le navigateur charge `GET /api/season`, valide la réponse et initialise la matrice. Les filtres et le curseur fonctionnent en mémoire ; les détails historiques sont lus dans les archives locales. Le contrôleur est nettoyé avant de charger une nouvelle version des données.
 
 Le design, les thèmes clair/sombre, les tris, les deux poules, la lecture automatique et le parcours clavier de la page initiale sont conservés. La lecture s’arrête aussi lorsque l’onglet devient invisible.
 
+## Consultation hors ligne et mise à jour
+
+Après une première synchronisation, conserver le dossier du projet, `node_modules` et `data/observatoire.sqlite`. Lancer `npm start` permet de consulter les données **sans connexion Internet**. Le serveur local doit rester lancé ; aucun service distant n’est nécessaire pour charger l’interface, la saison ou les compositions archivées.
+
+Avec une connexion, cliquer sur **Mettre à jour**. L’interface indique la progression, la couverture du calendrier, les compositions complètes/partielles/absentes et les erreurs. Le bouton **Revérifier toutes les feuilles** contourne la durée de fraîcheur du cache ; les validateurs HTTP restent utilisés si la source en fournit.
+
+La même opération est disponible dans le terminal :
+
+```powershell
+npm run sync
+npm run sync -- --force
+npm run sync -- --season=2026
+```
+
+La saison courante est déduite de l’année sportive commençant en juillet. `--season=2026` désigne juillet 2026 à juin 2027 ; cette option ne permet pas d’obtenir des archives que le site ne publie plus.
+
+Les calendriers restent frais 15 minutes, les feuilles complètes 24 heures et les feuilles incomplètes 1 heure. Une requête réseau au maximum par seconde, téléchargement limité à 3 Mo et délai de réponse de 20 secondes. Les refus HTTP 403/429 ou une coupure interrompent le parcours ; une nouvelle mise à jour reprend avec les données déjà acquises. Un verrou SQLite empêche deux synchronisations simultanées de la même saison, y compris entre le serveur et la commande terminal.
+
+## Périmètre et fiabilité
+
+La collecte découvre les calendriers des clubs référencés par la source, filtre chaque compétition senior masculine D4 et supérieure, puis déduplique les URL de match. Seules les rencontres terminées donnent lieu à une collecte de participations. Les coupes, jeunes, féminines et forfaits ne constituent pas des participations jouées dans cette analyse.
+
+Tous les joueurs publiés sont conservés. Les titulaires et remplaçants dont une entrée ou sortie est attestée sont distingués des remplaçants sans preuve de participation. Une composition partielle ou manquante produit `?`, jamais un faux zéro.
+
+Un repérage est une correspondance exacte de nom normalisé dans une participation D4 attestée et une participation en championnat supérieur **à une date strictement antérieure**, pendant la même saison. Les rencontres du même jour ne servent pas à établir une antériorité. Les liens et compositions locales permettent de contrôler les correspondances ; même club et autre club sont distingués.
+
+Les noms de la source sont abrégés, sans identifiant individuel exploitable : **un repérage ne certifie pas une identité**. Un zéro signifie aucun repérage dans les feuilles acquises ; des antécédents peuvent manquer si la source est incomplète ou ne couvre pas une compétition. La couverture affichée porte sur cette source, pas sur tous les championnats français.
+
 ## Données SQLite
 
-La base contient `season`, `pools`, `teams` et `appearances`. Équipes et apparitions sont relationnelles ; les dates et les exemples documentaires sont stockés en JSON dans `season`. Les requêtes d’initialisation utilisent des paramètres SQL et une transaction.
+Les tables initiales `season`, `pools`, `teams` et `appearances` conservent la démonstration. Une migration additive ajoute `source_pages`, `collected_fixtures`, `collected_sheets`, `collected_players`, `collection_meta` et `collection_locks`. Les joueurs sont stockés par feuille et ne sont pas fusionnés artificiellement en identités.
 
-L’initialisation ne s’exécute qu’en l’absence de saison. Modifier `server/demo.js` ne remplace donc pas une base existante. Pour sauvegarder les données, arrêter le serveur puis copier `data/observatoire.sqlite`.
+La mise à jour des feuilles utilise des transactions et des paramètres SQL. Une erreur conserve l’archive précédente ; une nouvelle composition moins complète ne remplace pas une archive plus complète et cette conservation est signalée. Les pages HTML sources et leurs validateurs sont également conservés.
 
-L’API est en lecture seule et n’expose pas le fichier SQLite. Cette version conserve le périmètre de la démonstration : deux poules de huit équipes, quatorze journées et un exemple documenté durant la phase aller. Un zéro, une feuille manquante (`null`) et une journée future sont des états distincts.
+Pour sauvegarder les données, arrêter les synchronisations et le serveur puis copier `data/observatoire.sqlite`. La base et les captures d’audit sont ignorées par Git. La page s’adapte au calendrier réel sans créer de rencontres ou scores fictifs.
 
-Aucun import automatique du collecteur ni formulaire de modification des données n’est inclus.
+L’API locale expose `GET /api/season`, `GET /api/sync`, `GET /api/sheet?url=…` et `POST /api/sync` (`?force=1` pour revérifier). Le déclenchement HTTP est réservé à l’application locale ; les fichiers de base et de serveur ne sont pas exposés.
 
 ## Vérifier le projet
 
@@ -68,8 +99,8 @@ npm run build
 npm test
 ```
 
-Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les tests natifs vérifient le calendrier, les fiches, la validation des données, la persistance après réouverture de SQLite et les routes HTTP. Ils utilisent une base temporaire ou en mémoire.
+Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 12 tests natifs couvrent notamment les compositions, le filtrage, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
 
-Le collecteur `collecte_onze_lotois.py` est un outil indépendant. Il utilise Python et `lxml` et n’est pas exécuté par l’application.
+Le prototype `collecte_onze_lotois.py` reste disponible comme outil indépendant. Ses sélecteurs ont servi de référence au collecteur Node.js ; Python et `lxml` ne sont pas requis pour l’application.
 
 Références : [langage visuel](design_language.md), [avancement](app-progress.md).

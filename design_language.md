@@ -10,4 +10,6 @@ Référence initiale : interface de `observatoire-d4.html`, conservée pendant l
 - Accessibilité : libellés explicites, focus visible, annonces de changements, clavier, retour du focus après fermeture et réduction des animations.
 - États : chargement annoncé, erreur avec nouvelle tentative, absence de données, feuille manquante, match futur et journée masquée distincts.
 - Les données fictives restent identifiées comme démonstration. Les liens documentaires existants sont conservés.
-- Ce sprint sépare les responsabilités techniques sans refonte graphique.
+- Le panneau d’archives précède la matrice : bordure végétale, couverture lisible, progression native accessible et erreurs dépliables. La mise à jour reste une action explicite.
+- Les compositions historiques sont consultables dans le détail sans quitter l’application. « Archive locale », « À confirmer » et les statuts de participation exposent les limites des données.
+- Zéro repérage connu, feuille absente/partielle et rencontre non jouée restent visuellement et sémantiquement distincts.

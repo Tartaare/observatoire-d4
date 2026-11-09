@@ -24,7 +24,7 @@ L’interface actuelle génère un calendrier fictif de huit équipes, quatorze 
 
 Le collecteur ne doit pas transformer une absence de feuille ou une composition partielle en zéro joueur. Tous les noms publiés doivent être conservés ; une participation non attestée doit rester distincte d’une participation confirmée.
 
-## Architecture proposée, soumise à validation
+## Architecture validée et implémentée
 
 1. Lire le classement D4 pour établir le périmètre et les poules, puis les calendriers des clubs pour découvrir les rencontres seniors masculines de la saison.
 2. Dédupliquer les rencontres par URL source avant téléchargement. Ne télécharger les feuilles que pour les rencontres terminées.
@@ -34,4 +34,12 @@ Le collecteur ne doit pas transformer une absence de feuille ou une composition 
 6. Fournir une commande de synchronisation dans l’interface et afficher la dernière mise à jour. L’application reste consultable sans Internet via son serveur local et sa base SQLite.
 7. Présenter les rapprochements de noms abrégés comme des repérages à confirmer, avec leurs sources, sans fusionner arbitrairement les identités.
 
-Un analyseur HTML maintenu évite de reproduire un parseur HTML dans le projet. Une version de Cheerio compatible avec Node.js 22.16 a été identifiée dans le registre npm ; l’ajout de cette dépendance fait partie de la proposition.
+Un analyseur HTML maintenu évite de reproduire un parseur HTML dans le projet. Cheerio 1.2.0, compatible avec Node.js 22.16, est l’unique dépendance directe ajoutée après validation.
+
+## Résultat de la collecte réelle
+
+Cheerio 1.2.0 a été installé avec un verrou de versions npm. Les quarante calendriers ont été examinés, puis 216 rencontres terminées dédupliquées ont été collectées. Les 180 rencontres du calendrier D4 sont indexées. Les compositions sont complètes pour 403 équipes, partielles pour 19 et absentes pour 10 ; les 5 834 noms enregistrés sont des entrées sur feuilles et non des personnes distinctes.
+
+Deux présentations de club ont été vérifiées : sections par équipe pour les clubs multiples et section « Matchs » avec division dans l’en-tête pour les clubs à une équipe. Le cas U.S. Nozacoise expose une incohérence de la source : en-tête D3 mais seules des cartes féminines ; aucune participation n’est retenue. Les forfaits ne sont pas assimilés à une participation jouée.
+
+La reprise immédiate n’a nécessité aucune requête réseau : 258 lectures ont été satisfaites par le cache local. Les feuilles non publiées restent explicitement absentes ; aucune exhaustivité au-delà des informations accessibles sur cette source n’est affirmée.
