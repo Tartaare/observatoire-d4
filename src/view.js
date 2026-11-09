@@ -1,4 +1,4 @@
-import {createSeason} from './season.js';
+import {createSeason, matchResult} from './season.js';
 import {query, escapeHTML} from './dom.js';
 import {liveDetail} from './detail.js';
 
@@ -68,20 +68,31 @@ export function createView(root, data, state) {
       const [name,,counts] = clubs[state.pool][team];
       const count = counts[day];
       const match = data.matches?.[`${state.pool}:${team}:${day}`];
-      const future = data.mode === 'live' ? !match || match.statusLabel !== 'Terminé' : day > lastPlayed;
+      const forfeit = !!match?.statusLabel.match(/^Forfait\b/i);
+      const future = data.mode === 'live' ? !match || match.statusLabel !== 'Terminé' && !forfeit : day > lastPlayed;
       const hidden = !future && day > state.day;
-      const missing = count === null && !hidden;
+      const missing = count === null && !hidden && !forfeit;
       const empty = future || hidden;
       button.disabled = empty;
       button.classList.toggle("od-missing", missing);
       button.classList.toggle("od-empty", empty);
       button.removeAttribute("data-tone");
       if (!empty && count !== null && count !== undefined) button.dataset.tone = String(Math.min(count,5));
-      button.textContent = future ? "—" : hidden ? "·" : missing ? "?" : String(count);
+      button.textContent = future || forfeit && !hidden ? "—" : hidden ? "·" : missing ? "?" : String(count);
+      const result = empty ? null : matchResult(match ?? season.matchAt(day, team, state.pool), name);
+      if (result) {
+        const marker = document.createElement('span');
+        marker.className = 'od-result';
+        marker.textContent = result.code;
+        marker.setAttribute('aria-hidden', 'true');
+        button.append(marker);
+      }
       const description = future ? (match?.statusLabel ?? 'Rencontre non indexée') : hidden ? 'Après le curseur' : missing
         ? match?.sheetState === 'partial' ? 'Composition partielle' : 'Feuille manquante ou non archivée'
         : count + (data.mode === 'live' ? ' repérage(s) à confirmer' : ' joueur(s)');
-      button.setAttribute("aria-label", name + ", journée " + (day + 1) + ", " + description);
+      const label = name + ", journée " + (day + 1) + ", " + (forfeit && !empty ? 'Rencontre non jouée' : description) + (result ? ', ' + result.label : '');
+      button.setAttribute("aria-label", label);
+      button.title = label;
     });
   }
 

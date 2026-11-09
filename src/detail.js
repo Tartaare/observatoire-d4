@@ -8,7 +8,8 @@ const statusLabel = status => ({starter: 'Titulaire', entered: 'Entrée en jeu a
 
 /** @param {import('./types.js').LiveMatch} match */
 export function liveDetail(match) {
-  const description = match.sheetState === 'uncollected' ? 'Feuille non encore archivée.' : match.sheetState === 'missing'
+  const description = /^Forfait\b/i.test(match.statusLabel) ? `${match.statusLabel}. Aucune participation jouée retenue.`
+    : match.sheetState === 'uncollected' ? 'Feuille non encore archivée.' : match.sheetState === 'missing'
     ? 'Composition non publiée par la source.' : match.sheetState === 'partial' ? 'Composition partielle : le total reste inconnu.'
       : `${match.count} repérage${match.count === 1 ? '' : 's'} à confirmer parmi les participations attestées.`;
   const roster = match.roster.map(player => {

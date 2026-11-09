@@ -104,7 +104,8 @@
 #observatoire-d4 .od-monogram{width:21px;height:21px;display:grid;place-items:center;border-radius:5px;background:var(--quiet);color:var(--forest);font:600 10px ui-monospace,monospace}
 #observatoire-d4 tbody td{height:39px;padding:3px;border-bottom:1px solid var(--line)}
 #observatoire-d4 tbody th{border-bottom:1px solid var(--line)}
-#observatoire-d4 .od-cell{width:100%;min-height:30px;display:grid;place-items:center;border:0;border-radius:5px;font-size:13px;font-weight:680;transition:background-color .22s,box-shadow .15s}
+#observatoire-d4 .od-cell{position:relative;width:100%;min-height:30px;display:grid;place-items:center;border:0;border-radius:5px;font-size:13px;font-weight:680;transition:background-color .22s,box-shadow .15s}
+#observatoire-d4 .od-result{position:absolute;right:4px;bottom:2px;font:600 9px/1 ui-monospace,monospace;color:inherit;pointer-events:none}
 #observatoire-d4 .od-cell:hover:not(:disabled){box-shadow:inset 0 0 0 1px var(--high)}
 #observatoire-d4 td.od-active{background:var(--selected)}
 #observatoire-d4 .od-cell.od-picked{box-shadow:inset 0 0 0 2px var(--ink)}
