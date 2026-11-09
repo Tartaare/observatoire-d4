@@ -61,9 +61,9 @@ test('le footer restitue la couverture, la progression et les échecs sans perdr
   try {
     setupSync({querySelector: selector => elements.get(selector)}, async () => { reloads++; });
     await nextTurn();
-    assert.match(get('sync-message').textContent, /Archives à jour\. Dernière mise à jour complète : 09\/11\/2026/);
-    for (const value of ['180/180 rencontres', '82/96 compositions complètes', '403/432', '19 partielles',
-      '10 absentes', '0 à récupérer', '5834 noms sur feuilles']) {
+    assert.match(get('sync-message').textContent, /Archives à jour · MAJ 09\/11\/2026/);
+    for (const value of ['Calendrier 180/180', 'D4 82/96', '403/432', '19 partielles',
+      '10 absentes', '0 à récupérer', '5834 noms']) {
       assert.ok(get('sync-coverage').textContent.includes(value), value);
     }
     const coverage = get('sync-coverage').textContent;

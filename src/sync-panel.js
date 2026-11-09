@@ -23,13 +23,14 @@ export function setupSync(root, onUpdated) {
     progress.max = Math.max(1, state.total);
     if (state.total) progress.value = state.done; else progress.removeAttribute('value');
     progress.setAttribute('aria-valuetext', `${state.done} sur ${state.total}`);
-    const last = state.lastSuccess ? `Dernière mise à jour complète : ${dateFormat.format(new Date(state.lastSuccess))}.` : 'Aucune synchronisation complète enregistrée.';
-    const text = state.running ? state.phase : `${state.phase}. ${last}`;
+    const last = state.lastSuccess ? `MAJ ${dateFormat.format(new Date(state.lastSuccess))}` : 'Aucune mise à jour complète';
+    const text = state.running ? state.phase : `${state.phase} · ${last}`;
     if (message.textContent !== text) message.textContent = text;
     const c = state.coverage;
     coverage.textContent = c.expected
-      ? `Calendrier D4 : ${c.calendar.discovered}${c.calendar.expected === null ? '' : '/' + c.calendar.expected} rencontres · D4 : ${c.d4.published}/${c.d4.expected} compositions complètes · Tous niveaux : ${c.published}/${c.expected} · ${c.partial} partielles · ${c.missing} absentes · ${c.uncollected} à récupérer · ${c.players} noms sur feuilles${c.retained ? ` · ${c.retained} archives précédentes conservées` : ''}`
+      ? `Calendrier ${c.calendar.discovered}${c.calendar.expected === null ? '' : '/' + c.calendar.expected} · D4 ${c.d4.published}/${c.d4.expected} · Tous niveaux ${c.published}/${c.expected} · ${c.partial} partielles · ${c.missing} absentes · ${c.uncollected} à récupérer · ${c.players} noms${c.retained ? ` · ${c.retained} archives conservées` : ''}`
       : 'Première utilisation : connectez-vous à Internet puis lancez une mise à jour. Les archives seront ensuite disponibles hors ligne.';
+    coverage.title = 'Calendrier : rencontres découvertes/attendues. D4 et tous niveaux : compositions complètes/attendues. Noms : entrées publiées sur les feuilles, pas des personnes distinctes.';
     errors.hidden = state.errors.length === 0;
     errorList.replaceChildren(...state.errors.map(error => {
       const row = document.createElement('li');

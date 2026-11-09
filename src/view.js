@@ -28,6 +28,7 @@ export function createView(root, data, state) {
   track.replaceChildren(...dates.map(() => document.createElement("span")));
   function renderBoard() {
     const teams = clubs[state.pool];
+    root.style.setProperty('--od-team-count', String(Math.max(1, teams.length)));
     const order = teams.map((_, index) => index);
     /** @param {number} index */
     const total = (index) => teams[index][2].reduce((sum, value) => (sum ?? 0) + (value ?? 0), 0) ?? 0;
