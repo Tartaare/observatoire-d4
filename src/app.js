@@ -1,6 +1,7 @@
 import {startObservatory} from './controller.js';
 import {query} from './dom.js';
 import {validateSeason} from './season.js';
+import {setupSync} from './sync-panel.js';
 
 const root = query(document, '#observatoire-d4', HTMLElement);
 const main = query(root, 'main', HTMLElement);
@@ -8,6 +9,8 @@ const status = query(root, '[data-status]', HTMLElement);
 const message = query(root, '[data-status-message]', HTMLElement);
 const content = query(root, '[data-content]', HTMLElement);
 const retry = query(root, '[data-retry]', HTMLButtonElement);
+/** @type {(() => void) | null} */
+let dispose = null;
 
 async function loadSeason() {
   retry.hidden = true;
@@ -22,8 +25,19 @@ async function loadSeason() {
       message.textContent = 'Aucune équipe disponible pour cette saison.';
       return;
     }
+    dispose?.();
+    query(root, '[data-pool]', HTMLSelectElement).value = 'a';
+    query(root, '[data-sort]', HTMLSelectElement).value = 'rank';
     content.hidden = false;
-    startObservatory(root, data);
+    dispose = startObservatory(root, data);
+    query(root, '[data-mode-label]', HTMLElement).textContent = data.mode === 'live' ? 'Archives locales' : 'Démonstration';
+    if (data.mode === 'live') {
+      query(root, '[data-season-label]', HTMLElement).textContent = `SAISON ${data.seasonStart}–${Number(data.seasonStart) + 1}`;
+      query(root, '[data-intro-description]', HTMLElement).textContent = 'Seniors masculins · correspondances de noms à confirmer en division supérieure.';
+      query(root, '[data-legend-label]', HTMLElement).textContent = 'Repérages connus';
+    } else {
+      query(root, '[data-intro-description]', HTMLElement).textContent = 'Données de démonstration. Lancez une mise à jour pour afficher les feuilles réelles.';
+    }
     status.hidden = true;
   } catch (error) {
     content.hidden = true;
@@ -41,3 +55,4 @@ async function loadSeason() {
 
 retry.addEventListener('click', loadSeason);
 loadSeason();
+setupSync(root, loadSeason);
