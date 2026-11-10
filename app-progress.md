@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 9 — Thèmes et palette personnalisable
+
+Branche : `feature/sprint-9-appearance`.
+
+Statut : **terminé le 10 novembre 2026**, sans fusion dans `main`. Intégration React/TypeScript ciblée et parcours d’apparence validés par l’utilisateur avant implémentation.
+
+US-018 : remplacer la palette verte par des surfaces neutres sombre/claire et un accent orange ; proposer une bascule directe clair/sombre, un mode système et une modale « Paramètres → Apparence » basée sur les composants officiels shadcn/ui Dialog, Button et Input. Les trois couleurs se modifient par sélecteur natif ou champ hexadécimal. Application immédiate, aperçu de l’échelle, réinitialisation, persistance locale versionnée, restauration avant les styles et partage entre onglets. Une saisie invalide conserve la dernière palette valide ; un stockage bloqué conserve l’usage en session et affiche son état.
+
+Les tokens communs à la page et au portail dérivent surfaces, textes, bordures, focus et six niveaux de repérage. Contraste minimal de 7:1 entre les bases, 4,5:1 pour les textes calculés et 3:1 pour le focus et les nouveaux contours de contrôle. La matrice, la navigation et le serveur conservent leur architecture native. Compilation locale isolée avec esbuild/Tailwind sans reset global, déclenchée au lancement ; aucun CDN. En portrait, l’en-tête se répartit sur deux lignes et la modale défile dans la fenêtre avec actions fixes et cibles de 44 px.
+
+Vérifications : build et typage strict de tout le frontend réussis ; 20 tests natifs réussis. Parcours Playwright dans Edge headless avec base synthétique : clair/sombre, palette, validation, réinitialisation, suivi du système, rechargement, multi-onglets, stockage corrompu/bloqué, confinement du focus et retour après Échap. Rendu inspecté sur captures en 1440 × 900 et en portrait tactile 320/390 × 844 ; aucun débordement de page ou de modale, bouton Terminé visible, lignes tactiles d’au moins 48 px. Aucune erreur JavaScript ni violation CSP. Les captures restent locales dans `artifacts/appearance/`. Le connecteur navigateur était indisponible ; les vérifications ont utilisé un profil de test isolé. Lighthouse non mesuré.
+
+Prévention des régressions : initialiser les variables Tailwind via `@tailwind base` même quand preflight est désactivé ; appliquer `box-sizing:border-box` à la racine du portail ; garder les tokens sur `<html>` et supprimer les transitions pendant le changement de thème. Ne pas utiliser l’overlay Radix qui injecte les styles de react-remove-scroll sous la CSP stricte : overlay et verrou de défilement restent en CSS local, focus et fermeture restent gérés par Radix. Normaliser les hexadécimaux avant tout calcul, conserver une couleur de texte propre à chaque niveau et utiliser la variante d’accent à 4,5:1 pour les textes. Les actions et préférences d’apparence restent indépendantes du chargement de saison. Décoder les URL de fichiers avec `fileURLToPath` dans les outils de capture.
+
 ## Sprint 8 — Répartition des hauteurs et footer sur une ligne
 
 Branche : `feature/sprint-8-layout-gaps`.

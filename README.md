@@ -6,14 +6,14 @@ L’interface affiche les données réelles archivées depuis [Le Onze Lotois](h
 
 ## Lancer le projet
 
-Prérequis : **Node.js 22.16 ou supérieur**. Le serveur et SQLite sont natifs ; Cheerio est l’unique dépendance directe, pour analyser le HTML de la source.
+Prérequis : **Node.js 22.16 ou supérieur**. Le serveur et SQLite sont natifs ; Cheerio analyse le HTML de la source. Les contrôles d’apparence utilisent React, shadcn/ui, Radix et Lucide. TypeScript, esbuild et Tailwind compilent cette partie localement.
 
 ```powershell
 npm ci --ignore-scripts
 npm start
 ```
 
-Ouvrir **http://127.0.0.1:3000**. Les modules JavaScript et l’API nécessitent le serveur ; ouvrir directement le fichier HTML ne suffit plus.
+`npm start` compile et vérifie automatiquement le frontend avant de lancer le serveur. Conserver les dépendances de développement pour cette compilation. Ouvrir **http://127.0.0.1:3000**. Les modules JavaScript et l’API nécessitent le serveur ; ouvrir directement le fichier HTML ne suffit plus. Après la mise à jour du sprint 9, relancer le serveur pour exposer les nouveaux fichiers compilés.
 
 Si le port est occupé :
 
@@ -31,7 +31,10 @@ La version locale Node.js 22.16 affiche un avertissement expérimental pour `nod
 ```text
 observatoire-d4.html         Structure et points d’entrée accessibles
 assets/css/observatoire.css  Styles, tokens, thèmes et responsive
+assets/css/appearance.css    Styles des contrôles et de la modale
+assets/generated/            Ressources compilées locales, ignorées par Git
 src/
+  appearance/               Contrôles React/TypeScript, thème et composants shadcn
   app.js                    Chargement API, états de chargement/erreur/vide
   controller.js             État de navigation, événements et lecture
   view.js                   Matrice et détail des matchs
@@ -54,7 +57,17 @@ Parcours : le navigateur charge `GET /api/season`, valide la réponse et initial
 
 Ces préférences sont propres au navigateur et à l’adresse utilisée (hôte et port compris). Si le stockage local est bloqué, plein ou corrompu, la consultation reste disponible ; seules les préférences valides sont restaurées. Les sections dépliées dans les compositions ne sont pas mémorisées.
 
-Le design, les thèmes clair/sombre, les tris, les deux poules, la lecture automatique et le parcours clavier de la page initiale sont conservés. La lecture s’arrête aussi lorsque l’onglet devient invisible.
+Les tris, les deux poules, la lecture automatique et le parcours clavier sont conservés. La lecture s’arrête aussi lorsque l’onglet devient invisible.
+
+## Apparence et couleurs
+
+Le bouton soleil/lune dans l’en-tête bascule immédiatement entre clair et sombre. **Paramètres → Apparence** propose aussi le mode **Système**, sélectionné par défaut, qui suit les préférences de l’appareil.
+
+La palette part de trois couleurs : sombre `#18181B`, claire `#FAFAFA`, accent orange `#F97316`. Chacune se modifie par sélecteur de couleur ou saisie hexadécimale. Les changements valides s’appliquent immédiatement à la page, à la modale et à l’échelle des repérages. Les nuances et les textes sont calculés automatiquement pour préserver la lisibilité. Les deux bases doivent conserver un contraste de 7:1 ; une saisie invalide est expliquée et ne remplace pas la dernière palette valide. **Réinitialiser** restaure les couleurs et le mode système.
+
+Les préférences d’apparence sont mémorisées par navigateur et adresse, indépendamment de la saison, et partagées entre les onglets de cette adresse. Elles sont restaurées avant les styles pour éviter un éclair de thème. Si le stockage est bloqué, les changements restent disponibles pour la session et leur absence de sauvegarde est indiquée. La modale gère le clavier, Échap, le retour du focus et le portrait mobile, avec des actions fixes en bas.
+
+React est limité aux contrôles d’apparence ; matrice, navigation, archives et API restent en modules natifs. Les ressources sont locales, sans CDN ni requête externe à l’exécution. Origine et licence des composants : [composants d’apparence](docs/ui-components.md).
 
 La vue principale utilise la hauteur disponible : saison et filtres au-dessus de la matrice, commandes de lecture et curseur en dessous, puis bilan des archives dans le footer. Sur les fenêtres d’au moins 900 × 700 px, la matrice s’étend verticalement et ses lignes grandissent pour éviter l’espace inutilisé en bas de page. Les longues compositions défilent dans la matrice avec noms d’équipes et en-tête fixes. Les petites fenêtres gardent un défilement naturel et les cibles tactiles restent accessibles. La largeur maximale est de 1800 px. La méthode et ses limites se consultent à la demande dans le footer ; leur ouverture rend à la page sa hauteur naturelle.
 
@@ -107,7 +120,9 @@ npm run build
 npm test
 ```
 
-Le projet est servi directement : `build` vérifie la syntaxe JavaScript, les imports locaux et les ressources HTML sans créer de bundle. Les 17 tests natifs couvrent notamment le placement des actions et de la lecture, le bilan permanent dans le footer (couverture, progression, erreurs et conservation des chiffres après une panne), la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+`build` compile les seuls contrôles d’apparence dans `assets/generated/`, vérifie la syntaxe JavaScript, les imports locaux, les ressources HTML et le typage strict de tout le frontend. La matrice et le serveur restent servis directement. Les 20 tests natifs couvrent notamment la palette, les contrastes des textes et contrôles dans les deux thèmes, le stockage d’apparence corrompu ou bloqué, le placement des actions et de la lecture, le bilan permanent dans le footer (couverture, progression, erreurs et conservation des chiffres après une panne), la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+
+Le parcours navigateur reproductible se lance avec `npm run test:ui`. Sous Windows, il utilise Edge installé dans un profil éphémère ; `$env:BROWSER_CHANNEL = 'chrome'` sélectionne Chrome. Sur les autres systèmes, installer Chromium avec `npx playwright install chromium`. Ce contrôle utilise une base en mémoire et vérifie thèmes, saisie et réinitialisation des couleurs, suivi du système, rechargement, synchronisation entre onglets, clavier, stockage bloqué, CSP et portrait tactile en 320/390 px. Les captures sont disponibles dans `artifacts/appearance/`, hors Git.
 
 Le prototype `collecte_onze_lotois.py` reste disponible comme outil indépendant. Ses sélecteurs ont servi de référence au collecteur Node.js ; Python et `lxml` ne sont pas requis pour l’application.
 

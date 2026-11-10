@@ -2,12 +2,16 @@
 
 Référence initiale : interface de `observatoire-d4.html`, conservée pendant le sprint 1.
 
-- Palette végétale : vert forêt, surfaces papier, nuances de vert pour les volumes ; thèmes clair et sombre selon le système.
+- Palette neutre et orange : sombre `#18181B`, clair `#FAFAFA`, accent `#F97316`. Ces trois bases sont personnalisables dans « Paramètres → Apparence ». Les fonds, bordures, textes et six niveaux de la matrice sont dérivés de ces bases ; les volumes utilisent des nuances d’accent, le zéro reste neutre.
+- Thèmes clair, sombre et système : bascule directe dans l’en-tête, choix explicite dans la modale, mémorisation locale indépendante de la saison. Restaurer le thème avant les styles, sans transition de couleur. Seul le mode système suit les changements du système.
+- Les couleurs sombre et claire restent ordonnées et présentent au moins 7:1 de contraste pour permettre la dérivation des surfaces. Les textes dérivés atteignent 4,5:1, les contours des nouveaux contrôles et le focus 3:1. Une palette invalide reste en saisie avec explication ; la dernière palette valide continue de s’afficher. L’accent de remplissage conserve la couleur choisie, son texte et sa variante pour les liens sont ajustés.
 - Hiérarchie : marque discrète et actions de synchronisation dans l’en-tête, saison et filtres compacts, matrice des équipes, lecture temporelle sous le tableau. Le détail reste contextuel dans la matrice.
 - Typographie : pile locale de l’interface existante, chiffres tabulaires, repères de journée monospace. Aucun téléchargement de police.
 - Espacement et couleurs centralisés dans les propriétés CSS. Rayon principal de 14 px, panneaux de 10 px, contrôles de 7 px.
 - Responsive : matrice défilante horizontalement avec noms d’équipes fixes ; adaptation à 560 px ; cibles tactiles de 44 px.
 - Accessibilité : libellés explicites, focus visible, annonces de changements, clavier, retour du focus après fermeture et réduction des animations.
+- Contrôles d’apparence en React/TypeScript, composants shadcn/ui conservés localement, icônes Lucide. Tailwind compile leurs utilitaires sans reset global. Les tokens sont portés par `<html>`, y compris pour le portail de la modale. La CSP reste stricte ; overlay et blocage du défilement sont assurés par du CSS local.
+- En portrait, la marque et les deux boutons d’apparence partagent la première ligne ; les actions d’archives occupent la suivante. La modale reste dans la fenêtre, défile intérieurement et garde ses actions visibles en bas. Cibles de 44 px, saisie des couleurs à 16 px, aucun zoom iOS imposé par de petits champs.
 - États : chargement annoncé, erreur avec nouvelle tentative, absence de données, feuille manquante, match futur et journée masquée distincts.
 - Les données fictives restent identifiées comme démonstration. Les liens documentaires existants sont conservés.
 - Les actions « Mettre à jour » et « Revérifier toutes les feuilles » restent directement accessibles dans l’en-tête. Le bilan des archives, la date de mise à jour et la couverture restent visibles dans le footer, hors des états masqués de la saison. La progression native et les erreurs dépliables s’affichent au même endroit. La mise à jour reste une action explicite.
