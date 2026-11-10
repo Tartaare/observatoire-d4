@@ -1,0 +1,3 @@
+[functions.observatoire]
+verify_jwt = false
+# Le handler vérifie le jeton auprès de Supabase Auth et l'appartenance à od_members.
