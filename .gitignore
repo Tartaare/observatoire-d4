@@ -3,5 +3,7 @@ data/*.sqlite
 data/*.sqlite-*
 data/audit/
 coverage/
+assets/generated/
+artifacts/appearance/
 __pycache__/
 *.pyc

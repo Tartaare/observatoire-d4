@@ -2,6 +2,7 @@
 export default {
   content: ['./src/appearance/**/*.tsx'],
   corePlugins: {preflight: false},
+  future: {hoverOnlyWhenSupported: true},
   theme: {
     extend: {
       colors: {

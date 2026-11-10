@@ -8,16 +8,22 @@
 <title>Observatoire D4</title>
 
 <meta name="description" content="Archives locales des compositions seniors masculines de D4 et repérages en division supérieure, avec synchronisation à la demande.">
+<script src="./assets/generated/theme.js"></script>
 <link rel="stylesheet" href="./assets/css/observatoire.css">
+<link rel="stylesheet" href="./assets/generated/appearance.css">
+<script defer src="./assets/generated/appearance.js"></script>
 <script type="module" src="./src/app.js"></script>
 </head>
 <body>
 <div id="observatoire-d4">
   <header class="od-top">
     <div class="od-brand"><span class="od-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span> Observatoire <b>D4</b></div>
-    <div class="od-sync-actions" role="group" aria-label="Synchronisation des archives">
-      <label class="od-refresh-option cursor-interaction"><input type="checkbox" data-sync-force> Revérifier toutes les feuilles</label>
-      <button class="od-play cursor-interaction" type="button" data-sync>Mettre à jour</button>
+    <div class="od-header-actions">
+      <div class="od-sync-actions" role="group" aria-label="Synchronisation des archives">
+        <label class="od-refresh-option cursor-interaction"><input type="checkbox" data-sync-force> Revérifier toutes les feuilles</label>
+        <button class="od-play cursor-interaction" type="button" data-sync>Mettre à jour</button>
+      </div>
+      <div data-appearance-root></div>
     </div>
   </header>
   <main class="od-main" aria-busy="true">
