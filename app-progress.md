@@ -1,5 +1,25 @@
 # Avancement
 
+## Sprint 11 — Accès en ligne avec Pages et Supabase
+
+Branche : `feature/sprint-11-online-hosting`.
+
+Statut au **11 novembre 2026 : implémentation locale validée, déploiement en attente d'accès**. Architecture Pages + Supabase choisie par l'utilisateur. Projet Supabase identifié : `sylibzlrejlwfarmbhyw`. Aucun changement distant appliqué, aucune archive envoyée et aucune fusion dans `main` ; le sprint ne sera terminé qu'après validation en ligne.
+
+US-020 : produire un site Pages avec un véritable `dist/index.html`, des ressources publiques explicitement sélectionnées et une API de même origine relayée vers Supabase. Build sans nouvelle dépendance. L'interface existante et le mode local SQLite sont conservés.
+
+US-021 : protéger les archives par Supabase Auth et une liste de membres explicite ; tables et fonctions `od_*` dédiées, RLS activé sans accès public, clés serveur confinées à Supabase. Connexion e-mail/mot de passe, renouvellement de session, erreurs annoncées et déconnexion. Les identifiants de l'application sont distincts du compte du tableau de bord Supabase.
+
+US-022 : adapter la collecte aux Edge Functions par opérations courtes reprenables. Bail PostgreSQL, progression/cache/données enregistrés atomiquement, cache conditionnel, cadence et limites de téléchargement conservés, conservation des compositions plus complètes. L'onglet pilote la reprise ; sa fermeture suspend les prochaines opérations et cette limite est affichée dans le footer. Les calculs de saison sont partagés avec SQLite.
+
+US-023 : préparer un import atomique des archives dans une saison distante vide, refusant l'écrasement d'une saison utilisée. Le contrôle en lecture seule sur la base réelle vérifie **808 rencontres et 216 archives**, avec une projection strictement identique à SQLite. Le cache HTML brut reste dans la copie locale ; les données analysées, classements et dates de suivi sont migrables.
+
+Vérifications : `npm run build:pages` réussi, syntaxe de 37 modules et typage strict du frontend et du code cloud. Suite existante de 20 tests et 7 nouveaux tests réussis : équivalence des projections, qualité des archives, reprise et refus des lancements concurrents, parcours complet par étapes, cache/limites réseau, authentification/autorisation, proxy Pages et démarrage de la fonction générée avec les seules API Web. Aucun réseau source utilisé dans les tests. Contrôle réel d'import exécuté sans écriture ni envoi.
+
+Limites : connecteur Supabase suggéré mais non connecté ; navigateur et accès natif indisponibles. Migrations PostgreSQL et baux non exécutés sur une base réelle ; contrôle visuel et parcours d'authentification distant non réalisés. Le dossier Pages et la fonction sont générés localement, sans publication. Configuration et ordre des opérations documentés dans [le guide de déploiement](docs/cloud-deployment.md).
+
+Prévention des régressions : ne jamais publier la racine du dépôt ou une clé serveur ; déployer aussi les Functions Pages ; importer avant la première collecte en ligne ; conserver SQLite en lecture seule pendant l'import ; vérifier le propriétaire du bail lors de chaque écriture ; refuser les comptes absents de `od_members` même si leur jeton Auth est valide. Le stockage cloud et local reste indépendant après import. Surveiller le quota de base et la croissance du cache HTML ; la projection en mémoire est limitée au volume d'une saison personnelle.
+
 ## Sprint 10 — Publication GitHub et suivi du développement
 
 Branche : `feature/sprint-10-github`.

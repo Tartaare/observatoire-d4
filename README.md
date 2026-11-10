@@ -19,6 +19,16 @@ cd observatoire-d4
 
 Les dépendances, ressources compilées, fichiers `.env`, clés privées, captures et archives SQLite locales sont exclus de Git. Le dépôt permet de retrouver le code ; sauvegarder séparément `data/observatoire.sqlite` pour conserver les données collectées.
 
+## Accès en ligne — Cloudflare Pages et Supabase
+
+La version hébergée utilise Cloudflare Pages pour l'interface et Supabase pour Auth, l'API et les archives PostgreSQL. Elle est préparée sur `feature/sprint-11-online-hosting` ; **le déploiement distant et l'import restent à effectuer** dans le projet Supabase `sylibzlrejlwfarmbhyw` et le projet Pages `usbf-d4-analyzer`.
+
+`npm run build:pages` génère `dist/index.html` et les ressources publiques ; `npm run build:cloud` génère l'Edge Function. Le dossier `functions/` fournit le relais API Pages. Aucun fichier de base ni secret n'est publié. Le mode local décrit ci-dessous reste utilisable et indépendant.
+
+L'accès en ligne est réservé aux utilisateurs Auth inscrits dans `od_members`. La collecte progresse par opérations courtes tant que l'onglet reste ouvert et reprend à sa réouverture. Les dernières archives restent consultables. Le script `npm run import:cloud -- --check` vérifie sans envoi l'équivalence avec les données locales avant leur import atomique.
+
+Configuration, migration, accès, import et limites gratuites : [guide de déploiement](docs/cloud-deployment.md).
+
 ## Lancer le projet
 
 Prérequis : **Node.js 22.16 ou supérieur**. Le serveur et SQLite sont natifs ; Cheerio analyse le HTML de la source. Les contrôles d’apparence utilisent React, shadcn/ui, Radix et Lucide. TypeScript, esbuild et Tailwind compilent cette partie localement.
@@ -135,7 +145,7 @@ npm run build
 npm test
 ```
 
-`build` compile les seuls contrôles d’apparence dans `assets/generated/`, vérifie la syntaxe JavaScript, les imports locaux, les ressources HTML et le typage strict de tout le frontend. La matrice et le serveur restent servis directement. Les 20 tests natifs couvrent notamment la palette, les contrastes des textes et contrôles dans les deux thèmes, le stockage d’apparence corrompu ou bloqué, le placement des actions et de la lecture, le bilan permanent dans le footer (couverture, progression, erreurs et conservation des chiffres après une panne), la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+`build` compile les seuls contrôles d’apparence dans `assets/generated/`, vérifie la syntaxe JavaScript, les imports locaux, les ressources HTML et le typage strict de tout le frontend. La matrice et le serveur restent servis directement. Les 27 tests natifs couvrent notamment la palette, les contrastes des textes et contrôles dans les deux thèmes, le stockage d’apparence corrompu ou bloqué, le placement des actions et de la lecture, le bilan permanent dans le footer (couverture, progression, erreurs et conservation des chiffres après une panne), la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
 
 Le parcours navigateur reproductible se lance avec `npm run test:ui`. Sous Windows, il utilise Edge installé dans un profil éphémère ; `$env:BROWSER_CHANNEL = 'chrome'` sélectionne Chrome. Sur les autres systèmes, installer Chromium avec `npx playwright install chromium`. Ce contrôle utilise une base en mémoire et vérifie thèmes, saisie et réinitialisation des couleurs, suivi du système, rechargement, synchronisation entre onglets, clavier, stockage bloqué, CSP et portrait tactile en 320/390 px. Les captures sont disponibles dans `artifacts/appearance/`, hors Git.
 

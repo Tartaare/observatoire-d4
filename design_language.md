@@ -22,3 +22,5 @@ Référence initiale : interface de `observatoire-d4.html`, conservée pendant l
 - Les textes introductifs répétitifs sont retirés. Le mode démonstration reste identifié près de la saison et la méthode reste accessible dans un volet natif replié en pied de page.
 - Les compositions historiques sont consultables dans le détail sans quitter l’application. « Archive locale », « À confirmer » et les statuts de participation exposent les limites des données.
 - Zéro repérage connu, feuille absente/partielle et rencontre non jouée restent visuellement et sémantiquement distincts.
+- En hébergement Pages/Supabase, un écran de connexion privé précède la consultation : mêmes tokens neutres/orange, champs explicitement libellés, autocomplétion et retour d'erreur annoncé, cibles de 48 px. La déconnexion reste dans l'en-tête. Aucun écran de connexion en mode local.
+- Le détail hébergé porte « Archive en ligne ». Pendant une collecte en ligne, le footer explique que l'onglet doit rester ouvert et que la réouverture reprend la progression ; ne pas promettre de consultation hors ligne pour cette version.
