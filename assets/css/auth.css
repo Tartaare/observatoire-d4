@@ -1,0 +1,17 @@
+.od-login { box-sizing: border-box; min-height: calc(100dvh - 2 * var(--page-gutter)); display: grid; place-items: center; padding: 24px;
+  font: 14px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif; }
+.od-login .od-eyebrow { color: var(--sub); font-size: 11px; letter-spacing: .1em; font-weight: 700; }
+.od-login-body { width: min(100%, 420px); border-top: 3px solid var(--accent); padding-block: 28px; }
+.od-login h1 { font-size: clamp(26px, 6vw, 34px); line-height: 1.15; margin: 16px 0; }
+.od-login p { line-height: 1.5; }
+.od-login form { display: grid; gap: 12px; margin-top: 28px; }
+.od-login label { font-weight: 600; }
+.od-login input { box-sizing: border-box; width: 100%; min-height: 48px; border: 1px solid var(--control-line);
+  border-radius: 7px; padding: 10px 12px; font: inherit; font-size: 16px; color: var(--ink); background: var(--surface); }
+.od-login :is(input, button):focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; }
+.od-login button { min-height: 48px; margin-top: 10px; justify-content: center; border: 0; border-radius: 7px;
+  background: var(--accent); color: var(--on-accent); font: inherit; font-weight: 700; cursor: pointer; }
+.od-login button:disabled { opacity: .65; cursor: wait; }
+.od-login [role=status] { min-height: 48px; margin: 0; }
+.od-signout { width: auto !important; padding-inline: 10px !important; font-size: 12px !important; }
+[hidden] { display: none !important; }
