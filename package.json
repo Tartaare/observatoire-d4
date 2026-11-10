@@ -8,12 +8,31 @@
     "node": ">=22.16.0"
   },
   "scripts": {
+    "prestart": "npm run build",
     "start": "node --use-system-ca server/index.js",
     "sync": "node --use-system-ca scripts/sync.js",
-    "test": "node --test",
-    "build": "node scripts/check.js"
+    "pretest": "npm run build:ui",
+    "test": "node --preserve-symlinks --preserve-symlinks-main --test",
+    "build:ui": "node --preserve-symlinks --preserve-symlinks-main scripts/build-ui.js",
+    "typecheck": "node --preserve-symlinks --preserve-symlinks-main node_modules/typescript/lib/tsc.js -p tsconfig.appearance.json",
+    "build": "npm run build:ui && node --preserve-symlinks --preserve-symlinks-main scripts/check.js && npm run typecheck"
   },
   "dependencies": {
-    "cheerio": "1.2.0"
+    "@radix-ui/react-dialog": "1.3.1",
+    "@radix-ui/react-slot": "1.5.0",
+    "cheerio": "1.2.0",
+    "class-variance-authority": "0.7.1",
+    "clsx": "2.1.1",
+    "lucide-react": "1.71.0",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "tailwind-merge": "3.7.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "esbuild": "0.28.2",
+    "tailwindcss": "3.4.19",
+    "typescript": "7.0.2"
   }
 }
