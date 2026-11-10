@@ -1,4 +1,6 @@
 import {escapeHTML as escape} from './dom.js';
+import {apiFetch} from './session.js';
+import {hosted} from './runtime.js';
 
 const dateFormat = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'short', timeZone: 'UTC'});
 /** @param {string | null} value */
@@ -22,7 +24,7 @@ export function liveDetail(match) {
       ${history && player.status !== 'unverified' ? '<span class="od-division">À confirmer</span>' : ''}</summary>
       ${movement ? `<p>${escape(movement)}</p>` : ''}${history ? `<ul>${history}</ul>` : '<p>Aucune correspondance antérieure dans les feuilles archivées.</p>'}</details>`;
   }).join('');
-  return `<div class="od-detail-head"><div><div class="od-match-kicker">${escape(dateLabel(match.matchDate))} · ARCHIVE LOCALE</div>
+  return `<div class="od-detail-head"><div><div class="od-match-kicker">${escape(dateLabel(match.matchDate))} · ${hosted ? 'ARCHIVE EN LIGNE' : 'ARCHIVE LOCALE'}</div>
     <h3 id="od-match-title">${escape(match.home)} ${escape(match.score)} ${escape(match.away)}</h3><p>${escape(description)}</p></div>
     <button type="button" class="od-arrow cursor-interaction" data-close aria-label="Fermer le détail">×</button></div>
     ${match.retained ? '<p class="od-archive-note">La dernière lecture était incomplète. La composition précédente est conservée.</p>' : ''}
@@ -40,9 +42,9 @@ export function bindArchives(root, signal) {
     if (!content) return;
     detail.dataset.loaded = 'loading';
     content.setAttribute('role', 'status');
-    content.textContent = 'Lecture de l’archive locale…';
+    content.textContent = 'Lecture de l’archive…';
     try {
-      const response = await fetch(`/api/sheet?url=${encodeURIComponent(detail.dataset.archiveUrl)}`, {signal: AbortSignal.any([signal, AbortSignal.timeout(8000)])});
+      const response = await apiFetch(`/api/sheet?url=${encodeURIComponent(detail.dataset.archiveUrl)}`, {signal: AbortSignal.any([signal, AbortSignal.timeout(hosted ? 30000 : 8000)])});
       if (!response.ok) throw new Error('Archive indisponible.');
       const archive = await response.json();
       const fragment = document.createDocumentFragment();
@@ -61,7 +63,7 @@ export function bindArchives(root, signal) {
       content.removeAttribute('role');
       detail.dataset.loaded = 'true';
     } catch {
-      content.textContent = 'Lecture locale impossible. Fermez puis rouvrez ce détail pour réessayer.';
+      content.textContent = 'Lecture impossible. Fermez puis rouvrez ce détail pour réessayer.';
       delete detail.dataset.loaded;
     }
   }, {capture: true, signal});

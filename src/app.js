@@ -2,6 +2,9 @@ import {startObservatory} from './controller.js';
 import {query} from './dom.js';
 import {validateSeason} from './season.js';
 import {setupSync} from './sync-panel.js';
+import {apiFetch} from './session.js';
+import {requireSession} from './auth.js';
+import {hosted} from './runtime.js';
 
 const root = query(document, '#observatoire-d4', HTMLElement);
 const main = query(root, 'main', HTMLElement);
@@ -18,7 +21,7 @@ async function loadSeason() {
   status.setAttribute('role', 'status');
   message.textContent = 'Chargement de la saison…';
   try {
-    const response = await fetch('/api/season', {signal: AbortSignal.timeout(8000)});
+    const response = await apiFetch('/api/season', {signal: AbortSignal.timeout(hosted ? 30000 : 8000)});
     if (!response.ok) throw new Error(`Lecture impossible (${response.status}).`);
     const data = validateSeason(await response.json());
     if (Object.values(data.clubs).every(teams => teams.length === 0)) {
@@ -40,6 +43,7 @@ async function loadSeason() {
     status.setAttribute('role', 'alert');
     message.textContent = location.protocol === 'file:'
       ? 'Lancez npm start, puis ouvrez http://127.0.0.1:3000 pour accéder à la saison.'
+      : hosted ? 'La saison est indisponible. Vérifiez votre connexion puis réessayez.'
       : 'La saison est indisponible. Vérifiez le serveur local puis réessayez.';
     retry.hidden = false;
     console.error('Chargement de la saison :', error);
@@ -49,5 +53,6 @@ async function loadSeason() {
 }
 
 retry.addEventListener('click', loadSeason);
+await requireSession(root);
 loadSeason();
 setupSync(root, loadSeason);

@@ -13,9 +13,10 @@ const assets = new Map([
   ['/', ['observatoire-d4.html', 'text/html']],
   ['/observatoire-d4.html', ['observatoire-d4.html', 'text/html']],
   ['/assets/css/observatoire.css', ['assets/css/observatoire.css', 'text/css']],
+  ['/assets/css/auth.css', ['assets/css/auth.css', 'text/css']],
   ...['theme.js', 'appearance.js', 'appearance.css'].map(name =>
     [`/assets/generated/${name}`, [`assets/generated/${name}`, name.endsWith('.css') ? 'text/css' : 'text/javascript']]),
-  ...['app', 'controller', 'view', 'season', 'dom', 'types', 'detail', 'sync-panel', 'navigation'].map(name =>
+  ...['app', 'controller', 'view', 'season', 'dom', 'types', 'detail', 'sync-panel', 'navigation', 'runtime', 'session', 'auth'].map(name =>
     [`/src/${name}.js`, [`src/${name}.js`, 'text/javascript']]),
 ]);
 
