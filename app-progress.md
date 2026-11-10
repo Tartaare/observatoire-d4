@@ -1,5 +1,17 @@
 # Avancement
 
+## Sprint 10 — Publication GitHub et suivi du développement
+
+Branche : `feature/sprint-10-github`.
+
+Statut : **terminé le 10 novembre 2026**. Dépôt privé : [Tartaare/observatoire-d4](https://github.com/Tartaare/observatoire-d4), avec tickets et projets activés. La version validée devient `main` ; les dix branches de sprint et l'historique des commits sont conservés.
+
+US-019 : publier l'application et son historique pour suivre son développement. Les modifications locales préexistantes (ponctuation du message d'apparence et document `web-ui-guidelines.md`) sont enregistrées dans un commit distinct. Aucun changement d'architecture ni de parcours utilisateur. Le README précise le clonage, les branches et la sauvegarde séparée des archives.
+
+Vérifications : `npm run build` réussi, 29 modules et ressources vérifiés, typage strict réussi ; `npm test` : 20 tests réussis, aucun échec. Exécution hors des restrictions de lecture du sandbox Windows. Revue des fichiers suivis et recherche des signatures courantes de secrets avant envoi. Les données SQLite, dépendances, captures et ressources compilées restent exclues ; les règles ignorent aussi les fichiers `.env` et les formats courants de clés privées.
+
+Prévention des régressions : développer chaque sprint sur sa branche, vérifier compilation et tests avant fusion dans `main`, conserver le dépôt privé et sauvegarder la base SQLite séparément. Ne jamais enregistrer de jeton GitHub dans les fichiers ou l'URL du dépôt distant.
+
 ## Sprint 9 — Thèmes et palette personnalisable
 
 Branche : `feature/sprint-9-appearance`.

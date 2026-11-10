@@ -4,6 +4,21 @@ Projet personnel non commercial pour explorer, par journée de D4, les apparitio
 
 L’interface affiche les données réelles archivées depuis [Le Onze Lotois](https://leonzelotois.fr/division/d4/). Avant la première synchronisation, la démonstration reste disponible et clairement identifiée.
 
+## Suivi du développement
+
+Le code et son historique sont hébergés dans le dépôt privé [Tartaare/observatoire-d4](https://github.com/Tartaare/observatoire-d4). L'accès nécessite une autorisation sur ce dépôt.
+
+`main` contient la version validée. Chaque nouveau sprint part d'une branche `feature/sprint-N-nom-court` et conserve des commits ciblés ; la fusion dans `main` intervient après revue, compilation et tests réussis. Les branches des sprints précédents restent disponibles pour consulter les étapes du développement. Le détail des livraisons et vérifications se trouve dans [app-progress.md](app-progress.md).
+
+Pour récupérer le projet sur un autre ordinateur :
+
+```powershell
+git clone https://github.com/Tartaare/observatoire-d4.git
+cd observatoire-d4
+```
+
+Les dépendances, ressources compilées, fichiers `.env`, clés privées, captures et archives SQLite locales sont exclus de Git. Le dépôt permet de retrouver le code ; sauvegarder séparément `data/observatoire.sqlite` pour conserver les données collectées.
+
 ## Lancer le projet
 
 Prérequis : **Node.js 22.16 ou supérieur**. Le serveur et SQLite sont natifs ; Cheerio analyse le HTML de la source. Les contrôles d’apparence utilisent React, shadcn/ui, Radix et Lucide. TypeScript, esbuild et Tailwind compilent cette partie localement.
