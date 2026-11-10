@@ -5,6 +5,11 @@ data/audit/
 coverage/
 assets/generated/
 artifacts/appearance/
+artifacts/cloud.mjs
+artifacts/cloud-browser/
+dist/
+supabase/functions/observatoire/index.ts
+supabase/.temp/
 __pycache__/
 *.pyc
 .env
