@@ -26,6 +26,7 @@ test('la saisie hexadécimale est normalisée et les bases trop proches sont rej
   assert.equal(normalizeHex(' f97316 '), '#F97316');
   for (const value of ['#fff', '#FFFFFF00', 'red', 'url(x)', '<script>']) assert.equal(normalizeHex(value), null);
   assert.equal(paletteError(DEFAULT_APPEARANCE.palette), '');
+  assert.equal(paletteError({dark: '18181b', light: 'fafafa', accent: 'f97316'}), '');
   assert.match(paletteError({...DEFAULT_APPEARANCE.palette, dark: '#EEEEEE'}), /contraste/);
   assert.match(paletteError({...DEFAULT_APPEARANCE.palette, dark: '#FFFFFF'}), /plus foncée/);
   assert.equal(resolveTheme('system', true), 'dark');

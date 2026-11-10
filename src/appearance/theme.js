@@ -43,9 +43,10 @@ export function mix(from, to, amount) {
 
 /** @param {Palette} palette */
 export function paletteError(palette) {
-  if (Object.values(palette).some(value => !normalizeHex(value))) return 'Saisissez six chiffres hexadécimaux, par exemple #F97316.';
-  if (luminance(palette.dark) >= luminance(palette.light)) return 'La couleur sombre doit être plus foncée que la couleur claire.';
-  if (contrast(palette.dark, palette.light) < 7) return 'Éloignez les couleurs sombre et claire : un contraste de 7:1 est nécessaire pour dériver des surfaces lisibles.';
+  const dark = normalizeHex(palette.dark), light = normalizeHex(palette.light);
+  if (!dark || !light || !normalizeHex(palette.accent)) return 'Saisissez six chiffres hexadécimaux, par exemple #F97316.';
+  if (luminance(dark) >= luminance(light)) return 'La couleur sombre doit être plus foncée que la couleur claire.';
+  if (contrast(dark, light) < 7) return 'Éloignez les couleurs sombre et claire : un contraste de 7:1 est nécessaire pour dériver des surfaces lisibles.';
   return '';
 }
 
