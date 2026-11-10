@@ -52,7 +52,7 @@ function AppearanceControls() {
     setAppearance(next);
     const persisted = saveAppearance(next);
     setSaved(persisted);
-    setNotice(persisted ? 'Préférences enregistrées dans ce navigateur.'
+    setNotice(persisted ? 'Préférences enregistrées dans ce navigateur !'
       : 'Appliqué pour cette session. Le stockage du navigateur est indisponible.');
   }
 
