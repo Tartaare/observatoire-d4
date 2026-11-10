@@ -114,7 +114,8 @@ test('le serveur expose la page, ses modules et une API de lecture sans exposer 
     assert.equal(response.headers.get('x-content-type-options'), 'nosniff');
     assert.ok(!response.headers.get('content-security-policy').includes('unsafe-inline'));
     for (const path of ['/', '/observatoire-d4.html', '/assets/css/observatoire.css',
-      '/src/app.js', '/src/controller.js', '/src/view.js', '/src/season.js', '/src/dom.js', '/src/types.js', '/src/navigation.js']) {
+      '/src/app.js', '/src/controller.js', '/src/view.js', '/src/season.js', '/src/dom.js', '/src/types.js', '/src/navigation.js',
+      '/assets/generated/theme.js', '/assets/generated/appearance.js', '/assets/generated/appearance.css']) {
       const asset = await fetch(origin + path);
       assert.equal(asset.status, 200, path);
       assert.ok((await asset.text()).length > 0, path);

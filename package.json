@@ -14,7 +14,8 @@
     "pretest": "npm run build:ui",
     "test": "node --preserve-symlinks --preserve-symlinks-main --test",
     "build:ui": "node --preserve-symlinks --preserve-symlinks-main scripts/build-ui.js",
-    "typecheck": "node --preserve-symlinks --preserve-symlinks-main node_modules/typescript/lib/tsc.js -p tsconfig.appearance.json",
+    "typecheck": "node --preserve-symlinks --preserve-symlinks-main node_modules/typescript/lib/tsc.js -p jsconfig.json && node --preserve-symlinks --preserve-symlinks-main node_modules/typescript/lib/tsc.js -p tsconfig.appearance.json",
+    "test:ui": "npm run build:ui && node --preserve-symlinks --preserve-symlinks-main scripts/check-appearance-browser.js",
     "build": "npm run build:ui && node --preserve-symlinks --preserve-symlinks-main scripts/check.js && npm run typecheck"
   },
   "dependencies": {
@@ -32,6 +33,7 @@
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "esbuild": "0.28.2",
+    "playwright": "1.65.0",
     "tailwindcss": "3.4.19",
     "typescript": "7.0.2"
   }

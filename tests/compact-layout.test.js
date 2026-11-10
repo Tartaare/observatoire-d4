@@ -7,6 +7,8 @@ import {setupSync} from '../src/sync-panel.js';
 
 test('les actions restent dans l’en-tête et le bilan reste visible dans le footer', async () => {
   const $ = load(await readFile(new URL('../observatoire-d4.html', import.meta.url), 'utf8'));
+  assert.equal($('header [data-appearance-root]').length, 1);
+  assert.equal($('head script').first().attr('src'), './assets/generated/theme.js');
   for (const name of ['sync', 'sync-force']) {
     assert.equal($(`header [data-${name}]`).length, 1, name);
   }
