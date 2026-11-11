@@ -1,8 +1,8 @@
 # Observatoire D4 — Fonctionnalités et fonctionnement de l’interface
 
-Référentiel fonctionnel destiné au design UI/UX, établi le **11 novembre 2026**, au sprint 15. Il décrit l’implémentation présente dans le dépôt, y compris les fonctionnalités des sprints 11 à 14. Il ne constitue pas une liste de fonctionnalités futures.
+Référentiel fonctionnel destiné au design UI/UX, établi le **11 novembre 2026**, actualisé au sprint 16. Il décrit l’implémentation présente dans le dépôt, dont la migration de présentation vers React/TypeScript et les composants shadcn, coss et ReUI adaptés localement. Il ne constitue pas une liste de fonctionnalités futures.
 
-L’inventaire résulte d’une lecture croisée du HTML, des composants, des styles, des contrôleurs, des règles de calcul et de la documentation. Les comportements décrits sont ceux du code ; cette rédaction ne constitue pas une nouvelle recette visuelle dans le navigateur. Le [langage visuel](design_language.md) reste la référence de conception ; [app-progress.md](app-progress.md) précise les validations et les limites de chaque livraison.
+L’inventaire résulte d’une lecture croisée du HTML, des composants, des styles, des contrôleurs, des règles de calcul et de la documentation. La migration du sprint 16 fait aussi l’objet de parcours automatisés dans Edge sur données synthétiques et d’une inspection de captures. Le [langage visuel](design_language.md) reste la référence de conception ; [app-progress.md](app-progress.md) précise les validations et les limites de chaque livraison.
 
 ## Sommaire
 
@@ -108,7 +108,7 @@ L’application utilise un écran principal unique. Les détails restent insér�
 | 6. Lecture temporelle | Lecture/Pause, précédent/suivant, journée/date courantes, frise avec curseur. | Révéler les journées dans le temps. |
 | 7. Pied de page | État des archives, dernière mise à jour complète, progression, couverture, erreurs et **Méthode et limites**. | Rendre la fraîcheur et la fiabilité consultables en permanence. |
 
-Le titre principal « Observatoire D4 » existe pour la structure accessible mais est masqué visuellement. L’état de chargement ou d’échec de la saison occupe le contenu principal ; les actions d’en-tête et le bilan du footer restent indépendants de ce contenu.
+Le titre principal visible est **Les équipes, au fil des journées**. La marque propose un lien vers le contenu de consultation et le sous-titre discret **LE FOOTBALL, FEUILLE APRÈS FEUILLE**. L’état de chargement ou d’échec de la saison occupe le contenu principal ; les actions d’en-tête et le bilan du footer restent indépendants de ce contenu.
 
 ## 4. Saison, poules et tris
 
@@ -134,7 +134,7 @@ Un changement de poule arrête la lecture, ferme le détail, conserve le mode de
 | **Nom (A–Z)** | Ordre alphabétique français sur les noms affichés. | Le nom complet, y compris la réserve, reste visible. |
 | **Apparitions cumulées** | Somme décroissante des nombres connus de chaque équipe sur toutes les journées acquises. | Les valeurs inconnues n’ajoutent rien. Le tri ignore la position du curseur et ne signifie ni total de joueurs uniques ni classement sportif. |
 
-Changer le tri arrête la lecture mais conserve la journée et le match sélectionné. Le détail est reconstruit : les sections de joueurs et de preuves précédemment dépliées se referment. Les lignes se réordonnent avec une animation de 240 ms si la réduction des mouvements n’est pas demandée. Aucun total de ligne supplémentaire n’est affiché : ce cumul sert au tri.
+Changer le tri arrête la lecture mais conserve la journée et le match sélectionné. Le détail est reconstruit : les sections de joueurs et de preuves précédemment dépliées se referment. Le réordonnancement est immédiat, sans animation de translation. Aucun total de ligne supplémentaire n’est affiché : ce cumul sert au tri.
 
 ## 5. Matrice des équipes par journée
 
@@ -203,7 +203,7 @@ Une note rappelle systématiquement les noms abrégés, l’absence de certifica
 
 ### 6.2 Liste de tous les joueurs publiés
 
-Chaque joueur occupe une section native dépliable, fermée initialement. Son résumé contient son nom et l’un de ces statuts :
+Chaque joueur occupe un item d’accordéon shadcn/Radix, fermé initialement. Son déclencheur contient son nom, un chevron d’ouverture et l’un de ces statuts :
 
 - **Titulaire** ;
 - **Entrée en jeu attestée** ;
@@ -239,7 +239,7 @@ La zone **Lecture de la saison** se situe sous la matrice. Le curseur est une li
 | Frise / curseur | Saisie directe d’une journée par pointage, glissement ou touches natives d’un curseur. Arrête la lecture et actualise immédiatement la matrice. |
 | Bouton d’en-tête Jxx | Même déplacement direct, avec annonce accessible et arrêt de la lecture. |
 
-La zone affiche **Journée N · date longue**. La frise comporte un segment par journée, différenciant journée courante, journées atteintes, journées connues non encore atteintes et journées ultérieures. Trois repères affichent la première journée, celle du milieu et la dernière ; ils suivent la longueur réelle du calendrier. Le curseur natif est transparent au-dessus de la frise ; un contour sur la piste rend son focus visible.
+La zone affiche **Journée N · date longue**. La frise comporte un segment par journée, différenciant journée courante, journées atteintes, journées connues non encore atteintes et journées ultérieures. Trois repères affichent la première journée, celle du milieu et la dernière ; ils suivent la longueur réelle du calendrier. Le curseur Radix possède une poignée circulaire visible, un focus explicite et une zone de manipulation agrandie sur écran tactile. Les flèches précédent/suivant disposent d’infobulles au survol et au focus lorsqu’elles sont actives.
 
 La lecture s’arrête à la dernière journée comportant un match terminé dans la saison acquise, même si le calendrier possède des journées futures. Elle annonce **Lecture terminée à la journée N**. Si elle démarre alors que le curseur est déjà à cette limite ou au-delà, elle repart de J01. Le bouton est désactivé lorsqu’il n’existe pas au moins deux journées jusqu’à cette limite.
 
@@ -253,7 +253,7 @@ Les flèches et la frise permettent de parcourir tout le calendrier, y compris l
 
 La case **Revérifier toutes les feuilles**, décochée initialement, contourne la fraîcheur du cache lors du prochain lancement. Elle ne supprime pas les archives et ne garantit pas que la source publiera des données supplémentaires. Les validateurs HTTP peuvent toujours éviter un téléchargement identique. Son choix n’est pas mémorisé après rechargement.
 
-Pendant le démarrage, le footer affiche **Démarrage de la mise à jour…** et les deux contrôles sont désactivés. Pendant la collecte, le bouton devient **Mise à jour en cours…** ; la revérification reste désactivée. Un lancement concurrent rejoint l’état de l’opération existante au lieu de démarrer un second travail sur la même saison.
+Pendant le démarrage, le footer affiche **Démarrage de la mise à jour…** et les deux contrôles sont désactivés. Pendant la collecte, le bouton devient **Mise à jour en cours…** ; la revérification reste désactivée. Un clic reçu pendant une lecture du statut est mis en attente puis exécuté, sans perte de la demande. Un lancement concurrent rejoint l’état de l’opération existante au lieu de démarrer un second travail sur la même saison.
 
 ### 8.2 Progression et résultat
 
@@ -292,7 +292,7 @@ Avant les premières archives, le footer invite à lancer une mise à jour. En l
 
 ### 8.4 Erreurs et reprise
 
-**Voir les erreurs de collecte** apparaît uniquement si des erreurs existent. Ce volet natif dépliable liste les URL concernées et les messages. La liste défile au-delà de 180 px. Son ouverture laisse la page reprendre une hauteur naturelle.
+**Voir les erreurs de collecte** apparaît uniquement si des erreurs existent, avec une icône d’avertissement et un badge de nombre d’erreurs. Ce volet natif dépliable liste les URL concernées et les messages. La liste défile au-delà de 180 px. Son ouverture laisse la page reprendre une hauteur naturelle.
 
 | Incident | Retour utilisateur et action possible |
 | --- | --- |
@@ -415,10 +415,10 @@ Ne sont pas mémorisés : sections de joueurs ou preuves dépliées, position ex
 
 | Situation | Présentation / reprise |
 | --- | --- |
-| Chargement initial de saison | **Chargement de la saison…**, zone principale marquée occupée, tableau masqué jusqu’à réception et validation. |
-| Saison invalide ou requête en échec | Alerte **La saison est indisponible…**, adaptée au serveur local ou à la connexion hébergée, et bouton **Réessayer**. Le contenu de saison est masqué ; en-tête et footer restent accessibles après authentification. |
-| HTML ouvert directement | Message demandant de lancer `npm start` et d’ouvrir l’adresse locale. |
-| Aucune équipe dans les deux poules | **Aucune équipe disponible pour cette saison.** Aucun tableau initialisé lors d’un premier chargement vide. |
+| Chargement initial de saison | **Chargement de la saison…**, indicateur de chargement et squelette du tableau ; zone principale marquée occupée, tableau masqué jusqu’à réception et validation. |
+| Saison invalide ou requête en échec | Alerte avec icône, titre **Impossible de lire la saison**, explication **La saison est indisponible…** adaptée au serveur local ou à la connexion hébergée, et bouton **Réessayer**. Le contenu de saison est masqué ; en-tête et footer restent accessibles après authentification. |
+| HTML ouvert directement | L’ouverture directe ne constitue pas un mode pris en charge : les modules nécessitent HTTP et le serveur lancé avec `npm start`. |
+| Aucune équipe dans les deux poules | État vide illustré par une icône de base, **Aucune équipe disponible pour cette saison.** et invitation à utiliser « Mettre à jour ». Aucun tableau initialisé. |
 | JavaScript désactivé | Message de repli **Activez JavaScript pour explorer la saison.** Les interactions et données ne fonctionnent pas. |
 | Date inconnue | **Date à confirmer** dans les repères concernés. |
 | Résultat inconnu | Aucun marqueur sportif déduit ; le score peut rester `—` dans le détail. |
@@ -436,11 +436,11 @@ Les états de la saison, de la collecte et d’une preuve historique sont indép
 ### 13.1 Mise en page selon l’écran
 
 - **Cadre général :** largeur maximale 1800 px, hauteur minimale de fenêtre, marges compactes. Hiérarchie en-tête → filtres → matrice → lecture → footer.
-- **Ordinateur d’au moins 900 × 700 px :** la matrice utilise la hauteur restante et répartit l’espace entre les équipes après un en-tête de 40 px. En-tête du tableau fixe en haut et noms fixes à gauche pendant le défilement. Les détails longs restent accessibles dans cette zone.
+- **Ordinateur d’au moins 900 × 700 px :** la matrice utilise la hauteur restante et répartit l’espace entre les équipes après un en-tête de 48 px, avec un minimum de 48 px par ligne. En-tête du tableau fixe en haut et noms fixes à gauche pendant le défilement. Les détails longs restent accessibles dans cette zone.
 - **Ordinateur de faible hauteur :** un mode plus dense réduit les espacements avec pointeur fin ; la page ne coupe pas de contenu pour simuler un ajustement parfait.
 - **Fenêtre plus petite :** hauteur naturelle de page et défilement conservé ; le nombre de journées ne réduit pas les cases jusqu’à les rendre illisibles.
-- **À 560 px et moins :** marque et boutons d’apparence sur la première ligne, commandes d’archives sur la suivante ; filtres sur la largeur disponible ; libellé visuel « Paramètres » masqué mais icône et nom accessible conservés. Colonne d’équipe de 135 px, noms pouvant revenir à la ligne, écusson maintenu.
-- **Pointage tactile :** cibles d’au moins 44 px pour les contrôles de consultation concernés, dans des lignes de tableau de 48 px. Les contrôles d’apparence mesurent au moins 44 px ; ceux de connexion 48 px.
+- **À 560 px et moins :** marque et boutons d’apparence sur la première ligne, commandes d’archives sur la suivante ; filtres sur la largeur disponible ; libellé visuel « Paramètres » masqué mais icône et nom accessible conservés. Colonne d’équipe de 155 px, noms pouvant revenir à la ligne, écusson maintenu. Le détail, ses alertes et ses historiques s’empilent dans la largeur visible.
+- **Pointage tactile :** cibles d’au moins 44 px pour les contrôles de consultation concernés, dans des lignes de tableau de 52 px. Les contrôles d’apparence mesurent au moins 44 px ; ceux de connexion 48 px.
 - **Footer étroit :** compteurs sur une ligne défilante horizontalement, zone focalisable au clavier ; aucune suppression de compteur. Ouvrir la méthode ou les erreurs rend de la hauteur à la page.
 - **Modale :** largeur maximale 520 px et marges de fenêtre, hauteur bornée par `dvh`, défilement interne, actions basses maintenues accessibles. À 380 px et moins, descriptions et champs couleur se répartissent sur plusieurs lignes. Champs hexadécimaux à 16 px pour éviter un zoom de saisie sur mobile.
 
@@ -460,7 +460,7 @@ Palette neutre sombre/claire avec accent orange personnalisable ; zéro neutre e
 
 Rayons de référence : cadre principal 14 px, panneaux 10 px, contrôles 7 px ; dialogue 16 px. Les tokens centralisent surfaces, textes, traits, focus, sélection et niveaux de repérage. Les contrastes calculés visent 4,5:1 pour les textes dérivés et 3:1 pour le focus et les contours des nouveaux contrôles, avec bases sombre/claire à 7:1 minimum. Ces règles de calcul ne constituent pas à elles seules une certification WCAG globale.
 
-Les composants d’apparence utilisent React/TypeScript, shadcn/ui et des icônes Lucide ; la matrice et la navigation restent natives. Pour un designer, la conséquence est un langage visuel commun à la page et à la modale, sans que l’ouverture des paramètres dépende du chargement des données.
+Toute la couche de présentation utilise React/TypeScript et les composants shadcn locaux : boutons, champs, sélecteurs natifs habillés, table, badges, états vides, alertes, squelette, dialogue, accordéons, curseur et infobulles. La matrice s’appuie sur **Frame de coss**, les antécédents sur une adaptation statique de **Timeline de ReUI**. Les calculs et API existants restent partagés. Les icônes sont issues de Lucide. Le langage visuel est commun à la page et à la modale ; l’ouverture des paramètres reste indépendante du chargement des données.
 
 ## 14. Parcours utilisateur de référence
 
@@ -532,17 +532,18 @@ Cette carte permet de retrouver l’implémentation sans avoir à découvrir tou
 
 | Périmètre décrit | Sources principales |
 | --- | --- |
-| Structure, libellés, légendes, points d’accès | [observatoire-d4.html](observatoire-d4.html) |
-| Chargement, validation et modes | [src/app.js](src/app.js), [src/season.js](src/season.js), [server/demo.js](server/demo.js) |
-| Poules, tris, curseur, lecture, sélection et focus | [src/controller.js](src/controller.js), [src/view.js](src/view.js) |
-| Détails réels, joueurs, preuves historiques | [src/detail.js](src/detail.js) |
+| Entrée HTML et rendu React | [observatoire-d4.html](observatoire-d4.html), [src/ui/main.tsx](src/ui/main.tsx) |
+| Chargement, validation et modes | [src/ui/main.tsx](src/ui/main.tsx), [src/season.js](src/season.js), [server/demo.js](server/demo.js) |
+| Poules, tris, curseur, lecture, sélection et focus | [src/ui/season-board.tsx](src/ui/season-board.tsx), [src/ui/use-navigation.ts](src/ui/use-navigation.ts), [src/ui/model.ts](src/ui/model.ts) |
+| Détails réels, joueurs, preuves historiques | [src/ui/match-detail.tsx](src/ui/match-detail.tsx) |
 | Règles de rapprochement, comptes, dates et classement acquis | [server/season-projection.js](server/season-projection.js), [server/source.js](server/source.js) |
-| Mise à jour, couverture, progression et conservation | [src/sync-panel.js](src/sync-panel.js), [server/synchronize.js](server/synchronize.js), [server/collection-store.js](server/collection-store.js) |
+| Mise à jour, couverture, progression et conservation | [src/ui/use-sync.ts](src/ui/use-sync.ts), [src/ui/archive-footer.tsx](src/ui/archive-footer.tsx), [server/synchronize.js](server/synchronize.js), [server/collection-store.js](server/collection-store.js) |
 | Navigation mémorisée | [src/navigation.js](src/navigation.js) |
 | Apparence, validation, modale et palette | [src/appearance/main.tsx](src/appearance/main.tsx), [src/appearance/theme.js](src/appearance/theme.js), [src/appearance/ui/dialog.tsx](src/appearance/ui/dialog.tsx) |
 | Logos, catalogue, import et brouillons | [src/club-logos.js](src/club-logos.js), [src/custom-logos.js](src/custom-logos.js), [src/appearance/club-logo-settings.tsx](src/appearance/club-logo-settings.tsx) |
-| Connexion et variante hébergée | [src/auth.js](src/auth.js), [src/session.js](src/session.js), [src/runtime.js](src/runtime.js), [cloud/api.ts](cloud/api.ts), [cloud/collector.ts](cloud/collector.ts) |
-| Mise en page, responsive, thèmes et états visuels | [assets/css/observatoire.css](assets/css/observatoire.css), [assets/css/appearance.css](assets/css/appearance.css), [assets/css/auth.css](assets/css/auth.css), [design_language.md](design_language.md) |
+| Connexion et variante hébergée | [src/ui/login.tsx](src/ui/login.tsx), [src/session.js](src/session.js), [src/runtime.js](src/runtime.js), [cloud/api.ts](cloud/api.ts), [cloud/collector.ts](cloud/collector.ts) |
+| Mise en page, responsive, thèmes et états visuels | [assets/css/interface.css](assets/css/interface.css), [assets/css/observatoire.css](assets/css/observatoire.css), [assets/css/appearance.css](assets/css/appearance.css), [assets/css/auth.css](assets/css/auth.css), [design_language.md](design_language.md) |
+| Composants et provenance | [docs/ui-components.md](docs/ui-components.md), [src/appearance/ui/frame.tsx](src/appearance/ui/frame.tsx), [src/appearance/ui/timeline.tsx](src/appearance/ui/timeline.tsx) |
 | État de livraison et limites des vérifications | [app-progress.md](app-progress.md), [README.md](README.md), [docs/source-audit.md](docs/source-audit.md) |
 
 Lors d’une évolution, mettre à jour ici le parcours, les libellés, les états, les règles de calcul et les effets de persistance concernés, puis aligner le langage visuel et l’avancement si nécessaire. Conserver la distinction entre comportement implémenté, comportement validé et service effectivement publié.
