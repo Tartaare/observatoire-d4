@@ -1,6 +1,7 @@
 import {mkdir, readdir, readFile, writeFile, copyFile, lstat, realpath, rm} from 'node:fs/promises';
 import {fileURLToPath} from 'node:url';
 import {dirname, resolve} from 'node:path';
+import {clubLogos} from '../src/club-logos.js';
 
 // Liste fermée : aucune archive, clé, dépendance ou source serveur dans le site public.
 const root = new URL('../', import.meta.url);
@@ -22,6 +23,11 @@ for (const directory of ['src', 'assets/css', 'assets/generated']) {
     await copyFile(new URL(`${directory}/${entry.name}`, root), new URL(`${directory}/${entry.name}`, output));
   }
 }
+await mkdir(new URL('assets/clubs/', output), {recursive: true});
+for (const {id} of clubLogos) {
+  const filename = `assets/clubs/BC${id}.jpg`;
+  await copyFile(new URL(filename, root), new URL(filename, output));
+}
 await writeFile(new URL('src/runtime.js', output), 'export const hosted = true;\n');
 const html = await readFile(new URL('observatoire-d4.html', root), 'utf8');
 await writeFile(new URL('index.html', output), html.replace('Archives locales des compositions', 'Archives des compositions'));
@@ -31,7 +37,7 @@ await writeFile(new URL('_headers', output), `/*
   Referrer-Policy: no-referrer
   X-Frame-Options: DENY
   Cache-Control: no-cache
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 `);
 await writeFile(new URL('_routes.json', output), JSON.stringify({version: 1, include: ['/api/*'], exclude: []}));
 console.log(`Site Pages prêt : ${fileURLToPath(output)}`);
