@@ -112,10 +112,10 @@ const logos = new Map(clubLogos.map(club => [key(club.name), club.id]));
 // Variantes des noms présents dans la démonstration historique.
 for (const [name, id] of [['US Béduer-Faycelles', '565091'], ['Haut Célé FC', '582418'], ['FC Cuzance', '533635'], ['FC Bouriane', '542833'], ['Causse Limargue', '542832']]) logos.set(key(name), id);
 
-/** @param {string} name @param {Record<string, string>} [custom] @returns {string | null} */
-export function clubLogoURL(name, custom = readCustomLogos()) {
+/** @param {string} name @returns {string | null} */
+export function clubLogoURL(name) {
   const id = logos.get(key(name));
-  return id ? custom[id] ?? './assets/clubs/BC' + id + '.jpg' : null;
+  return id ? readCustomLogos()[id] ?? './assets/clubs/BC' + id + '.jpg' : null;
 }
 
 /** @param {string} name @param {string} initials */
