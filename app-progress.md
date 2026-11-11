@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 14 — Validation manuelle des logos
+
+Branche : `feature/sprint-14-confirm-club-logos`.
+
+Statut : **terminé le 11 novembre 2026**, sans fusion ni publication.
+
+US-026 : dissocier l’aperçu importé du logo enregistré. L’import prépare uniquement une image temporaire ; « Enregistrer le logo » confirme l’écriture et la propagation. « Annuler le changement », changer de club ou fermer la modale abandonne le brouillon. La restauration du logo d’origine passe par la même validation. Une erreur de stockage conserve le logo enregistré et le brouillon pour permettre une nouvelle tentative.
+
+Propagation : le mécanisme partagé existant est conservé, sans refonte. Après validation, matrice, paramètres, réserves du même club et autres onglets suivent la même valeur enregistrée ; les tris, changements de poule et rechargements relisent cette valeur. Avant validation, seul l’aperçu des paramètres change.
+
+Vérifications : build Pages et typage strict réussis ; 30 tests natifs réussis. Contrôle Edge étendu : absence d’écriture et de changement dans la matrice/autre onglet avant confirmation, annulation, abandon lors du changement de club, confirmation explicite, propagation à une réserve dans l’autre poule et après tri, persistance, restauration confirmée, fichier illisible et stockage plein. Transparence, absence de débordement à 320 px et retour du focus vérifiés.
+
+Prévention des régressions : ne jamais appeler `saveCustomLogo` pendant le décodage de l’image ; réserver cet appel au bouton de confirmation. Garder l’aperçu indépendant du stockage et ne pas propager de brouillon par les événements globaux. Conserver un seul identifiant de logo par club pour toutes ses équipes.
+
 ## Sprint 13 — Import des logos personnalisés
 
 Branche : `feature/sprint-13-custom-club-logos`.
