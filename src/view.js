@@ -1,6 +1,7 @@
 import {createSeason, matchResult} from './season.js';
 import {query, escapeHTML} from './dom.js';
 import {liveDetail} from './detail.js';
+import {clubBadge, bindClubLogoFallbacks} from './club-logos.js';
 
 /** @param {HTMLElement} root @param {import("./types.js").SeasonData} data @param {import("./types.js").AppState} state */
 export function createView(root, data, state) {
@@ -41,8 +42,9 @@ export function createView(root, data, state) {
     body.innerHTML = order.map((team) => {
       const [name, initials] = teams[team];
       const cells = dates.map((_, day) => '<td data-column="' + day + '"><button type="button" class="od-cell cursor-interaction" data-team="' + team + '" data-day="' + day + '"></button></td>').join("");
-      return '<tr data-row="' + team + '"><th scope="row" class="od-team"><div class="od-club"><span class="od-rank" aria-label="Rang ' + (team + 1) + '">' + (team + 1) + '</span><span class="od-monogram" aria-hidden="true">' + escapeHTML(initials) + '</span><span>' + escapeHTML(name) + '</span></div></th>' + cells + '</tr>';
+      return '<tr data-row="' + team + '"><th scope="row" class="od-team"><div class="od-club"><span class="od-rank" aria-label="Rang ' + (team + 1) + '">' + (team + 1) + '</span>' + clubBadge(name, initials) + '<span>' + escapeHTML(name) + '</span></div></th>' + cells + '</tr>';
     }).join("");
+    bindClubLogoFallbacks(body);
     updateDay();
     renderDetail();
   }
