@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 13 — Import des logos personnalisés
+
+Branche : `feature/sprint-13-custom-club-logos`.
+
+Statut : **terminé le 11 novembre 2026**, sans fusion ni publication.
+
+US-025 : ajouter dans les paramètres une section repliable pour les 20 clubs du catalogue : sélection, import PNG/JPEG/WebP, aperçu immédiat, restauration individuelle. Images limitées à 2 Mo et 4096 px de côté, réencodées en PNG à 256 px maximum, proportions et transparence conservées. Stockage local versionné indépendant de la saison et de la palette ; synchronisation entre onglets de la même origine. Aucun envoi de fichier au serveur, aucune nouvelle dépendance ni modification des archives.
+
+Design : suppression du fond blanc CSS et masquage des initiales sous les images transparentes ; retour des initiales si une image est indisponible. Paramètres accessibles au clavier, contrôles de 44 px, aperçu et retour de progression/erreur. Choix du club et import verrouillés pendant le traitement. Une erreur de décodage ou de stockage conserve le logo précédent.
+
+Vérifications : build Pages et typage strict réussis, 30 tests natifs réussis. Edge : import d’un PNG synthétique transparent, réduction 512 × 256 vers 256 × 128 avec alpha nul en bordure, absence de fond et d’initiales sous l’image, aperçu/matrice, rechargement, multi-onglets, restauration, fichier illisible et quota dépassé. Modale vérifiée en portrait 320 px, sans débordement, retour du focus après Échap. Parcours d’apparence existant réussi en 320/390 px. Captures dans `artifacts/appearance/`, hors Git.
+
+Prévention des régressions : garder les trois CSP alignées avec `img-src 'self' data:` ; n’accepter en stockage que des données PNG bornées et des identifiants à six chiffres. Le canvas conserve l’alpha et élimine les formats actifs ; SVG non accepté. Stockage plafonné à 3 millions de caractères, refus explicite si indisponible. Nettoyer les listeners avec le contrôleur et synchroniser les restaurations entre onglets. Le contrôle navigateur ignore uniquement l’éventuelle requête automatique `/favicon.ico` absente, jamais les erreurs JS/CSP applicatives. Les personnalisations sont propres au navigateur et disparaissent lors de l’effacement de ses données.
+
 ## Sprint 12 — Logos des clubs
 
 Branche : `feature/sprint-12-club-logos`.

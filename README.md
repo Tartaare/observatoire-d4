@@ -8,6 +8,10 @@ Les 20 clubs du classement D4 disposent de leur logo FFF à gauche du nom. Les J
 
 Contrôle navigateur des logos : `node --preserve-symlinks --preserve-symlinks-main scripts/check-club-logos-browser.js` (Edge par défaut). Vérifie les 20 images, les deux thèmes, le portrait 320 px, le tri, le repli après erreur réseau et l’absence de requête externe. Captures dans `artifacts/appearance/`, hors Git.
 
+Dans **Paramètres → Logos des clubs**, déplier la section, choisir un club puis importer une image PNG, JPEG ou WebP de 2 Mo maximum (4096 × 4096 px maximum). L’aperçu et la matrice changent immédiatement ; la transparence des PNG est conservée. Les images sont réduites à 256 px maximum, sans déformation, et enregistrées dans ce navigateur uniquement : aucun envoi au serveur ni partage entre utilisateurs. Les équipes d’un même club utilisent le même logo, y compris après rechargement et dans les autres onglets de la même adresse. **Restaurer le logo d’origine** retire cette personnalisation ; **Réinitialiser** reste réservé à la palette. Effacer les données du navigateur efface aussi les logos importés. En cas d’image invalide ou de stockage plein/bloqué, le logo précédent est conservé et une erreur est affichée.
+
+Vérification de l’import : `node --preserve-symlinks --preserve-symlinks-main scripts/check-custom-logos-browser.js` (Edge par défaut).
+
 ## Suivi du développement
 
 Le code et son historique sont hébergés dans le dépôt privé [Tartaare/observatoire-d4](https://github.com/Tartaare/observatoire-d4). L'accès nécessite une autorisation sur ce dépôt.
