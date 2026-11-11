@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 15 — Référentiel des fonctionnalités et de l’interface
+
+Branche : `feature/sprint-15-feature-inventory`.
+
+Statut : **terminé le 11 novembre 2026**, sans fusion ni publication.
+
+US-027 : créer [app-features.md](app-features.md), un référentiel destiné à un designer UI/UX découvrant l’application sans l’avoir utilisée. Lecture croisée de la documentation, du HTML, des composants, des styles, des contrôleurs et des calculs de saison. Seize sections décrivent finalité et vocabulaire, accès local/démonstration/hébergé, anatomie de l’écran, poules et tris, matrice et résultats, compositions et preuves historiques, lecture temporelle, synchronisation et couverture, apparence, logos, persistance, erreurs, responsive et accessibilité. Cinq parcours de référence, périmètre des fonctions hors interface et carte des fichiers sources complètent l’inventaire. Le README donne un accès direct au document.
+
+Design : documenter chaque contrôle avec son effet et ses états ; distinguer zéro, inconnu, non joué et masqué après le curseur. Préciser que le tri cumulé porte sur toutes les journées acquises, que les forfaits restent consultables et que la palette s’applique immédiatement tandis que les logos exigent une confirmation. Séparer la variante hébergée implémentée de son déploiement distant toujours en attente. Aucun changement de code, d’interface ou d’architecture.
+
+Vérifications : `npm run build:pages` réussi, 43 modules JavaScript et ressources validés, typage strict réussi ; `npm test` : 30 tests réussis, aucun échec. Exécution hors sandbox nécessaire pour les restrictions de lecture Windows d’esbuild. Contrôle documentaire : 16 sections, 50 liens et ancres valides, encodage UTF-8 sans caractère de remplacement ; revue du diff sans erreur d’espacement. Aucune nouvelle recette visuelle ni opération sur les services distants pour ce sprint documentaire.
+
+Prévention des régressions : maintenir `app-features.md` avec les parcours, libellés, états, règles de calcul et effets de persistance de toute évolution fonctionnelle. Ne pas présenter une fonction préparée comme un service publié, ni confondre repérage de nom et identité certifiée. Garder ce référentiel aligné avec `design_language.md`, le README et le comportement réel du code.
+
 ## Sprint 14 — Validation manuelle des logos
 
 Branche : `feature/sprint-14-confirm-club-logos`.
