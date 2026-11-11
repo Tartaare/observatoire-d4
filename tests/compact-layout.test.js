@@ -5,23 +5,15 @@ import {setImmediate as nextTurn} from 'node:timers/promises';
 import {load} from 'cheerio';
 import {setupSync} from '../src/sync-panel.js';
 
-test('les actions restent dans l’en-tête et le bilan reste visible dans le footer', async () => {
+test('la page charge le rendu React local et restaure le thème avant les styles', async () => {
   const $ = load(await readFile(new URL('../observatoire-d4.html', import.meta.url), 'utf8'));
-  assert.equal($('header [data-appearance-root]').length, 1);
   assert.equal($('head script').first().attr('src'), './assets/generated/theme.js');
-  for (const name of ['sync', 'sync-force']) {
-    assert.equal($(`header [data-${name}]`).length, 1, name);
-  }
-  for (const name of ['sync-message', 'sync-coverage', 'sync-progress', 'sync-errors']) {
-    assert.equal($(`#observatoire-d4 > footer [data-${name}]`).length, 1, name);
-    assert.equal($(`[data-${name}]`).parents('[hidden], [data-content], main').length, 0, name);
-  }
-  assert.equal($('[data-sync-panel], [data-sync-summary]').length, 0);
-  assert.equal($('main .od-sync').length, 0);
-  assert.equal($('.od-board').next().hasClass('od-replay'), true);
-  assert.equal($('[data-intro-description], [data-mode-label]').length, 0);
-  assert.equal($('[data-demo-label]').length, 1);
-  assert.equal($('.od-footer details:not([open]) [data-method-note]').length, 1);
+  assert.equal($('script[type=module]').attr('src'), './assets/generated/appearance.js');
+  assert.equal($('#observatoire-d4 [role=status]').length, 1);
+  assert.equal($('noscript').length, 1);
+  assert.ok($('link[href="./assets/css/interface.css"]').length);
+  const bundle = await readFile(new URL('../assets/generated/appearance.js', import.meta.url), 'utf8');
+  assert.match(bundle, /["']\.\.\/\.\.\/src\/runtime\.js["']/); // Mode hébergé choisi par Pages à l'exécution, jamais figé dans le bundle.
 });
 
 test('le footer restitue la couverture, la progression et les échecs sans perdre les archives', async t => {

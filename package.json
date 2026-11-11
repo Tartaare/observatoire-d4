@@ -19,14 +19,15 @@
     "import:cloud": "npm run build:cloud && node --preserve-symlinks --preserve-symlinks-main scripts/import-cloud.js",
     "typecheck": "node --preserve-symlinks --preserve-symlinks-main node_modules/typescript/lib/tsc.js -p jsconfig.json && node --preserve-symlinks --preserve-symlinks-main node_modules/typescript/lib/tsc.js -p tsconfig.appearance.json && node --preserve-symlinks --preserve-symlinks-main node_modules/typescript/lib/tsc.js -p tsconfig.cloud.json",
     "test:ui": "npm run build:ui && node --preserve-symlinks --preserve-symlinks-main scripts/check-appearance-browser.js",
+    "test:interface": "npm run build:ui && node --preserve-symlinks --preserve-symlinks-main scripts/check-interface-browser.js",
     "build": "npm run build:ui && npm run build:cloud && node --preserve-symlinks --preserve-symlinks-main scripts/check.js && npm run typecheck"
   },
   "dependencies": {
-    "@radix-ui/react-accordion": "1.3.1",
+    "@radix-ui/react-accordion": "1.2.20",
     "@radix-ui/react-dialog": "1.3.1",
-    "@radix-ui/react-slider": "1.6.1",
+    "@radix-ui/react-slider": "1.4.7",
     "@radix-ui/react-slot": "1.5.0",
-    "@radix-ui/react-tooltip": "1.4.1",
+    "@radix-ui/react-tooltip": "1.2.16",
     "cheerio": "1.2.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
