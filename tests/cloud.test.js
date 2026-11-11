@@ -123,13 +123,21 @@ test('le proxy Pages borne les routes, les origines et les corps sans exposer de
   assert.equal((await onRequest({request: request('/sync', {method: 'POST', headers: {Origin: 'https://evil.test'}}), env})).status, 403);
   assert.equal((await onRequest({request: request('/auth/token?grant_type=client_credentials', {method: 'POST', headers: {Origin: 'https://app.pages.dev'}}), env})).status, 400);
   assert.equal((await onRequest({request: request('/auth/token?grant_type=password', {method: 'POST', headers: {Origin: 'https://app.pages.dev'}, body: 'x'.repeat(4097)}), env})).status, 413);
+  let upstreamRedirects = false;
   t.mock.method(globalThis, 'fetch', async (url, options) => {
     assert.equal(url, `${env.SUPABASE_URL}/functions/v1/observatoire/season`);
     assert.equal(options.headers.get('Authorization'), 'Bearer user-token');
+    assert.equal(options.redirect, 'manual');
+    if (upstreamRedirects) return Response.redirect('https://example.com/', 307);
     return Response.json({ok: true});
   });
-  const result = await onRequest({request: request('/season', {headers: {Authorization: 'Bearer user-token'}}), env});
+  const callRelay = () => onRequest({request: request('/season', {headers: {Authorization: 'Bearer user-token'}}), env});
+  const result = await callRelay();
   assert.equal(result.status, 200); assert.equal(result.headers.get('Cache-Control'), 'no-store');
+  upstreamRedirects = true;
+  const rejected = await callRelay();
+  assert.equal(rejected.status, 502);
+  assert.equal(rejected.headers.has('Location'), false);
 });
 
 test('la fonction générée démarre avec les API Web, sans modules Node.js', async () => {

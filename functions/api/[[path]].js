@@ -42,7 +42,11 @@ export async function onRequest({request, env}) {
       body = new Blob(chunks);
     }
     const upstream = await fetch(env.SUPABASE_URL + target, {method: request.method, headers, body,
-      redirect: 'error', signal: AbortSignal.timeout(60000)});
+      redirect: 'manual', signal: AbortSignal.timeout(60000)});
+    if (upstream.status >= 300 && upstream.status < 400) {
+      await upstream.body?.cancel();
+      return respond({error: 'Redirection inattendue du service.'}, 502);
+    }
     return new Response(upstream.body, {status: upstream.status, headers: {'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff'}});
   } catch (error) {
