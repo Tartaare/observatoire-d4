@@ -1,5 +1,25 @@
 # Avancement
 
+## Sprint 16 — Interface unifiée avec shadcn, coss et ReUI
+
+Branche : `feature/sprint-16-shadcn-ui`.
+
+Statut : **terminé le 11 novembre 2026**, sans fusion ni publication. Migration de la couche de présentation React/TypeScript + shadcn/Radix explicitement validée par l’utilisateur avant implémentation.
+
+US-028 : étendre les composants shadcn partagés à l’interface : boutons, champs, sélecteurs natifs habillés, table, badges, alertes, squelette, état vide, dialogue, accordéons, curseur et infobulles. Ajouter uniquement les trois primitives Radix nécessaires, avec versions exactes et verrou synchronisé. Adapter Frame de coss pour la matrice et Timeline de ReUI pour les antécédents, à partir des sources publiques lues et avec notices MIT conservées. Aucun composant Pro ni moteur Base UI ajouté ; Tailwind 3 reste en place.
+
+US-029 : rendre en React les filtres, la matrice, les compositions, les preuves historiques et la lecture. Conserver les règles de saison, résultats et forfaits, les zéros/inconnus/non-joués/journées masquées, la navigation mémorisée, les noms fixes et le détail contextuel. Le curseur possède une poignée visible et les quatre états de segments ; les joueurs utilisent des accordéons multiples et leurs antécédents une chronologie. Restaurer le focus, annoncer les changements et ne pas substituer la date générale de journée à une date de match inconnue. Réutiliser le calendrier construit et lire les logos personnalisés une seule fois par révision, plutôt qu’à chaque cellule ou équipe.
+
+US-030 : migrer chargement, erreurs, saison vide, connexion, mise à jour et bilan permanent. Valider les réponses de statut et d’archives utilisées par la nouvelle UI ; nettoyer requêtes, minuteurs et listeners au démontage. Une demande de mise à jour reçue pendant la lecture du statut est mise en attente, sans perte du clic. Les calculs, API et archives restent partagés ; seul le serveur expose une nouvelle ressource CSS. Les anciens fichiers de rendu sont conservés, sans constituer l’entrée active. Le bundle laisse `src/runtime.js` externe pour préserver le choix local/hébergé après génération Pages.
+
+US-031 : ajouter `npm run test:interface`, un contrôle métier des états de matrice et actualiser le test d’entrée compilée. Mettre à jour `app-features.md`, `design_language.md`, le README et les provenances de composants. L’interface garde l’identité neutre/orange, la palette personnalisable, la validation explicite des logos et le footer compact ; le portrait organise les commandes et les détails sans couper les compositions. Contrôles de 44 px sur écran tactile, lignes de 52 px et colonne d’équipe de 155 px en petit écran.
+
+Vérifications finales : `npm run build:pages` réussi, 45 modules JavaScript/imports/ressources vérifiés et typage strict du frontend et du cloud réussi ; `npm test` : **31 tests réussis, aucun échec**. Les quatre recettes Edge passent : interface complète, apparence, catalogue des 20 logos et logos personnalisés. Couverture : données réelles synthétiques, forfaits, preuves, focus/Échap, slider clavier, lecture, persistance, collecte forcée, erreurs et compteurs conservés, clic pendant lecture du statut, saison en erreur/vide, connexion refusée puis réussie et déconnexion hébergées simulées, thèmes, stockage bloqué, transparence, confirmation, réserves et multi-onglets. Portrait 320/390 px et format 768 px sans débordement de page ; captures ordinateur, thèmes, historique et portrait inspectées dans `artifacts/appearance/`, hors Git. Les parcours d’interface et d’apparence contrôlent les erreurs JS/CSP ; les erreurs HTTP 503 explicitement provoquées pour tester la récupération sont distinguées des erreurs de rendu. Référentiel : 57 liens/ancres valides et UTF-8 vérifié.
+
+Limites : recettes sur données synthétiques et services simulés ; aucune collecte réelle, modification d’archives personnelles ou action distante. Le sprint 11 reste en attente de déploiement/validation distante. Lighthouse et conformité WCAG globale non certifiés ; les vérifications portent sur les parcours et propriétés décrits. Les commandes de compilation et navigateur nécessitent la sortie des restrictions Windows du sandbox ; l’installation utilise le magasin système de certificats sans désactiver TLS.
+
+Prévention des régressions : garder `src/runtime.js` externe au bundle, le script de thème avant les styles, les tokens communs aux portails et la CSP stricte. Ne pas réintroduire de lecture du stockage des logos à chaque cellule, perdre une demande pendant un rafraîchissement ou afficher un faux zéro/date. Ne pas modifier les clés de navigation et de personnalisation sans migration. Relancer le serveur après ce sprint pour exposer `assets/css/interface.css`, et maintenir la recette complète avec tout changement de parcours.
+
 ## Sprint 15 — Référentiel des fonctionnalités et de l’interface
 
 Branche : `feature/sprint-15-feature-inventory`.
