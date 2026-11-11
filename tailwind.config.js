@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ['./src/appearance/**/*.tsx', './src/ui/**/*.tsx'],
+  content: ['./src/appearance/**/*.tsx'],
   corePlugins: {preflight: false},
   future: {hoverOnlyWhenSupported: true},
   theme: {

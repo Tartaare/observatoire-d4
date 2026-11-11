@@ -12,11 +12,72 @@
 <link rel="stylesheet" href="./assets/css/observatoire.css">
 <link rel="stylesheet" href="./assets/css/auth.css">
 <link rel="stylesheet" href="./assets/generated/appearance.css">
-<link rel="stylesheet" href="./assets/css/interface.css">
-<script type="module" src="./assets/generated/appearance.js"></script>
+<script defer src="./assets/generated/appearance.js"></script>
+<script type="module" src="./src/app.js"></script>
 </head>
 <body>
-<div id="observatoire-d4"><p role="status">Chargement de la saison&#8230;</p></div>
-<noscript><p>Activez JavaScript pour explorer la saison.</p></noscript>
+<div id="observatoire-d4">
+  <header class="od-top">
+    <div class="od-brand"><span class="od-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h4l3-8 4 16 3-8h4"/></svg></span> Observatoire <b>D4</b></div>
+    <div class="od-header-actions">
+      <div class="od-sync-actions" role="group" aria-label="Synchronisation des archives">
+        <label class="od-refresh-option cursor-interaction"><input type="checkbox" data-sync-force> Revérifier toutes les feuilles</label>
+        <button class="od-play cursor-interaction" type="button" data-sync>Mettre à jour</button>
+      </div>
+      <div data-appearance-root></div>
+    </div>
+  </header>
+  <main class="od-main" aria-busy="true">
+    <h1 class="od-sr">Observatoire D4</h1>
+    <div class="od-status" data-status role="status"><p data-status-message>Chargement de la saison…</p><button type="button" class="od-play cursor-interaction" data-retry hidden>Réessayer</button></div>
+    <noscript><p>Activez JavaScript pour explorer la saison.</p></noscript>
+    <div data-content hidden>
+    <div class="od-intro">
+      <div>
+        <div class="od-eyebrow">DISTRICT 4 DU LOT <span>/</span> <span data-season-label>SAISON 2026–2027</span></div>
+        <span class="od-mode" data-demo-label hidden>Démonstration</span>
+      </div>
+      <div class="od-selects">
+        <label>Poule<select data-pool><option value="a">Poule A</option><option value="b">Poule B</option></select></label>
+        <label>Trier les équipes<select data-sort><option value="rank">Classement</option><option value="name">Nom (A–Z)</option><option value="total">Apparitions cumulées</option></select></label>
+      </div>
+    </div>
+    <section class="od-board" aria-labelledby="od-matrix-title">
+      <div class="od-board-head">
+        <div class="od-board-title"><h2 id="od-matrix-title">Équipes par journée</h2><span data-team-count></span></div>
+        <div class="od-legend" aria-label="Nombre de repérages connus, de 0 à 5 et plus"><span data-legend-label>Repérages</span><span class="od-scale"><b data-tone="0">0</b><b data-tone="1">1</b><b data-tone="2">2</b><b data-tone="3">3</b><b data-tone="4">4</b><b data-tone="5">5+</b></span></div>
+      </div>
+      <div class="od-scroll"><table><caption class="od-sr">Repérages de noms en division supérieure à confirmer, par équipe et par journée de D4</caption><thead></thead><tbody></tbody></table></div>
+      <div class="od-board-foot"><span><b class="od-missing">?</b> Feuille absente ou incomplète</span><span><b>—</b> À venir / non joué</span><span><b>·</b> Après le curseur</span><span>V · Victoire / N · Nul / D · Défaite / F · Forfait</span></div>
+    </section>
+    <section class="od-replay" aria-label="Lecture de la saison">
+      <div class="od-replay-top">
+        <div class="od-transport">
+          <button type="button" class="od-play cursor-interaction" data-play aria-pressed="false"><span data-play-icon aria-hidden="true">▶</span><span data-play-label>Lecture</span></button>
+          <button type="button" class="od-arrow cursor-interaction" data-prev aria-label="Journée précédente">‹</button>
+          <button type="button" class="od-arrow cursor-interaction" data-next aria-label="Journée suivante">›</button>
+        </div>
+        <div class="od-current"><span data-round-label></span><span class="od-dot">·</span><span data-round-date></span></div>
+      </div>
+      <div class="od-timeline">
+        <div class="od-track" data-track></div>
+        <input class="od-range cursor-interaction" type="range" min="0" max="13" step="1" aria-label="Journée affichée">
+        <div class="od-ticks" aria-hidden="true"><span>J01</span><span>J07</span><span>J14</span></div>
+      </div>
+    </section>
+    </div>
+    <span class="od-sr" data-announcement aria-live="polite"></span>
+  </main>
+  <footer class="od-footer" aria-label="État des archives et méthode">
+    <div class="od-sync-info" tabindex="0" role="region" aria-label="Bilan des archives, défilement horizontal si nécessaire">
+      <p data-sync-message role="status" aria-live="polite">Lecture de l’état des archives…</p>
+      <progress data-sync-progress aria-label="Avancement de la synchronisation" hidden></progress>
+      <p class="od-sync-coverage" data-sync-coverage></p>
+      <details class="od-sync-errors" data-sync-errors hidden><summary class="cursor-interaction">Voir les erreurs de collecte</summary><ul data-sync-error-list></ul></details>
+    </div>
+    <details class="od-method"><summary class="cursor-interaction">Méthode et limites</summary><p data-method-note>Un nom est repéré s’il apparaît dans une participation attestée en D4 et dans une feuille antérieure de championnat supérieur du même club, pendant la même saison. Noms abrégés : identités à confirmer. Les totaux portent sur les feuilles archivées.</p></details>
+  </footer>
+</div>
+
 </body>
 </html>
