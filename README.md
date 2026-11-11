@@ -6,8 +6,6 @@ L’interface affiche les données réelles archivées depuis [Le Onze Lotois](h
 
 Le [référentiel des fonctionnalités et de l’interface](app-features.md) décrit les parcours utilisateur, chaque zone et contrôle, les états de données, la synchronisation, les personnalisations, le responsive et l’accessibilité. Il distingue la version locale, la démonstration et la variante hébergée préparée, pour permettre une prise en main UI/UX sans avoir utilisé l’application.
 
-La présentation utilise désormais React/TypeScript et les composants shadcn locaux, avec Frame de coss pour la matrice et une adaptation de Timeline de ReUI pour les preuves historiques. L’interface conserve ses calculs, archives et préférences, avec contrôles clavier, poignée de lecture visible, états de chargement/erreur/vide et disposition portrait. Provenance, adaptations et licences : [composants UI](docs/ui-components.md).
-
 Les 20 clubs du classement D4 disposent de leur logo FFF à gauche du nom. Les JPEG sont intégrés localement : aucune connexion au CDN n’est nécessaire pendant la consultation. Les initiales restent le repli pour un club inconnu ou une image indisponible. Les réserves partagent le logo de leur club ; les correspondances explicites et leurs pages sources figurent dans `src/club-logos.js`. Pour une nouvelle saison, vérifier ce catalogue avant d’ajouter les nouveaux écussons à `assets/clubs/`.
 
 Contrôle navigateur des logos : `node --preserve-symlinks --preserve-symlinks-main scripts/check-club-logos-browser.js` (Edge par défaut). Vérifie les 20 images, les deux thèmes, le portrait 320 px, le tri, le repli après erreur réseau et l’absence de requête externe. Captures dans `artifacts/appearance/`, hors Git.
@@ -43,14 +41,14 @@ Configuration, migration, accès, import et limites gratuites : [guide de déplo
 
 ## Lancer le projet
 
-Prérequis : **Node.js 22.16 ou supérieur**. Le serveur et SQLite sont natifs ; Cheerio analyse le HTML de la source. La présentation utilise React, shadcn/ui, Radix et Lucide, avec des compositions coss et ReUI adaptées localement. TypeScript, esbuild et Tailwind compilent le frontend.
+Prérequis : **Node.js 22.16 ou supérieur**. Le serveur et SQLite sont natifs ; Cheerio analyse le HTML de la source. Les contrôles d’apparence utilisent React, shadcn/ui, Radix et Lucide. TypeScript, esbuild et Tailwind compilent cette partie localement.
 
 ```powershell
 npm ci --ignore-scripts
 npm start
 ```
 
-`npm start` compile et vérifie automatiquement le frontend avant de lancer le serveur. Conserver les dépendances de développement pour cette compilation. Ouvrir **http://127.0.0.1:3000**. Les modules JavaScript et l’API nécessitent le serveur ; ouvrir directement le fichier HTML ne suffit plus. Après la mise à jour du sprint 16, relancer le serveur pour exposer aussi la nouvelle feuille de styles de l’interface.
+`npm start` compile et vérifie automatiquement le frontend avant de lancer le serveur. Conserver les dépendances de développement pour cette compilation. Ouvrir **http://127.0.0.1:3000**. Les modules JavaScript et l’API nécessitent le serveur ; ouvrir directement le fichier HTML ne suffit plus. Après la mise à jour du sprint 9, relancer le serveur pour exposer les nouveaux fichiers compilés.
 
 Si le port est occupé :
 
@@ -72,13 +70,9 @@ assets/css/appearance.css    Styles des contrôles et de la modale
 assets/generated/            Ressources compilées locales, ignorées par Git
 src/
   appearance/               Contrôles React/TypeScript, thème et composants shadcn
-  ui/main.tsx               Application React, chargement et états de saison
-  ui/season-board.tsx       Matrice, filtres, sélection et lecture
-  ui/match-detail.tsx       Compositions, joueurs et preuves historiques
-  ui/use-navigation.ts     Navigation et lecture, préférences partagées
-  ui/use-sync.ts           Collecte, progression, reprise et validation du statut
-  ui/archive-footer.tsx    Couverture, méthode et erreurs permanentes
-  ui/login.tsx             Connexion de la variante hébergée
+  app.js                    Chargement API, états de chargement/erreur/vide
+  controller.js             État de navigation, événements et lecture
+  view.js                   Matrice et détail des matchs
   season.js                 Calendrier, fiches et validation des données
   dom.js                    Requêtes DOM typées et échappement HTML
   types.js                  Contrats JSDoc partagés
@@ -92,9 +86,9 @@ tests/observatoire.test.js  Vérifications métier, SQLite et HTTP
 jsconfig.json               Vérification stricte du JavaScript dans un IDE compatible
 ```
 
-Les modules de collecte sont `server/source.js` (analyse HTML), `source-reader.js` (HTTP/cache), `collection-store.js` (archives SQLite), `synchronize.js` (orchestration) et `live-season.js` (projection de la saison réelle). Les anciens modules de rendu DOM restent conservés pour compatibilité et tests historiques ; la page utilise désormais le rendu React compilé. `assets/css/interface.css` adapte les composants aux tokens et au responsive du projet.
+Les modules de collecte sont `server/source.js` (analyse HTML), `source-reader.js` (HTTP/cache), `collection-store.js` (archives SQLite), `synchronize.js` (orchestration) et `live-season.js` (projection de la saison réelle). L’interface utilise aussi `src/sync-panel.js` pour la synchronisation et `src/detail.js` pour les compositions archivées.
 
-Parcours : le navigateur charge `GET /api/season`, valide la réponse et initialise la matrice. La poule, le tri, la journée et le match ouvert sont mémorisés dans le stockage local du navigateur par `src/navigation.js`, séparément pour chaque saison et pour la démonstration. Ils sont restaurés après rechargement et après mise à jour des données ; la lecture automatique reste en pause. Le match est retrouvé par nom d’équipe, puis vérifié dans les données courantes. Les détails historiques sont lus dans les archives locales. Les effets React nettoient minuteurs, requêtes et écouteurs lors du démontage ; le suivi de collecte reste indépendant de l’état de la saison.
+Parcours : le navigateur charge `GET /api/season`, valide la réponse et initialise la matrice. La poule, le tri, la journée et le match ouvert sont mémorisés dans le stockage local du navigateur par `src/navigation.js`, séparément pour chaque saison et pour la démonstration. Ils sont restaurés après rechargement et après mise à jour des données ; la lecture automatique reste en pause. Le match est retrouvé par nom d’équipe, puis vérifié dans les données courantes. Les détails historiques sont lus dans les archives locales. Le contrôleur est nettoyé avant de charger une nouvelle version des données.
 
 Ces préférences sont propres au navigateur et à l’adresse utilisée (hôte et port compris). Si le stockage local est bloqué, plein ou corrompu, la consultation reste disponible ; seules les préférences valides sont restaurées. Les sections dépliées dans les compositions ne sont pas mémorisées.
 
@@ -108,11 +102,11 @@ La palette part de trois couleurs : sombre `#18181B`, claire `#FAFAFA`, accent o
 
 Les préférences d’apparence sont mémorisées par navigateur et adresse, indépendamment de la saison, et partagées entre les onglets de cette adresse. Elles sont restaurées avant les styles pour éviter un éclair de thème. Si le stockage est bloqué, les changements restent disponibles pour la session et leur absence de sauvegarde est indiquée. La modale gère le clavier, Échap, le retour du focus et le portrait mobile, avec des actions fixes en bas.
 
-React couvre la présentation ; les règles de calcul et API existantes restent partagées. Les ressources sont locales, sans CDN ni requête de registre à l’exécution. `src/runtime.js` reste externe au bundle pour que le build Pages active effectivement l’authentification et les archives en ligne. Origine et licence des composants : [composants de l’interface](docs/ui-components.md).
+React est limité aux contrôles d’apparence ; matrice, navigation, archives et API restent en modules natifs. Les ressources sont locales, sans CDN ni requête externe à l’exécution. Origine et licence des composants : [composants d’apparence](docs/ui-components.md).
 
 La vue principale utilise la hauteur disponible : saison et filtres au-dessus de la matrice, commandes de lecture et curseur en dessous, puis bilan des archives dans le footer. Sur les fenêtres d’au moins 900 × 700 px, la matrice s’étend verticalement et ses lignes grandissent pour éviter l’espace inutilisé en bas de page. Les longues compositions défilent dans la matrice avec noms d’équipes et en-tête fixes. Les petites fenêtres gardent un défilement naturel et les cibles tactiles restent accessibles. La largeur maximale est de 1800 px. La méthode et ses limites se consultent à la demande dans le footer ; leur ouverture rend à la page sa hauteur naturelle.
 
-La hauteur supplémentaire est attribuée directement aux lignes des équipes, avec un en-tête de 48 px, plutôt qu’à la hauteur globale du tableau. Le bilan du footer reste sur une seule ligne avec libellés abrégés ; si la largeur manque, il défile horizontalement (zone accessible au clavier). Les compteurs sont tous conservés et leur signification est précisée au survol. La méthode et les erreurs peuvent être dépliées à la demande.
+La hauteur supplémentaire est attribuée directement aux lignes des équipes, avec un en-tête de 40 px, plutôt qu’à la hauteur globale du tableau. Le bilan du footer reste sur une seule ligne avec libellés abrégés ; si la largeur manque, il défile horizontalement (zone accessible au clavier). Les compteurs sont tous conservés et leur signification est précisée au survol. La méthode et les erreurs peuvent être dépliées à la demande.
 
 Chaque case visible porte un repère discret si le résultat est connu : **V** (victoire), **N** (nul), **D** (défaite), **F** (forfait de cette équipe). Le résultat complet est disponible au survol et dans le libellé accessible. L’adversaire d’une équipe forfait est indiqué « Victoire par forfait » ; ces rencontres restent sans participation jouée comptabilisée. Les repères suivent le curseur de journée, y compris lorsque le résultat est connu mais la composition manque.
 
@@ -161,12 +155,10 @@ npm run build
 npm test
 ```
 
-`build` compile toute la présentation React dans `assets/generated/`, vérifie la syntaxe JavaScript, les imports locaux, les ressources HTML et le typage strict de tout le frontend. Le serveur et les API restent natifs. Les 31 tests natifs couvrent notamment la palette, les contrastes des textes et contrôles dans les deux thèmes, le stockage d’apparence corrompu ou bloqué, le placement des actions et de la lecture, le bilan permanent dans le footer (couverture, progression, erreurs et conservation des chiffres après une panne), la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
+`build` compile les seuls contrôles d’apparence dans `assets/generated/`, vérifie la syntaxe JavaScript, les imports locaux, les ressources HTML et le typage strict de tout le frontend. La matrice et le serveur restent servis directement. Les 27 tests natifs couvrent notamment la palette, les contrastes des textes et contrôles dans les deux thèmes, le stockage d’apparence corrompu ou bloqué, le placement des actions et de la lecture, le bilan permanent dans le footer (couverture, progression, erreurs et conservation des chiffres après une panne), la persistance de navigation (saisons distinctes, équipes réordonnées ou retirées, sélection invalide, stockage corrompu ou indisponible), les résultats par équipe et forfaits, les compositions, le filtrage strict par club, le cache conditionnel, les transactions, la persistance après réouverture de SQLite avec panne réseau simulée, les protections HTTP et l’échappement du rendu. Les tests utilisent uniquement des données synthétiques locales et n’effectuent pas de collecte réelle.
 
 Le parcours navigateur reproductible se lance avec `npm run test:ui`. Sous Windows, il utilise Edge installé dans un profil éphémère ; `$env:BROWSER_CHANNEL = 'chrome'` sélectionne Chrome. Sur les autres systèmes, installer Chromium avec `npx playwright install chromium`. Ce contrôle utilise une base en mémoire et vérifie thèmes, saisie et réinitialisation des couleurs, suivi du système, rechargement, synchronisation entre onglets, clavier, stockage bloqué, CSP et portrait tactile en 320/390 px. Les captures sont disponibles dans `artifacts/appearance/`, hors Git.
 
 Le prototype `collecte_onze_lotois.py` reste disponible comme outil indépendant. Ses sélecteurs ont servi de référence au collecteur Node.js ; Python et `lxml` ne sont pas requis pour l’application.
-
-La recette de l’interface complète se lance avec `npm run test:interface` : états réels de matrice, forfaits, compositions et preuves, focus, curseur, lecture, persistance, collecte, erreurs, saison vide et connexion hébergée simulée. Elle inclut un clic de mise à jour pendant la lecture du statut et les formats 320/390/768 px ; aucune archive personnelle ni service distant n’est utilisé. Les scripts de vérification des logos restent complémentaires.
 
 Références : [langage visuel](design_language.md), [avancement](app-progress.md).
