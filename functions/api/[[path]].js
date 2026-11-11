@@ -45,5 +45,9 @@ export async function onRequest({request, env}) {
       redirect: 'error', signal: AbortSignal.timeout(60000)});
     return new Response(upstream.body, {status: upstream.status, headers: {'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff'}});
-  } catch { return respond({error: 'Connexion au service interrompue. Réessayez.'}, 503); }
+  } catch (error) {
+    const message = error instanceof Error ? error.message.replace(/https?:\/\/\S+/g, '[URL]') : 'Erreur inconnue';
+    console.error('Échec du relais Supabase', {route: path, message});
+    return respond({error: 'Connexion au service interrompue. Réessayez.'}, 503);
+  }
 }
