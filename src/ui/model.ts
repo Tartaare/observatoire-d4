@@ -7,7 +7,7 @@ export const dayLabel = (day: number) => `J${String(day + 1).padStart(2, '0')}`;
 export function dateLabel(date: string | null | undefined, long = false) {
   return date ? new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: long ? 'long' : 'short', timeZone: 'UTC'}).format(new Date(date)) : 'Date à confirmer';
 }
-export function cellState(data: SeasonData, state: Navigation, team: number, day: number) {
+export function cellState(data: SeasonData, state: Navigation, team: number, day: number, season?: ReturnType<typeof createSeason>) {
   const [name, , counts] = data.clubs[state.pool][team];
   const match = data.matches?.[`${state.pool}:${team}:${day}`];
   const forfeit = !!match?.statusLabel.match(/^Forfait\b/i);
@@ -16,7 +16,7 @@ export function cellState(data: SeasonData, state: Navigation, team: number, day
   const missing = counts[day] == null && !forfeit;
   const disabled = future || hidden;
   const value = future || forfeit && !hidden ? '—' : hidden ? '·' : missing ? '?' : String(counts[day]);
-  const result = disabled ? null : matchResult(match ?? createSeason(data).matchAt(day, team, state.pool), name);
+  const result = disabled ? null : matchResult(match ?? (season ?? createSeason(data)).matchAt(day, team, state.pool), name);
   const description = future ? match?.statusLabel ?? 'Rencontre non indexée' : hidden ? 'Après le curseur' : forfeit ? 'Rencontre non jouée' : missing
     ? match?.sheetState === 'partial' ? 'Composition partielle' : 'Feuille manquante ou non archivée'
     : `${counts[day]} ${data.mode === 'live' ? 'repérage(s) à confirmer' : 'joueur(s)'}`;

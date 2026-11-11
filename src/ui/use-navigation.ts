@@ -1,6 +1,6 @@
 import {useCallback, useEffect, useState} from 'react';
 import {restoreNavigation, saveNavigation} from '../navigation.js';
-import type {Navigation, SeasonData} from './model';
+import {cellState, dateLabel, type Navigation, type SeasonData} from './model';
 
 export function useNavigation(data: SeasonData) {
   const [state, setState] = useState<Navigation>(() => restoreNavigation(data));
@@ -28,12 +28,18 @@ export function useNavigation(data: SeasonData) {
       setPlaying(false); announce(`Lecture terminée à la journée ${data.lastPlayed + 1}`);
     }
   }, [state.day, playing, data.lastPlayed]);
-  const navigate = (day: number) => { setPlaying(false); setDay(day); announce(`Journée ${Math.max(0, Math.min(day, data.dates.length - 1)) + 1}`); };
+  const navigate = (day: number) => {
+    const bounded = Math.max(0, Math.min(day, data.dates.length - 1));
+    setPlaying(false); setDay(bounded); announce(`Journée ${bounded + 1}, ${dateLabel(data.dates[bounded], true)}`);
+  };
   const togglePlay = () => {
     if (!playing && state.day >= data.lastPlayed) setDay(0);
     setPlaying(current => !current);
   };
-  const select = (selected: Navigation['selected']) => { setPlaying(false); setState(current => ({...current, selected})); };
+  const select = (selected: Navigation['selected']) => {
+    setPlaying(false); setState(current => ({...current, selected}));
+    announce(selected ? cellState(data, state, selected.team, selected.day).label : 'Détail fermé.');
+  };
   const pool = (value: Navigation['pool']) => {
     setPlaying(false); setState(current => ({...current, pool: value, day: Math.max(0, data.lastPlayed), selected: null}));
     announce(`Poule ${value.toUpperCase()}, ${data.clubs[value].length} équipes.`);
