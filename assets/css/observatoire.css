@@ -110,7 +110,8 @@ html.od-theme-changing *,html.od-theme-changing *::before,html.od-theme-changing
 #observatoire-d4 .od-rank{min-width:15px;font:11px ui-monospace,monospace;color:var(--sub)}
 #observatoire-d4 .od-crest{position:relative;width:28px;height:28px;flex:0 0 28px;display:grid;place-items:center}
 #observatoire-d4 .od-monogram{width:28px;height:28px;display:grid;place-items:center;border-radius:5px;background:var(--quiet);color:var(--accent-ink);font:600 10px ui-monospace,monospace}
-#observatoire-d4 .od-crest img{position:absolute;inset:0;width:28px;height:28px;object-fit:contain;background:#fff;border-radius:3px}
+#observatoire-d4 .od-crest img{position:absolute;inset:0;width:28px;height:28px;object-fit:contain}
+#observatoire-d4 .od-crest:has(img) .od-monogram{visibility:hidden}
 #observatoire-d4 tbody td{height:32px;padding:1px 2px;border-bottom:1px solid var(--line)}
 #observatoire-d4 tbody th{border-bottom:1px solid var(--line)}
 #observatoire-d4 .od-cell{position:relative;width:100%;min-height:28px;display:grid;place-items:center;border:0;border-radius:5px;font-size:13px;font-weight:680;transition:background-color .22s,box-shadow .15s}

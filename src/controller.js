@@ -2,6 +2,8 @@ import {createView} from "./view.js";
 import {query} from './dom.js';
 import {bindArchives} from './detail.js';
 import {restoreNavigation, saveNavigation} from './navigation.js';
+import {refreshClubLogos} from './club-logos.js';
+import {LOGOS_EVENT, LOGOS_KEY} from './custom-logos.js';
 
 /** @param {HTMLElement} root @param {import("./types.js").SeasonData} data */
 export function startObservatory(root, data) {
@@ -114,6 +116,10 @@ export function startObservatory(root, data) {
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); }, {signal: lifecycle.signal});
   bindArchives(root, lifecycle.signal);
+  window.addEventListener(LOGOS_EVENT, () => refreshClubLogos(root), {signal: lifecycle.signal});
+  window.addEventListener('storage', event => {
+    if (event.key === LOGOS_KEY || event.key === null) refreshClubLogos(root);
+  }, {signal: lifecycle.signal});
 
   const resize = new ResizeObserver(() => root.style.setProperty("--od-view", scroll.clientWidth + "px"));
   resize.observe(scroll);

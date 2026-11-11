@@ -1,4 +1,5 @@
 import {escapeHTML} from './dom.js';
+import {readCustomLogos} from './custom-logos.js';
 
 // Correspondances du classement D4, vérifiées le 11 novembre 2026.
 // Source des images : https://cdn-transverse.azureedge.net/phlogos/BC{numéro FFF}.jpg
@@ -114,17 +115,31 @@ for (const [name, id] of [['US Béduer-Faycelles', '565091'], ['Haut Célé FC',
 /** @param {string} name @returns {string | null} */
 export function clubLogoURL(name) {
   const id = logos.get(key(name));
-  return id ? './assets/clubs/BC' + id + '.jpg' : null;
+  return id ? readCustomLogos()[id] ?? './assets/clubs/BC' + id + '.jpg' : null;
 }
 
 /** @param {string} name @param {string} initials */
 export function clubBadge(name, initials) {
   const url = clubLogoURL(name);
-  return '<span class="od-crest" aria-hidden="true"><span class="od-monogram">' + escapeHTML(initials) + '</span>' +
+  return '<span class="od-crest" data-club-name="' + escapeHTML(name) + '" aria-hidden="true"><span class="od-monogram">' + escapeHTML(initials) + '</span>' +
     (url ? '<img src="' + url + '" alt="" width="28" height="28" decoding="async">' : '') + '</span>';
 }
 
 /** @param {HTMLElement} root */
 export function bindClubLogoFallbacks(root) {
   root.querySelectorAll('.od-crest img').forEach(image => image.addEventListener('error', () => image.remove(), {once: true}));
+}
+
+/** @param {HTMLElement} root */
+export function refreshClubLogos(root) {
+  root.querySelectorAll('.od-crest[data-club-name]').forEach(badge => {
+    const url = clubLogoURL(badge.getAttribute('data-club-name') ?? '');
+    badge.querySelector('img')?.remove();
+    if (!url) return;
+    const image = document.createElement('img');
+    image.alt = ''; image.width = 28; image.height = 28; image.decoding = 'async';
+    image.addEventListener('error', () => image.remove(), {once: true});
+    image.src = url;
+    badge.append(image);
+  });
 }
