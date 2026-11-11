@@ -1,5 +1,17 @@
 # Avancement
 
+## Sprint 17 — Annulation du sprint 16
+
+Branche : `feature/sprint-17-revert-shadcn-ui`.
+
+Statut : **terminé le 11 novembre 2026**, sans fusion ni publication.
+
+US-032 : annuler intégralement le sprint 16 à la demande de l’utilisateur, qui ne souhaite pas conserver la nouvelle interface. Les neuf commits sont inversés par commits ciblés, sans réécriture de l’historique. Avant cette note, tous les fichiers suivis sont strictement identiques au commit `ff06dce` de clôture du sprint 15. Le référentiel `app-features.md`, l’interface précédente et les paramètres de logos sont restaurés. Les dépendances supplémentaires sont retirées et les ressources compilées régénérées. Les archives et préférences utilisateur ne sont pas modifiées.
+
+Vérifications : build Pages et typage strict réussis ; **30 tests réussis**. Parcours Edge réussi pour thèmes, palette, clavier, persistance, multi-onglets, stockage bloqué et portrait 320/390 px. Diff de restauration vérifié contre le sprint 15 ; aucune différence applicative restante.
+
+Prévention des régressions : le sprint 16 reste consultable dans l’historique mais son interface est annulée. Toute nouvelle proposition de refonte devra partir de l’interface restaurée et faire valider sa direction visuelle avant implémentation. Relancer le serveur et recharger la page pour reprendre la version restaurée.
+
 ## Sprint 15 — Référentiel des fonctionnalités et de l’interface
 
 Branche : `feature/sprint-15-feature-inventory`.
