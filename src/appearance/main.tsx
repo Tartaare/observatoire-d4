@@ -1,5 +1,4 @@
 import {useEffect, useState} from 'react';
-import {createRoot} from 'react-dom/client';
 import {Check, Monitor, Moon, RotateCcw, Settings2, Sun} from 'lucide-react';
 import {Button} from './ui/button';
 import {Input} from './ui/input';
@@ -20,7 +19,7 @@ const modes: {value: ThemeMode; label: string; icon: typeof Sun}[] = [
   {value: 'system', label: 'Système', icon: Monitor},
 ];
 
-function AppearanceControls() {
+export function AppearanceControls() {
   const [appearance, setAppearance] = useState<Appearance>(readAppearance);
   const [draft, setDraft] = useState<Palette>(appearance.palette);
   const [systemDark, setSystemDark] = useState(() => matchMedia('(prefers-color-scheme: dark)').matches);
@@ -147,6 +146,3 @@ function AppearanceControls() {
     </Dialog>
   </div>;
 }
-
-const mount = document.querySelector('[data-appearance-root]');
-if (mount) createRoot(mount).render(<AppearanceControls />);
