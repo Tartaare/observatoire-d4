@@ -3,6 +3,14 @@
 Projet Supabase cible : `sylibzlrejlwfarmbhyw`. Projet Pages existant : `usbf-d4-analyzer`.
 Le déploiement distant reste à réaliser ; les fichiers ci-dessous constituent la configuration à appliquer.
 
+## Connexion de l'agent au projet hébergé
+
+Le 11 novembre 2026, la connexion MCP Codex `supabase-observatoire` a été configurée sur `https://mcp.supabase.com/mcp?project_ref=sylibzlrejlwfarmbhyw` et son authentification OAuth a réussi. La session qui a créé la connexion n'exposait pas encore ses outils : rouvrir une session Codex dans ce dossier, puis vérifier l'accès en lecture avant toute migration.
+
+Le message « Could not connect to local Supabase project » signale une tentative de connexion locale. `supabase start` n'est pas requis pour ce déploiement hébergé. Pour les opérations CLI, consulter l'aide de la version installée et sélectionner explicitement le projet distant : la CLI v3 cible le local par défaut. Ne pas confondre l'installation des compétences du plugin avec la disponibilité effective des outils SQL et Edge Functions.
+
+Point de reprise : vérifier les tables `od_*` et l'historique des migrations du projet distant, puis suivre les étapes ci-dessous. Aucune migration, création d'utilisateur, import d'archives ou publication n'a encore été exécuté par cette session.
+
 ## Architecture
 
 Pages sert `dist/index.html`, les styles et les modules. Les Functions Pages relaient uniquement les routes `/api/*` autorisées vers Supabase, sur la même origine que l'interface. La CSP reste limitée à `self`. Il n'y a ni serveur Node.js permanent ni SQLite sur Pages.
