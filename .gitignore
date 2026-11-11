@@ -1,4 +1,5 @@
 node_modules/
+.npm-cache/
 data/*.sqlite
 data/*.sqlite-*
 data/audit/

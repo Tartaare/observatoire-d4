@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react';
 import {clubLogos} from '../club-logos.js';
 import {importClubImage, LOGOS_EVENT, LOGOS_KEY, readCustomLogos, saveCustomLogo} from '../custom-logos.js';
 import {Button} from './ui/button';
+import {NativeSelect} from './ui/primitives';
 
 export function ClubLogoSettings() {
   const [id, setId] = useState(clubLogos[0].id);
@@ -35,9 +36,9 @@ export function ClubLogoSettings() {
     <summary>Logos des clubs</summary>
     <p className="od-palette-hint" id="od-logo-help">Importez un PNG transparent, JPEG ou WebP (2 Mo maximum), puis validez avec « Enregistrer le logo ». Les logos restent dans ce navigateur et sont partagés par les équipes du même club.</p>
     <label htmlFor="od-logo-club">Club à personnaliser</label>
-    <select id="od-logo-club" value={id} disabled={busy} onChange={event => {
+    <NativeSelect id="od-logo-club" value={id} disabled={busy} onChange={event => {
       setId(event.target.value); setDraft(undefined); setMessage(''); setError('');
-    }}>{clubLogos.map(club => <option key={club.id} value={club.id}>{club.name.replace(/\s+\d+$/, '')}</option>)}</select>
+    }}>{clubLogos.map(club => <option key={club.id} value={club.id}>{club.name.replace(/\s+\d+$/, '')}</option>)}</NativeSelect>
     <div className="od-logo-editor" aria-busy={busy}>
       <div className="od-logo-preview"><img src={(draft === undefined ? logos[id] : draft) ?? `./assets/clubs/BC${id}.jpg`} alt={`Aperçu du logo de ${club.name}`} /></div>
       <div className="od-logo-actions">
