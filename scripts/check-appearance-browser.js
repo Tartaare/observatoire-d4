@@ -23,7 +23,9 @@ try {
   const page = await context.newPage();
   const errors = [];
   page.on('pageerror', error => errors.push(error.message));
-  page.on('console', message => { if (message.type() === 'error') errors.push(message.text()); });
+  page.on('console', message => {
+    if (message.type() === 'error' && !message.location().url.endsWith('/favicon.ico')) errors.push(message.text());
+  });
   await page.goto(origin);
   await page.getByRole('button', {name: 'Paramètres d’apparence'}).waitFor();
   await page.locator('tbody tr').first().waitFor();
