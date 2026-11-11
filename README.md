@@ -4,6 +4,10 @@ Projet personnel non commercial pour explorer, par journée de D4, les apparitio
 
 L’interface affiche les données réelles archivées depuis [Le Onze Lotois](https://leonzelotois.fr/division/d4/). Avant la première synchronisation, la démonstration reste disponible et clairement identifiée.
 
+Les 20 clubs du classement D4 disposent de leur logo FFF à gauche du nom. Les JPEG sont intégrés localement : aucune connexion au CDN n’est nécessaire pendant la consultation. Les initiales restent le repli pour un club inconnu ou une image indisponible. Les réserves partagent le logo de leur club ; les correspondances explicites et leurs pages sources figurent dans `src/club-logos.js`. Pour une nouvelle saison, vérifier ce catalogue avant d’ajouter les nouveaux écussons à `assets/clubs/`.
+
+Contrôle navigateur des logos : `node --preserve-symlinks --preserve-symlinks-main scripts/check-club-logos-browser.js` (Edge par défaut). Vérifie les 20 images, les deux thèmes, le portrait 320 px, le tri, le repli après erreur réseau et l’absence de requête externe. Captures dans `artifacts/appearance/`, hors Git.
+
 ## Suivi du développement
 
 Le code et son historique sont hébergés dans le dépôt privé [Tartaare/observatoire-d4](https://github.com/Tartaare/observatoire-d4). L'accès nécessite une autorisation sur ce dépôt.

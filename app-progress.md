@@ -1,5 +1,19 @@
 # Avancement
 
+## Sprint 12 — Logos des clubs
+
+Branche : `feature/sprint-12-club-logos`.
+
+Statut : **terminé le 11 novembre 2026**, sans fusion dans `main` ni publication. Le sprint 11 reste indépendant et en attente de sa validation distante.
+
+US-024 : remplacer les abréviations à gauche des 20 clubs réels par leur écusson FFF. Correspondances vérifiées dans le classement D4 du Onze Lotois, qui utilise les mêmes URL `cdn-transverse.azureedge.net/phlogos/BC{numéro FFF}.jpg` que l’exemple fourni. Les 20 JPEG (environ 90 Ko au total) sont versionnés et servis localement, y compris dans le build Pages. Catalogue explicite par nom normalisé, réserves partageant un logo ; aucun rapprochement approximatif ni modification des archives. Les clubs fictifs sans correspondance conservent leurs initiales.
+
+Design : écussons de 28 px sans déformation, fond blanc discret en thème sombre, place réservée sans saut de mise en page, noms et rangs conservés. Images décoratives avec `alt` vide. Repli sur les initiales lors d’une erreur réseau ; correction de l’ancienne règle mobile qui les masquait. CSP limitée à `img-src 'self'`, aucune dépendance supplémentaire ni requête externe à l’exécution.
+
+Vérifications : build Pages et typage strict réussis ; 29 tests natifs réussis, dont deux nouveaux couvrant catalogue, normalisation, refus des faux rapprochements, JPEG et exposition HTTP. Edge headless : chargement des 20 images, deux poules, clair/sombre, portrait 320 px sans débordement de page, tri et erreur réseau réelle avec repli visible. Aucune erreur JavaScript ou CSP, aucune requête externe. Captures inspectées et conservées dans `artifacts/appearance/` (hors Git).
+
+Prévention des régressions : ne pas masquer les initiales sur mobile ; conserver les dimensions réservées, `object-fit:contain` et les trois CSP cohérentes (HTML, serveur, Pages). Réviser le catalogue lors d’un changement de clubs, intégrer les JPEG localement et relancer le contrôle `scripts/check-club-logos-browser.js`. Les droits des écussons restent à leurs titulaires ; usage dans le projet personnel non commercial existant.
+
 ## Sprint 11 — Accès en ligne avec Pages et Supabase
 
 Branche : `feature/sprint-11-online-hosting`.
