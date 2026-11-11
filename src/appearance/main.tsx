@@ -7,6 +7,7 @@ import {Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogD
 import {applyAppearance, DEFAULT_APPEARANCE, normalizeHex, paletteError, readAppearance,
   resolveTheme, saveAppearance, STORAGE_KEY} from './theme.js';
 import type {Appearance, Palette, ThemeMode} from './theme.js';
+import {ClubLogoSettings} from './club-logo-settings';
 
 const colorFields: {key: keyof Palette; label: string; description: string}[] = [
   {key: 'dark', label: 'Couleur sombre', description: 'Fonds sombres et textes du mode clair'},
@@ -137,6 +138,7 @@ function AppearanceControls() {
         <div className="od-settings-feedback" role="status">
           {saved && <Check aria-hidden="true" />}<span>{notice}</span>
         </div>
+        <ClubLogoSettings />
         <div className="od-settings-footer">
           <Button variant="ghost" onClick={reset}><RotateCcw aria-hidden="true" />Réinitialiser</Button>
           <DialogClose asChild><Button>Terminé</Button></DialogClose>

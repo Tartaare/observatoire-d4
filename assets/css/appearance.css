@@ -54,6 +54,21 @@ body:has(.od-dialog) {overflow:hidden}
 .od-settings-feedback {display:flex;align-items:flex-start;gap:6px;color:var(--sub);font-size:11px;min-height:16px}
 .od-settings-feedback svg {color:var(--accent-ink);width:14px;height:14px}
 .od-settings-footer {position:sticky;bottom:-24px;z-index:1;display:flex;justify-content:space-between;gap:12px;margin:0 -24px -24px;padding:16px 24px;background:var(--surface);border-top:1px solid var(--line)}
+.od-logo-settings {border-top:1px solid var(--line);padding-top:10px;min-width:0}
+.od-logo-settings summary {min-height:44px;align-content:center;cursor:pointer;font-weight:650;font-size:13px}
+.od-logo-settings > label {display:block;font-size:12px;margin:14px 0 5px}
+.od-logo-settings select {width:100%;min-height:44px;background:var(--surface);color:var(--ink);border:1px solid var(--control-line);border-radius:7px;font:inherit;padding:8px}
+.od-logo-settings select:focus-visible {outline:2px solid var(--focus);outline-offset:3px}
+.od-logo-editor {display:flex;align-items:flex-start;gap:12px;margin:14px 0}
+.od-logo-preview {flex:0 0 56px;width:56px;height:56px;display:grid;place-items:center;background:var(--paper);border:1px solid var(--line);border-radius:7px}
+.od-logo-preview img {width:48px;height:48px;object-fit:contain}
+.od-logo-actions {display:grid;gap:8px;min-width:0;flex:1}
+.od-logo-actions label {font-size:12px}
+.od-logo-actions input {width:100%;min-height:44px;padding:5px;font-size:12px}
+.od-logo-actions input::file-selector-button {min-height:32px;background:var(--quiet);color:var(--ink);border:0;border-radius:4px;margin-right:8px;cursor:pointer}
+.od-logo-actions button {font-size:12px;white-space:normal}
+.od-logo-settings > p[role] {font-size:12px;overflow-wrap:anywhere}
+.od-logo-settings > p:empty {display:none}
 @media (hover:hover) {
   .od-appearance button:hover {background:var(--quiet)}
   .od-appearance button.bg-primary:hover {background:var(--accent);filter:brightness(.95)}
