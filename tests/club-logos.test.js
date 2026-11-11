@@ -33,7 +33,7 @@ test('le serveur expose uniquement les logos répertoriés avec une CSP locale',
       const response = await fetch(`${origin}/assets/clubs/BC${id}.jpg`);
       assert.equal(response.status, 200);
       assert.match(response.headers.get('content-type'), /^image\/jpeg/);
-      assert.match(response.headers.get('content-security-policy'), /img-src 'self';/);
+      assert.match(response.headers.get('content-security-policy'), /img-src 'self' data:;/);
       assert.ok((await response.arrayBuffer()).byteLength > 0);
     }
     assert.equal((await fetch(`${origin}/assets/clubs/BC000000.jpg`)).status, 404);

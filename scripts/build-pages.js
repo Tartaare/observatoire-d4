@@ -37,7 +37,7 @@ await writeFile(new URL('_headers', output), `/*
   Referrer-Policy: no-referrer
   X-Frame-Options: DENY
   Cache-Control: no-cache
-  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
 `);
 await writeFile(new URL('_routes.json', output), JSON.stringify({version: 1, include: ['/api/*'], exclude: []}));
 console.log(`Site Pages prêt : ${fileURLToPath(output)}`);
