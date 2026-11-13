@@ -1,5 +1,18 @@
 # Avancement
 
+## Sprint 18 — Publication Git et Cloudflare Pages
+
+Branche : `feature/sprint-18-publish-pages`.
+
+Statut : **terminé le 13 novembre 2026** ; livraison par fusion dans `main` et déploiement automatique Pages.
+
+US-033 : publier la version restaurée du sprint 17, incluant les logos et leur validation explicite. Aucun changement applicatif ou visuel. L’intégration GitHub de `usbf-d4-analyzer` suit `main` avec `npm run build:pages` et la sortie `dist`.
+
+Vérifications : compilation Pages et typage strict réussis ; 30 tests natifs réussis ; revue du diff et absence d’erreur d’espacement. Le relais Pages et le code cloud restent identiques à la prévisualisation déjà déployée du sprint 11. Aucune migration ni import de données pendant cette publication.
+
+Prévention des régressions : vérifier le commit et le statut du déploiement de production après chaque push ; utiliser l’adresse stable https://usbf-d4-analyzer.pages.dev/ pour consulter la version courante. Les mentions « sans fusion ni publication » des sprints précédents décrivent leur clôture initiale ; leurs changements conservés sont livrés ensemble ici.
+
+
 ## Sprint 17 — Annulation du sprint 16
 
 Branche : `feature/sprint-17-revert-shadcn-ui`.
