@@ -31,7 +31,7 @@ Les dépendances, ressources compilées, fichiers `.env`, clés privées, captur
 
 ## Accès en ligne — Cloudflare Pages et Supabase
 
-La version hébergée utilise Cloudflare Pages pour l'interface et Supabase pour Auth, l'API et les archives PostgreSQL. Elle est préparée sur `feature/sprint-11-online-hosting` ; **le déploiement distant et l'import restent à effectuer** dans le projet Supabase `sylibzlrejlwfarmbhyw` et le projet Pages `usbf-d4-analyzer`.
+La version hébergée utilise Cloudflare Pages pour l'interface et Supabase pour Auth, l'API et les archives PostgreSQL. Le projet Pages `usbf-d4-analyzer` suit le dépôt GitHub : chaque push sur `main` compile et publie la version validée à https://usbf-d4-analyzer.pages.dev/. Le sprint 18 livre la version restaurée du sprint 17. Le déploiement de l'API Supabase et l'import des archives sont des opérations distinctes, non exécutées pendant cette publication ; leur état doit être vérifié dans le projet `sylibzlrejlwfarmbhyw`.
 
 `npm run build:pages` génère `dist/index.html` et les ressources publiques ; `npm run build:cloud` génère l'Edge Function. Le dossier `functions/` fournit le relais API Pages. Aucun fichier de base ni secret n'est publié. Le mode local décrit ci-dessous reste utilisable et indépendant.
 
