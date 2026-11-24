@@ -1,3 +1,4 @@
+import {migratePlayerEvents} from './migrate-player-events.js';
 /** @typedef {import('node:sqlite').DatabaseSync} Database */
 
 /** @param {Database} db */
@@ -29,6 +30,7 @@ export function migrateCollection(db) {
     ) STRICT;
     CREATE INDEX IF NOT EXISTS players_name ON collected_players(name_key);
   `);
+  migratePlayerEvents(db);
 }
 
 /** @param {Database} db @param {string} key @param {unknown} value */
@@ -74,9 +76,9 @@ export function saveMatch(db, season, match) {
         name=excluded.name,club_url=excluded.club_url,state=excluded.state,latest_state=excluded.latest_state,updated_at=excluded.updated_at`)
         .run(match.url, side, sheet.name, sheet.clubURL, sheet.state, sheet.state, now);
       db.prepare('DELETE FROM collected_players WHERE match_url=? AND side=?').run(match.url, side);
-      const insert = db.prepare('INSERT INTO collected_players VALUES(?,?,?,?,?,?,?,?,?)');
+      const insert = db.prepare('INSERT INTO collected_players(match_url,side,ordinal,name,name_key,shirt,status,entry,exit,events) VALUES(?,?,?,?,?,?,?,?,?,?)');
       sheet.players.forEach((player, ordinal) => insert.run(match.url, side, ordinal, player.name, player.key,
-        player.shirt, player.status, player.entry, player.exit));
+        player.shirt, player.status, player.entry, player.exit, player.events ? JSON.stringify(player.events) : null));
     });
     db.exec('COMMIT');
   } catch (error) { db.exec('ROLLBACK'); throw error; }
