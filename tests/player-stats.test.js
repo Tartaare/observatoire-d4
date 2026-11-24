@@ -2,6 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseMatch} from '../server/source.js';
 import {teamStats} from '../src/player-stats.js';
+import {openDatabase} from '../server/database.js';
+import {saveMatch} from '../server/collection-store.js';
+import {migratePlayerEvents} from '../server/migrate-player-events.js';
 
 const url = 'https://leonzelotois.fr/matchs/exemple/';
 const names = ['Nord', 'Sud'];
@@ -36,4 +39,30 @@ test('le cumul déduplique les apparitions et suit équipe, journée, couverture
   assert.deepEqual(end.rows[0].totals, {appearances: 2, starts: 1, entries: 1, goals: 0, yellows: 0, reds: 0});
   assert.equal(end.rows[0].unknown.size, 6);
   assert.deepEqual(teamStats(data, 'a', 1, 3).rows, []);
+});
+
+test('la relecture du cache conserve le buteur hors composition et la fraîcheur de la feuille', () => {
+  const html = header + '<div class="timeline">' + event('home', 'but', 'Buteur B.') + '</div>';
+  const match = parseMatch(html, url, 2026);
+  const db = openDatabase(':memory:');
+  try {
+    saveMatch(db, 2026, match);
+    db.prepare('INSERT INTO source_pages VALUES(?,?,NULL,NULL,?)').run(url, html, match.date);
+    db.exec('ALTER TABLE collected_sheets DROP COLUMN event_only');
+    db.exec('ALTER TABLE collected_players DROP COLUMN events');
+    const timestamp = () => db.prepare('SELECT read_at FROM collected_fixtures').get().read_at;
+    const before = timestamp();
+    migratePlayerEvents(db);
+    migratePlayerEvents(db);
+    const record = db.prepare('SELECT state,event_only FROM collected_sheets WHERE side=0').get();
+    const stats = teamStats({matches: {'a:0:0': {statusLabel: 'Terminé', sheetState: record.state, roster: [],
+      eventOnly: JSON.parse(record.event_only)}}}, 'a', 0, 0);
+    assert.equal(stats.documented, 1);
+    assert.equal(stats.rows[0].totals.goals, 1);
+    assert.equal(stats.rows[0].totals.appearances, 1);
+    assert.deepEqual([...stats.rows[0].unknown].sort(), ['entries', 'goals', 'starts']);
+    assert.equal(stats.rows[0].name, 'Buteur B.');
+    assert.equal(timestamp(), before);
+    assert.equal(record.state, 'missing');
+  } finally { db.close(); }
 });

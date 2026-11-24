@@ -7,6 +7,8 @@ const columns = /** @type {const} */ ({
 /** @typedef {keyof typeof columns} StatColumn */
 /** @typedef {{team: number, column: StatColumn, ascending: boolean}} StatsSelection */
 /** @typedef {Exclude<StatColumn, 'name'>} Metric */
+/** @typedef {import('./types.js').RosterPlayer} RosterPlayer */
+/** @typedef {{name: string, status: RosterPlayer['status'] | 'event', events?: RosterPlayer['events']}} PlayerEvidence */
 /** @typedef {{name: string, partialSheets: number, totals: Record<Metric, number>, unknown: Set<Metric>}} PlayerRow */
 /** @param {string} key @returns {key is StatColumn} */
 export const isStatColumn = key => Object.hasOwn(columns, key);
@@ -20,11 +22,15 @@ export function teamStats(data, pool, team, day) {
     const match = data.matches?.[`${pool}:${team}:${i}`];
     if (match?.statusLabel !== 'Terminé') continue;
     played++;
-    if (match.roster.length) documented++;
+    const eventOnly = match.eventOnly ?? [];
+    if (match.roster.length || eventOnly.length) documented++;
     if (match.sheetState !== 'published') partial++;
-    /** @type {Map<string, typeof match.roster>} */
+    /** @type {Map<string, PlayerEvidence[]>} */
     const names = new Map();
-    for (const p of match.roster) {
+    /** @type {PlayerEvidence[]} */
+    const evidence = [...match.roster,
+      ...eventOnly.map(p => ({...p, status: /** @type {const} */ ('event')}))];
+    for (const p of evidence) {
       const key = p.name.normalize('NFKC').toLocaleLowerCase('fr').replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
       const same = names.get(key);
       if (same) same.push(p); else names.set(key, [p]);
@@ -35,11 +41,14 @@ export function teamStats(data, pool, team, day) {
       players.set(key, row);
       if (match.sheetState !== 'published') row.partialSheets++;
       const starter = group.some(p => p.status === 'starter');
-      const entered = !starter && group.some(p => p.status === 'entered' || (p.events?.goals ?? 0) > 0);
+      const entered = !starter && group.some(p => p.status === 'entered' || p.status === 'unverified' && (p.events?.goals ?? 0) > 0);
+      const appeared = starter || entered || group.some(p => (p.events?.goals ?? 0) > 0);
       row.totals.starts += Number(starter);
       row.totals.entries += Number(entered);
-      row.totals.appearances += Number(starter || entered);
-      if (!starter && !entered) { row.unknown.add('entries'); row.unknown.add('appearances'); }
+      row.totals.appearances += Number(appeared);
+      if (!appeared) row.unknown.add('appearances');
+      if (!starter && !entered) row.unknown.add('entries');
+      if (group.every(p => p.status === 'event')) row.unknown.add('starts');
       for (const p of group) {
         for (const metric of /** @type {const} */ (['goals', 'yellows', 'reds'])) {
           row.totals[metric] += p.events?.[metric] ?? 0;
@@ -89,7 +98,7 @@ export function statsPanel(data, state, selection) {
   const name = escapeHTML(data.clubs[state.pool][team][0]);
   const missing = played - documented;
   const coverage = `${documented} / ${played} matchs terminés documentés` +
-    (partial > missing ? ` · ${partial - missing} avec composition partielle` : '');
+    (partial > missing ? ` · ${partial - missing} sans composition complète` : '');
   const description = data.mode === 'live' ? coverage : 'Les compositions complètes sont disponibles avec les archives réelles.';
   return `<section id="od-stats-panel" class="od-detail od-stats" aria-labelledby="od-stats-title">
     <div class="od-detail-head"><div><div class="od-match-kicker">${name} · J1 à J${state.day + 1}</div>
