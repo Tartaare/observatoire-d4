@@ -107,6 +107,9 @@ html.od-theme-changing *,html.od-theme-changing *::before,html.od-theme-changing
 #observatoire-d4 .od-day button span{font-size:10px;color:var(--sub);font-weight:500;white-space:nowrap}
 #observatoire-d4 .od-day.od-active button{background:var(--selected);color:var(--accent-ink)}
 #observatoire-d4 .od-club{display:flex;align-items:center;gap:7px;font-weight:630;font-size:12px;white-space:nowrap}
+#observatoire-d4 .od-team-name{padding:2px 0;min-height:28px;border:0;background:transparent;text-align:left;cursor:pointer;color:var(--accent-ink);text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:3px}
+#observatoire-d4 .od-team-name:is(:hover,[aria-expanded=true]){text-decoration-thickness:2px}
+#observatoire-d4 .od-team:has([aria-expanded=true]){background:var(--selected)}
 #observatoire-d4 .od-rank{min-width:15px;font:11px ui-monospace,monospace;color:var(--sub)}
 #observatoire-d4 .od-crest{position:relative;width:28px;height:28px;flex:0 0 28px;display:grid;place-items:center}
 #observatoire-d4 .od-monogram{width:28px;height:28px;display:grid;place-items:center;border-radius:5px;background:var(--quiet);color:var(--accent-ink);font:600 10px ui-monospace,monospace}
@@ -124,6 +127,21 @@ html.od-theme-changing *,html.od-theme-changing *::before,html.od-theme-changing
 #observatoire-d4 .od-board-foot span{display:flex;align-items:center;gap:5px}
 #observatoire-d4 .od-board-foot b{display:grid;place-items:center;width:17px;height:17px;border-radius:4px;color:var(--ink)}
 #observatoire-d4 .od-detail-row td{padding:0;background:var(--paper)}
+#observatoire-d4 .od-stats-row > td{padding:0;background:var(--paper)}
+#observatoire-d4 .od-detail.od-stats{animation:none}
+#observatoire-d4 .od-stats-scroll{margin-top:12px;overflow:auto;border:1px solid var(--line);border-radius:7px;background:var(--surface)}
+#observatoire-d4 .od-stats-scroll:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+#observatoire-d4 .od-stats table{font-size:12px;white-space:nowrap}
+#observatoire-d4 .od-stats :is(td,th){text-align:right;padding:5px 9px}
+#observatoire-d4 .od-stats th:first-child{position:sticky;left:0;z-index:1;text-align:left;background:var(--surface);border-right:1px solid var(--line)}
+#observatoire-d4 .od-stats thead th{position:static;background:var(--quiet);color:var(--sub);padding:0;border-top:0}
+#observatoire-d4 .od-stats thead th:first-child{position:sticky;background:var(--quiet)}
+#observatoire-d4 .od-stats th[aria-sort]{color:var(--accent-ink)}
+#observatoire-d4 .od-stats th button{min-height:44px;border:0;padding:0 9px;background:transparent;cursor:pointer;font-weight:650}
+#observatoire-d4 .od-stats th button:focus-visible{outline-offset:-3px}
+#observatoire-d4 .od-stats th button span{margin-left:4px}
+#observatoire-d4 .od-stats .od-stats-note{margin-top:8px;font-size:12px}
+#observatoire-d4 .od-unknown{color:var(--sub)}
 #observatoire-d4 .od-detail{position:sticky;left:0;width:var(--od-view, 100%);padding:14px 16px;border-top:2px solid var(--focus);animation:od-in .18s ease-out}
 #observatoire-d4 .od-detail-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 #observatoire-d4 .od-match-kicker{font:600 11px ui-monospace,monospace;color:var(--accent-ink);margin-bottom:4px}
@@ -159,7 +177,7 @@ html.od-theme-changing *,html.od-theme-changing *::before,html.od-theme-changing
   #observatoire-d4 thead th{position:sticky;top:0;z-index:3;height:40px}
   #observatoire-d4 thead .od-team{z-index:4}
   #observatoire-d4 thead{height:40px}
-  #observatoire-d4 table:not(:has(.od-detail-row)) tbody td{position:relative;height:max(var(--od-row-min),calc((100cqh - 40px) / var(--od-team-count,10)))}
+  #observatoire-d4 .od-scroll > table:not(:has(.od-detail-row)) > tbody > [data-row] > td{position:relative;height:max(var(--od-row-min),calc((100cqh - 40px) / var(--od-team-count,10)))}
   #observatoire-d4 table:not(:has(.od-detail-row)) .od-cell{position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px)}
   #observatoire-d4:has(.od-footer details[open]){height:auto}
   #observatoire-d4:has(.od-footer details[open]) .od-scroll{container-type:normal;flex:0 0 auto}
@@ -193,6 +211,7 @@ html.od-theme-changing *,html.od-theme-changing *::before,html.od-theme-changing
   #observatoire-d4 .od-selects label:last-child{flex:1}
 }
 @media(pointer:coarse){
+  #observatoire-d4 .od-team-name{min-height:44px}
   #observatoire-d4{--od-row-min:48px}
   #observatoire-d4 tbody td{height:48px}
   #observatoire-d4 :is(.od-arrow,.od-play,select,.od-cell,.od-day button,summary,.od-refresh-option){min-height:44px}

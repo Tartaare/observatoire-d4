@@ -2,6 +2,7 @@ import {createSeason, matchResult} from './season.js';
 import {query, escapeHTML} from './dom.js';
 import {liveDetail} from './detail.js';
 import {clubBadge, bindClubLogoFallbacks} from './club-logos.js';
+import {statsPanel} from './player-stats.js';
 
 /** @param {HTMLElement} root @param {import("./types.js").SeasonData} data @param {import("./types.js").AppState} state */
 export function createView(root, data, state) {
@@ -42,7 +43,8 @@ export function createView(root, data, state) {
     body.innerHTML = order.map((team) => {
       const [name, initials] = teams[team];
       const cells = dates.map((_, day) => '<td data-column="' + day + '"><button type="button" class="od-cell cursor-interaction" data-team="' + team + '" data-day="' + day + '"></button></td>').join("");
-      return '<tr data-row="' + team + '"><th scope="row" class="od-team"><div class="od-club"><span class="od-rank" aria-label="Rang ' + (team + 1) + '">' + (team + 1) + '</span>' + clubBadge(name, initials) + '<span>' + escapeHTML(name) + '</span></div></th>' + cells + '</tr>';
+      const label = escapeHTML(name);
+      return `<tr data-row="${team}"><th scope="row" class="od-team"><div class="od-club"><span class="od-rank" aria-label="Rang ${team + 1}">${team + 1}</span>${clubBadge(name, initials)}<button type="button" class="od-team-name" data-stats-team="${team}" aria-label="${label}, statistiques des joueurs" aria-expanded="false">${label}</button></div></th>${cells}</tr>`;
     }).join("");
     bindClubLogoFallbacks(body);
     updateDay();
@@ -100,12 +102,39 @@ export function createView(root, data, state) {
   }
 
   function renderDetail(returnFocus = false) {
+    const existing = body.querySelector('.od-stats-row');
+    const innerScroll = existing?.querySelector('.od-stats-scroll')?.scrollLeft ?? 0;
     body.querySelector(".od-detail-row")?.remove();
+    body.querySelectorAll('[data-stats-team]').forEach(button => {
+      const open = state.stats?.team === Number(button.getAttribute('data-stats-team'));
+      button.setAttribute('aria-expanded', String(open));
+      if (open) button.setAttribute('aria-controls', 'od-stats-panel'); else button.removeAttribute('aria-controls');
+    });
     body.querySelectorAll(".od-cell").forEach((button) => {
       const picked = state.selected?.day === Number(button.getAttribute('data-day')) && state.selected?.team === Number(button.getAttribute('data-team'));
       button.classList.toggle("od-picked",picked);
       button.setAttribute("aria-expanded",String(picked));
     });
+    if (state.stats) {
+      const parent = query(body, `[data-row="${state.stats.team}"]`, HTMLTableRowElement);
+      const same = existing && existing.previousElementSibling === parent;
+      const row = same ? existing : document.createElement('tr');
+      row.className = 'od-stats-row';
+      row.innerHTML = `<td colspan="${dates.length + 1}">${statsPanel(data, state, state.stats)}</td>`;
+      if (!same) { existing?.remove(); parent.after(row); }
+      const scroller = row.querySelector('.od-stats-scroll');
+      if (same && scroller) scroller.scrollLeft = innerScroll;
+      if (!same) {
+        find('[data-announcement]').textContent = 'Statistiques des joueurs · ' + clubs[state.pool][state.stats.team][0];
+        const close = query(row, '[data-close]', HTMLButtonElement);
+        if (returnFocus) close.focus({preventScroll: true});
+        if (close.getBoundingClientRect().bottom > Math.min(scroll.getBoundingClientRect().bottom, window.innerHeight)) {
+          close.scrollIntoView({block: 'nearest', inline: 'nearest'});
+        }
+      }
+      return;
+    }
+    existing?.remove();
     if (!state.selected) return;
     const {day,team} = state.selected;
     if (data.mode === 'live') {

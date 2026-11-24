@@ -95,7 +95,7 @@ export function statsPanel(data, state, selection) {
     <div class="od-detail-head"><div><div class="od-match-kicker">${name} · J1 à J${state.day + 1}</div>
     <h3 id="od-stats-title">Statistiques des joueurs</h3><p>${description}</p></div>
     <button type="button" class="od-arrow" data-close aria-label="Fermer les statistiques des joueurs">×</button></div>
-    ${rows.length ? statsTable(rows, selection) + '<p class="od-stats-note">0 = zéro vérifié sur les feuilles · ? = inconnu · ≥ = minimum attesté. Les noms abrégés peuvent regrouper des homonymes.</p>' :
+    ${rows.length ? '<p class="od-stats-note">0 = zéro vérifié sur les feuilles · ? = inconnu · ≥ = minimum attesté. Les noms abrégés peuvent regrouper des homonymes.</p>' + statsTable(rows, selection) :
       data.mode === 'live' ? `<p class="od-stats-note">${played ? 'Aucun nom publié dans les feuilles disponibles.' : 'Aucun match de D4 terminé à cette journée.'}</p>` : ''}
     </section>`;
 }

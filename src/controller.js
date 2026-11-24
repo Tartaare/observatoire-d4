@@ -4,6 +4,7 @@ import {bindArchives} from './detail.js';
 import {restoreNavigation, saveNavigation} from './navigation.js';
 import {refreshClubLogos} from './club-logos.js';
 import {LOGOS_EVENT, LOGOS_KEY} from './custom-logos.js';
+import {isStatColumn} from './player-stats.js';
 
 /** @param {HTMLElement} root @param {import("./types.js").SeasonData} data */
 export function startObservatory(root, data) {
@@ -32,6 +33,7 @@ export function startObservatory(root, data) {
       renderDetail();
     }
     updateDay();
+    if (state.stats) renderDetail();
     keepDayVisible(state.day);
     persist();
     if (announce) find("[data-announcement]").textContent = range.getAttribute("aria-valuetext");
@@ -65,6 +67,7 @@ export function startObservatory(root, data) {
     stop();
     if (pool.value !== 'a' && pool.value !== 'b') return;
     state.pool = pool.value;
+    delete state.stats;
     state.day = Math.max(0,lastPlayed);
     state.selected = null;
     persist();
@@ -86,6 +89,15 @@ export function startObservatory(root, data) {
     });
   });
   function closeDetail() {
+    if (state.stats) {
+      const team = state.stats.team;
+      delete state.stats;
+      renderDetail();
+      const trigger = query(body, `[data-stats-team="${team}"]`, HTMLButtonElement);
+      trigger.focus({preventScroll:true});
+      trigger.scrollIntoView({block:'nearest', inline:'nearest'});
+      return;
+    }
     if (!state.selected) return;
     const {team,day} = state.selected;
     state.selected = null;
@@ -96,12 +108,32 @@ export function startObservatory(root, data) {
   on(root, "click", (event) => {
     const button = event.target instanceof Element ? event.target.closest('button') : null;
     if (!button || button.disabled) return;
+    if (button.dataset.statsTeam !== undefined) {
+      stop();
+      const team = Number(button.dataset.statsTeam);
+      if (state.stats?.team === team) { closeDetail(); return; }
+      state.selected = null;
+      state.stats = {team, column: 'appearances', ascending: false};
+      persist();
+      renderDetail(event.detail === 0);
+      return;
+    }
+    const column = button.dataset.statSort;
+    if (column && isStatColumn(column) && state.stats) {
+      stop();
+      state.stats.ascending = state.stats.column === column ? !state.stats.ascending : column === 'name';
+      state.stats.column = column;
+      renderDetail();
+      query(body, `[data-stat-sort="${column}"]`, HTMLButtonElement).focus({preventScroll:true});
+      return;
+    }
     if (button.hasAttribute("data-jump")) {
       stop();
       setDay(Number(button.dataset.jump),true);
     }
     if (button.hasAttribute("data-team")) {
       stop();
+      delete state.stats;
       const day = Number(button.dataset.day);
       const team = Number(button.dataset.team);
       if (state.selected?.day === day && state.selected?.team === team) { closeDetail(); return; }
@@ -112,7 +144,7 @@ export function startObservatory(root, data) {
     if (button.hasAttribute("data-close")) closeDetail();
   });
   on(root, "keydown", (event) => {
-    if (event.key === "Escape" && state.selected) closeDetail();
+    if (event.key === "Escape" && (state.selected || state.stats)) closeDetail();
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); }, {signal: lifecycle.signal});
   bindArchives(root, lifecycle.signal);
