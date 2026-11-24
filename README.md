@@ -8,6 +8,8 @@ L’interface affiche les données réelles archivées depuis [Le Onze Lotois](h
 
 Dans le classement, cliquer sur le **nom d’une équipe** ouvre **Statistiques des joueurs** sous sa ligne. La fiche suit la journée du curseur. Elle affiche les matchs documentés, les apparitions, les titularisations, les entrées, les buts et les cartons jaunes et rouges. Cliquer sur un en-tête trie sa colonne. Un **0** indique un zéro vérifié dans les sources disponibles, **?** une valeur inconnue et **≥** un minimum attesté.
 
+À côté du nom du joueur, **n° 8 / n° 10** indique qu’il a porté ces deux numéros lors de participations attestées avec cette équipe jusqu’à la journée affichée. Ouvrir une rencontre permet de retrouver le numéro inscrit sur sa feuille. Les archives existantes suffisent pour consulter les maillots hors ligne.
+
 Au premier démarrage avec le sprint 19, SQLite relit automatiquement les pages D4 en cache. Cette opération fonctionne hors ligne. Pour la version hébergée, publier également l’Edge Function actualisée puis lancer **Mettre à jour** pour enrichir les archives existantes. Le contrôle `npm run import:cloud -- --check` compare les projections locale et hébergée sans envoyer les données.
 
 Le [référentiel des fonctionnalités et de l’interface](app-features.md) décrit les parcours utilisateur, chaque zone et contrôle, les états de données, la synchronisation, les personnalisations, le responsive et l’accessibilité. Il distingue la version locale, la démonstration et la variante hébergée préparée, pour permettre une prise en main UI/UX sans avoir utilisé l’application.

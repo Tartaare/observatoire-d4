@@ -1,5 +1,13 @@
 # Avancement
 
+## Sprint 23 — Numéros de maillot des joueurs
+
+**US-038.** La fiche d’équipe affiche les numéros portés en D4 jusqu’à la journée sélectionnée. Le détail du match et les compositions historiques affichent le numéro inscrit sur la feuille. Les archives locales et hébergées fournissent déjà cette donnée.
+
+**Vérifications.** Les 1 451 inscriptions D4 de la base locale comportent un numéro. Compilation Pages, typage strict et 36 tests réussis. Parcours Edge sur les archives réelles à 320 px en sombre et 1 440 px en clair, avec tri, ouverture d’une rencontre et lecture d’une composition historique. À 320 px, le nom et les numéros restent visibles pendant le défilement horizontal des statistiques.
+
+**Prévention des régressions.** Le test du cumul distingue deux inscriptions homonymes sur une feuille et rattache le maillot à la participation de la ligne concernée. Il couvre le numéro absent, le buteur hors composition, le forfait, le changement de journée et l’isolation par équipe et par poule.
+
 ## Sprint 22 — Audit UI/UX en portrait
 
 **US-037.** Audit de la saison archivée sur cinq formats téléphone, une tablette portrait et un témoin ordinateur. Edge et WebKit reproduisent un recouvrement tactile entre la flèche et le curseur, un focus caché par la colonne Équipe et une fiche de match ouverte sous le bord de l’écran. Une réponse vide après collecte laisse également apparaître les anciennes équipes. Le rapport précise les reproductions, les priorités et les critères de correction. [Audit mobile en portrait](docs/audit-mobile-portrait.md)
