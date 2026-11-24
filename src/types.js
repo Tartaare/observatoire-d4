@@ -11,7 +11,7 @@
  * @typedef {{count: number | null, score: string, home: string, away: string, players: Player[],
  *   featured: boolean, realSheet: boolean, sourceURL: string, matchDate: string | null,
  *   statusLabel: string, sheetState: 'published' | 'partial' | 'missing' | 'uncollected',
- *   retained: boolean, roster: RosterPlayer[]}} LiveMatch
+ *   retained: boolean, roster: RosterPlayer[], eventOnly?: import('../server/collection-types.js').EventPlayer[]}} LiveMatch
  * @typedef {{calendar: {discovered: number, expected: number | null}, matches: number, expected: number, published: number, partial: number, missing: number,
  *   uncollected: number, retained: number, players: number,
  *   d4: {expected: number, published: number, partial: number, missing: number}}} Coverage

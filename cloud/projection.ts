@@ -35,7 +35,7 @@ export function projectSnapshot(season: number, snapshot: Snapshot, state: State
     const fixture = byURL.get(match.url);
     match.sheets.forEach((sheet, side) => {
       sheets.push({match_url: match.url, side, name: sheet.name, club_url: sheet.clubURL,
-        state: sheet.state, latest_state: sheet.latestState});
+        state: sheet.state, latest_state: sheet.latestState, event_only: JSON.stringify(sheet.eventOnly ?? [])});
       if (fixture?.status !== 'Terminé') return;
       sheet.players.forEach((p, ordinal) => participants.push({match_url: match.url, side, ordinal,
         name: p.name, name_key: p.key, shirt: p.shirt, status: p.status, entry: p.entry, exit: p.exit,

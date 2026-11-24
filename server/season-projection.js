@@ -67,7 +67,8 @@ export function projectSeason(seasonStart, standings, fixtures, sheets, particip
         players: [], featured: false, realSheet: false, sourceURL: String(fixture.url),
         matchDate: fixture.date ? String(fixture.date) : null, statusLabel: String(fixture.status),
         sheetState: sheet ? /** @type {'published' | 'partial' | 'missing'} */ (sheet.state) : 'uncollected',
-        retained: Boolean(sheet && sheet.latest_state !== sheet.state), roster};
+        retained: Boolean(sheet && sheet.latest_state !== sheet.state), roster,
+        eventOnly: sheet?.event_only ? JSON.parse(String(sheet.event_only)) : []};
     }
   }
   return {mode: 'live', seasonStart, lastPlayed, dates, clubs, matches, coverage,

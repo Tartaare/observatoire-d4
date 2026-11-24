@@ -126,6 +126,9 @@ function validateLiveMatches(data) {
   const invalid = () => { throw new TypeError('Format des feuilles archivées invalide.'); };
   if (!Number.isInteger(data.seasonStart) || !data.matches || typeof data.matches !== 'object' || Array.isArray(data.matches)) return invalid();
   const validText = (/** @type {unknown} */ value) => typeof value === 'string' && value.length > 0 && value.length <= 300;
+  const validEvents = (/** @type {import('../server/collection-types.js').PlayerEvents} */ e) => e &&
+    [e.goals, e.yellows, e.reds].every(n => Number.isSafeInteger(n) && n >= 0) &&
+    [e.goalsComplete, e.yellowsComplete, e.redsComplete].every(flag => typeof flag === 'boolean');
   const validURL = (/** @type {unknown} */ value) => typeof value === 'string' && /^https:\/\/leonzelotois\.fr\/matchs\/[a-z0-9-]+\/$/.test(value);
   const validDate = (/** @type {unknown} */ value) => typeof value === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(value) &&
     Number.isFinite(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value;
@@ -138,11 +141,12 @@ function validateLiveMatches(data) {
       !['published', 'partial', 'missing', 'uncollected'].includes(match.sheetState) || !Array.isArray(match.roster) || match.roster.length > 50) return invalid();
     if (match.count !== null && (!Number.isInteger(match.count) || match.count < 0 || match.count > 30)) return invalid();
     if (match.count !== data.clubs[/** @type {import('./types.js').PoolId} */ (pool)][Number(team)][2][Number(day)]) return invalid();
+    if (match.eventOnly !== undefined && (!Array.isArray(match.eventOnly) || match.eventOnly.length > 100 ||
+      match.eventOnly.some(p => !p || !validText(p.name) || !validEvents(p.events)))) return invalid();
     for (const player of match.roster) {
       if (!validText(player.name) || !['starter', 'entered', 'unverified'].includes(player.status) || !Array.isArray(player.history)) return invalid();
       const e = player.events;
-      if (e != null && (![e.goals, e.yellows, e.reds].every(n => Number.isSafeInteger(n) && n >= 0) ||
-        ![e.goalsComplete, e.yellowsComplete, e.redsComplete].every(flag => typeof flag === 'boolean'))) return invalid();
+      if (e != null && !validEvents(e)) return invalid();
       for (const history of player.history) {
         if (!validDate(history.date) || !['L1', 'L2', 'N1', 'N2', 'N3', 'R1', 'R2', 'R3', 'D1', 'D2', 'D3'].includes(history.division) ||
           !validText(history.team) || !validURL(history.sourceURL) ||
