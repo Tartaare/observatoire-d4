@@ -39,7 +39,7 @@ test('le footer restitue la couverture, la progression et les échecs sans perdr
     replaceChildren(...children) { this.children = children; }
   }
   const elements = new Map(['sync', 'sync-force', 'sync-message', 'sync-coverage', 'sync-progress',
-    'sync-errors', 'sync-error-list'].map(name => [`[data-${name}]`, new Element()]));
+    'sync-eta', 'sync-errors', 'sync-error-list'].map(name => [`[data-${name}]`, new Element()]));
   const globals = {HTMLElement: Element, HTMLButtonElement: Element, HTMLInputElement: Element,
     HTMLProgressElement: Element, HTMLDetailsElement: Element, HTMLUListElement: Element,
     document: {createElement: () => new Element()}};
@@ -77,6 +77,7 @@ test('le footer restitue la couverture, la progression et les échecs sans perdr
     assert.equal(get('sync').disabled, true);
     assert.equal(get('sync-force').disabled, true);
     assert.equal(get('sync-progress').hidden, false);
+    assert.equal(get('sync-eta').hidden, false);
     t.mock.timers.tick(2000);
     await nextTurn();
     assert.equal(get('sync-progress').max, 2);

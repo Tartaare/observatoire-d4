@@ -22,7 +22,8 @@
     <div class="od-header-actions">
       <div class="od-sync-actions" role="group" aria-label="Synchronisation des archives">
         <label class="od-refresh-option cursor-interaction"><input type="checkbox" data-sync-force> Revérifier toutes les feuilles</label>
-        <button class="od-play cursor-interaction" type="button" data-sync>Mettre à jour</button>
+        <button class="od-play cursor-interaction" type="button" data-sync aria-describedby="sync-eta">Mettre à jour</button>
+        <span id="sync-eta" data-sync-eta hidden></span>
       </div>
       <div data-appearance-root></div>
     </div>

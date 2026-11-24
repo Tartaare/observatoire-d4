@@ -2,6 +2,29 @@ import {query} from './dom.js';
 import {apiFetch} from './session.js';
 import {hosted} from './runtime.js';
 
+export function createTimeEstimate() {
+  let phase = '', firstDone = 0, firstTime = 0, lastDone = 0, label = '';
+  /** @param {Pick<import('../server/collection-types.js').SyncStatus, 'startedAt'|'phase'|'running'|'total'|'done'>} state */
+  return (state, now = performance.now()) => {
+    if (!state.running) { phase = ''; return ''; }
+    const key = JSON.stringify([state.startedAt, state.phase, state.total]);
+    const calendars = state.phase === 'Lecture des calendriers';
+    const prefix = calendars ? 'Calendriers' : 'Fin estimée';
+    if (phase !== key || state.done < lastDone) {
+      phase = key;
+      firstDone = lastDone = state.done;
+      firstTime = now;
+      label = calendars ? 'Calendriers · estimation en cours…' : 'Durée restante en cours d’estimation…';
+    } else if (state.done > lastDone && state.total > state.done) {
+      const seconds = (now - firstTime) / 1000 * (state.total - state.done) / (state.done - firstDone);
+      const duration = seconds < 60 ? `${Math.max(5, Math.ceil(seconds / 5) * 5)} s` : `${Math.ceil(seconds / 60)} min`;
+      label = `${prefix} · encore environ ${duration}`;
+      lastDone = state.done;
+    }
+    return label;
+  };
+}
+
 /** @param {HTMLElement} root @param {() => Promise<void>} onUpdated */
 export function setupSync(root, onUpdated) {
   const button = query(root, '[data-sync]', HTMLButtonElement);
@@ -9,6 +32,8 @@ export function setupSync(root, onUpdated) {
   const message = query(root, '[data-sync-message]', HTMLElement);
   const coverage = query(root, '[data-sync-coverage]', HTMLElement);
   const progress = query(root, '[data-sync-progress]', HTMLProgressElement);
+  const eta = query(root, '[data-sync-eta]', HTMLElement);
+  const estimate = createTimeEstimate();
   const errors = query(root, '[data-sync-errors]', HTMLDetailsElement);
   const errorList = query(root, '[data-sync-error-list]', HTMLUListElement);
   const dateFormat = new Intl.DateTimeFormat('fr-FR', {dateStyle: 'short', timeStyle: 'short'});
@@ -19,6 +44,8 @@ export function setupSync(root, onUpdated) {
 
   /** @param {import('../server/collection-types.js').SyncStatus & {coverage: import('./types.js').Coverage}} state */
   function render(state) {
+    eta.textContent = estimate(state);
+    eta.hidden = !state.running;
     button.disabled = state.running;
     force.disabled = state.running;
     button.textContent = state.running ? 'Mise à jour en cours…' : 'Mettre à jour';
@@ -67,12 +94,15 @@ export function setupSync(root, onUpdated) {
       force.disabled = false;
       button.textContent = 'Réessayer la mise à jour';
       progress.hidden = true;
+      eta.hidden = true;
       timer = setTimeout(refresh, 10000);
     }
   }
 
   button.addEventListener('click', async () => {
     generation++;
+    eta.textContent = 'Durée restante en cours d’estimation…';
+    eta.hidden = false;
     if (timer !== null) clearTimeout(timer);
     button.disabled = true;
     force.disabled = true;
@@ -88,6 +118,7 @@ export function setupSync(root, onUpdated) {
       timer = setTimeout(refresh, response.status === 409 ? 2000 : hosted ? 0 : 150);
     } catch {
       message.textContent = 'Impossible de démarrer la mise à jour. Les données affichées sont conservées.';
+      eta.hidden = true;
       button.disabled = false;
       force.disabled = false;
       timer = setTimeout(refresh, 10000);
