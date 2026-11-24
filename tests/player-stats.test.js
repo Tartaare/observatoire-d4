@@ -1,7 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {parseMatch} from '../server/source.js';
-import {teamStats} from '../src/player-stats.js';
+import {statsPanel, teamStats} from '../src/player-stats.js';
+import {load} from 'cheerio/slim';
 import {openDatabase} from '../server/database.js';
 import {saveMatch} from '../server/collection-store.js';
 import {migratePlayerEvents} from '../server/migrate-player-events.js';
@@ -39,6 +40,28 @@ test('le cumul déduplique les apparitions et suit équipe, journée, couverture
   assert.deepEqual(end.rows[0].totals, {appearances: 2, starts: 1, entries: 1, goals: 0, yellows: 0, reds: 0});
   assert.equal(end.rows[0].unknown.size, 6);
   assert.deepEqual(teamStats(data, 'a', 1, 3).rows, []);
+});
+
+test('les maillots affichés suivent les participations du joueur dans cette équipe jusqu’à la journée choisie', () => {
+  const starter = {name: 'Noé T.', status: 'starter', shirt: 10};
+  const bench = {...starter, name: 'NOÉ T.', status: 'unverified', shirt: 14};
+  const sheet = {statusLabel: 'Terminé', sheetState: 'partial', roster: [starter, bench],
+    eventOnly: [{name: 'Alex M.', events: {goals: 1}}]};
+  const data = {mode: 'live', clubs: {a: [['Nord']]}, matches: {
+    'a:0:0': sheet, 'a:0:1': {...sheet, roster: [{...starter, status: 'entered', shirt: 8}, {...starter, shirt: null}]},
+    'a:0:2': {...sheet, roster: [starter, {...bench, shirt: 12, events: {goals: 1}}]},
+    'a:0:3': {...sheet, statusLabel: 'Forfait Nord', roster: [{...starter, shirt: 9}]},
+    'a:1:0': {...sheet, roster: [{...starter, shirt: 2}]},
+    'b:0:0': {...sheet, roster: [{...starter, shirt: 3}]},
+  }};
+  const numbers = day => {
+    const $ = load(statsPanel(data, {pool: 'a', day}, {team: 0, column: 'name', ascending: true}));
+    assert.equal($('th[scope=row]').first().text(), 'Alex M.');
+    return $('th[scope=row] .od-shirts').text();
+  };
+  assert.equal(numbers(0), 'n° 10');
+  assert.equal(numbers(1), 'n° 8 / n° 10');
+  assert.equal(numbers(3), 'n° 8 / n° 10 / n° 12');
 });
 
 test('la relecture du cache conserve le buteur hors composition et la fraîcheur de la feuille', () => {

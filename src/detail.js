@@ -1,4 +1,4 @@
-import {escapeHTML as escape} from './dom.js';
+import {escapeHTML as escape, isShirtNumber} from './dom.js';
 import {apiFetch} from './session.js';
 import {hosted} from './runtime.js';
 
@@ -7,6 +7,8 @@ const dateFormat = new Intl.DateTimeFormat('fr-FR', {day: 'numeric', month: 'sho
 const dateLabel = value => value ? dateFormat.format(new Date(value)) : 'Date à confirmer';
 /** @param {'starter' | 'entered' | 'unverified'} status */
 const statusLabel = status => ({starter: 'Titulaire', entered: 'Entrée en jeu attestée', unverified: 'Remplaçant · participation non attestée'})[status];
+/** @param {unknown} shirt */
+const shirtSuffix = shirt => isShirtNumber(shirt) ? ` · n° ${shirt}` : '';
 
 /** @param {import('./types.js').LiveMatch} match */
 export function liveDetail(match) {
@@ -20,7 +22,7 @@ export function liveDetail(match) {
       <details data-archive-url="${escape(item.sourceURL)}"><summary class="cursor-interaction">Composition archivée</summary><div data-archive-content></div></details>
       <a href="${escape(item.sourceURL)}" target="_blank" rel="noopener noreferrer">Source en ligne ↗</a></li>`).join('');
     const movement = [player.entry ? `Entrée ${player.entry}′` : '', player.exit ? `Sortie ${player.exit}′` : ''].filter(Boolean).join(' · ');
-    return `<details><summary class="cursor-interaction"><strong>${escape(player.name)}</strong><span class="od-player-status">${escape(statusLabel(player.status))}</span>
+    return `<details><summary class="cursor-interaction"><strong>${escape(player.name)}<span class="od-shirts">${shirtSuffix(player.shirt)}</span></strong><span class="od-player-status">${escape(statusLabel(player.status))}</span>
       ${history && player.status !== 'unverified' ? '<span class="od-division">À confirmer</span>' : ''}</summary>
       ${movement ? `<p>${escape(movement)}</p>` : ''}${history ? `<ul>${history}</ul>` : '<p>Aucune correspondance antérieure dans les feuilles archivées.</p>'}</details>`;
   }).join('');
@@ -54,7 +56,7 @@ export function bindArchives(root, signal) {
         const list = document.createElement('ul');
         for (const player of sheet.players) {
           const row = document.createElement('li');
-          row.textContent = `${player.name} · ${statusLabel(player.status)}`;
+          row.textContent = `${player.name}${shirtSuffix(player.shirt)} · ${statusLabel(player.status)}`;
           list.append(row);
         }
         fragment.append(heading, list);

@@ -19,3 +19,8 @@ export function escapeHTML(value) {
   };
   return value.replace(/[&<>"']/g, character => entities[character] ?? character);
 }
+
+/** @param {unknown} value @returns {value is number} */
+export function isShirtNumber(value) {
+  return typeof value === 'number' && Number.isSafeInteger(value) && value >= 0;
+}

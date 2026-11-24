@@ -1,4 +1,4 @@
-import {escapeHTML} from './dom.js';
+import {escapeHTML, isShirtNumber} from './dom.js';
 
 const columns = /** @type {const} */ ({
   name: 'Joueur', appearances: 'Apparitions', starts: 'Titularisations', entries: 'Entrées en jeu',
@@ -8,8 +8,10 @@ const columns = /** @type {const} */ ({
 /** @typedef {{team: number, column: StatColumn, ascending: boolean}} StatsSelection */
 /** @typedef {Exclude<StatColumn, 'name'>} Metric */
 /** @typedef {import('./types.js').RosterPlayer} RosterPlayer */
-/** @typedef {{name: string, status: RosterPlayer['status'] | 'event', events?: RosterPlayer['events']}} PlayerEvidence */
-/** @typedef {{name: string, partialSheets: number, totals: Record<Metric, number>, unknown: Set<Metric>}} PlayerRow */
+/** @typedef {{name: string, status: RosterPlayer['status'] | 'event', shirt?: RosterPlayer['shirt'], events?: RosterPlayer['events']}} PlayerEvidence */
+/** @typedef {{name: string, shirts: Set<number>, partialSheets: number, totals: Record<Metric, number>, unknown: Set<Metric>}} PlayerRow */
+/** @param {PlayerEvidence} player */
+const playedMatch = player => player.status === 'starter' || player.status === 'entered' || (player.events?.goals ?? 0) > 0;
 /** @param {string} key @returns {key is StatColumn} */
 export const isStatColumn = key => Object.hasOwn(columns, key);
 
@@ -36,13 +38,13 @@ export function teamStats(data, pool, team, day) {
       if (same) same.push(p); else names.set(key, [p]);
     }
     for (const [key, group] of names) {
-      const row = players.get(key) ?? {name: group[0].name, partialSheets: 0, unknown: new Set(),
+      const row = players.get(key) ?? {name: group[0].name, shirts: new Set(), partialSheets: 0, unknown: new Set(),
         totals: {appearances: 0, starts: 0, entries: 0, goals: 0, yellows: 0, reds: 0}};
       players.set(key, row);
       if (match.sheetState !== 'published') row.partialSheets++;
       const starter = group.some(p => p.status === 'starter');
       const entered = !starter && group.some(p => p.status === 'entered' || p.status === 'unverified' && (p.events?.goals ?? 0) > 0);
-      const appeared = starter || entered || group.some(p => (p.events?.goals ?? 0) > 0);
+      const appeared = group.some(playedMatch);
       row.totals.starts += Number(starter);
       row.totals.entries += Number(entered);
       row.totals.appearances += Number(appeared);
@@ -50,6 +52,7 @@ export function teamStats(data, pool, team, day) {
       if (!starter && !entered) row.unknown.add('entries');
       if (group.every(p => p.status === 'event')) row.unknown.add('starts');
       for (const p of group) {
+        if (isShirtNumber(p.shirt) && playedMatch(p)) row.shirts.add(p.shirt);
         for (const metric of /** @type {const} */ (['goals', 'yellows', 'reds'])) {
           row.totals[metric] += p.events?.[metric] ?? 0;
           if (!p.events?.[`${metric}Complete`]) row.unknown.add(metric);
@@ -64,6 +67,14 @@ export function teamStats(data, pool, team, day) {
     }
   }
   return {rows: [...players.values()], played, documented, partial};
+}
+
+/** @param {PlayerRow} row */
+function playerHeading(row) {
+  const name = escapeHTML(row.name);
+  if (!row.shirts.size) return name;
+  const shirts = [...row.shirts].sort((a, b) => a - b).map(n => `n° ${n}`).join(' / ');
+  return `${name} <span class="od-shirts">${shirts}</span>`;
 }
 
 /** @param {PlayerRow} row @param {Metric} key */
@@ -87,7 +98,7 @@ function statsTable(rows, {column, ascending}) {
     return `<th scope="col"${active ? ` aria-sort="${ascending ? 'ascending' : 'descending'}"` : ''}><button type="button" data-stat-sort="${key}">${columns[key]}<span aria-hidden="true">${active ? ascending ? '↑' : '↓' : '↕'}</span></button></th>`;
   });
   return `<div class="od-stats-scroll" tabindex="0" role="region" aria-label="Statistiques par joueur"><table aria-labelledby="od-stats-title"><thead><tr>${heads.join('')}</tr></thead><tbody>${rows.map(row =>
-    '<tr>' + keys.map(k => k === 'name' ? `<th scope="row">${escapeHTML(row.name)}</th>` : `<td>${cell(row, k)}</td>`).join('') + '</tr>'
+    '<tr>' + keys.map(k => k === 'name' ? `<th scope="row">${playerHeading(row)}</th>` : `<td>${cell(row, k)}</td>`).join('') + '</tr>'
   ).join('')}</tbody></table></div>`;
 }
 
@@ -104,7 +115,7 @@ export function statsPanel(data, state, selection) {
     <div class="od-detail-head"><div><div class="od-match-kicker">${name} · J1 à J${state.day + 1}</div>
     <h3 id="od-stats-title">Statistiques des joueurs</h3><p>${description}</p></div>
     <button type="button" class="od-arrow" data-close aria-label="Fermer les statistiques des joueurs">×</button></div>
-    ${rows.length ? '<p class="od-stats-note">0 = zéro vérifié sur les feuilles · ? = inconnu · ≥ = minimum attesté. Les noms abrégés peuvent regrouper des homonymes.</p>' + statsTable(rows, selection) :
+    ${rows.length ? '<p class="od-stats-note">Les numéros de maillot correspondent aux matchs où la participation est attestée. Les noms abrégés peuvent regrouper des homonymes.</p><p class="od-stats-note">0 = zéro vérifié sur les feuilles · ? = inconnu · ≥ = minimum attesté.</p>' + statsTable(rows, selection) :
       data.mode === 'live' ? `<p class="od-stats-note">${played ? 'Aucun nom publié dans les feuilles disponibles.' : 'Aucun match de D4 terminé à cette journée.'}</p>` : ''}
     </section>`;
 }
