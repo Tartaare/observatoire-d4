@@ -1,8 +1,10 @@
 /**
  * @typedef {'starter' | 'entered' | 'unverified'} ParticipationStatus
  * @typedef {'published' | 'partial' | 'missing'} SheetState
+ * @typedef {{goals: number, yellows: number, reds: number, goalsComplete: boolean,
+ *   yellowsComplete: boolean, redsComplete: boolean}} PlayerEvents
  * @typedef {{name: string, key: string, shirt: number | null, status: ParticipationStatus,
- *   entry: string | null, exit: string | null}} Participant
+ *   entry: string | null, exit: string | null, events?: PlayerEvents | null}} Participant
  * @typedef {{name: string, clubURL: string | null, state: SheetState, players: Participant[]}} Sheet
  * @typedef {{url: string, division: string, round: number, status: string,
  *   home: string, away: string, date: string | null, score: string | null}} Fixture

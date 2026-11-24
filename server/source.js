@@ -1,4 +1,5 @@
 import {load} from 'cheerio/slim';
+import {attachPlayerEvents, compositionGoals} from './player-events.js';
 
 export const ORIGIN = 'https://leonzelotois.fr';
 export const DIVISIONS = new Set(['L1', 'L2', 'N1', 'N2', 'N3', 'R1', 'R2', 'R3', 'D1', 'D2', 'D3', 'D4']);
@@ -124,7 +125,7 @@ export function parseMatch(html, url, seasonStart) {
   if (!/^\d+\s*[–—-]\s*\d+$/.test(score)) throw new Error('Score de rencontre non reconnu.');
   /** @type {import('./collection-types.js').Sheet[]} */
   const sheets = [];
-  head.find('.mt-team').each((_, node) => {
+  head.find('.mt-team').each((side, node) => {
     const team = $(node), name = clean(team.find('.mt-name').text());
     if (!name) throw new Error('Nom d’équipe absent.');
     const link = team.find('a.crest-lien').attr('href');
@@ -132,6 +133,8 @@ export function parseMatch(html, url, seasonStart) {
     const columns = $('.compo-col').filter((_, column) => clean($(column).find('.compo-team').text()) === name);
     /** @type {import('./collection-types.js').Participant[]} */
     const players = [];
+    /** @type {number[]} */
+    const goals = [];
     let incomplete = columns.length !== 1;
     columns.first().find('ol.compo-list').each((_, node) => {
       const list = $(node), substitute = list.hasClass('compo-list--subs');
@@ -141,6 +144,7 @@ export function parseMatch(html, url, seasonStart) {
         const entryText = clean(row.find('.compo-mvt--in').text());
         const exitText = clean(row.find('.compo-mvt--out').text());
         const shirtText = clean(row.find('.num').text());
+        goals.push(compositionGoals($, row));
         players.push({name: playerName, key: normalizeName(playerName),
           shirt: /^\d+$/.test(shirtText) ? Number(shirtText) : null,
           status: !substitute ? 'starter' : entryText || exitText ? 'entered' : 'unverified',
@@ -149,6 +153,7 @@ export function parseMatch(html, url, seasonStart) {
       });
     });
     const duplicate = new Set(players.map(player => player.key)).size !== players.length;
+    attachPlayerEvents($, side, Number(score.split(/[–—-]/)[side]), players, goals, normalizeName);
     const state = players.length === 0 ? 'missing' : incomplete || duplicate || players.filter(player => player.status === 'starter').length !== 11 ? 'partial' : 'published';
     sheets.push({name, clubURL, state, players});
   });
