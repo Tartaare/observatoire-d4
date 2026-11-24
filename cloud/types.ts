@@ -8,6 +8,7 @@ export type State = SyncStatus & {
   stage: 'standings' | 'directory' | 'clubs' | 'matches' | 'finished';
   queue: string[]; standings: Standing[]; rounds: number; force: boolean;
   nextRequestAt: number; coverage: Coverage;
+  verified: Record<string, import('../server/refresh-policy.js').Verification | null>;
 };
 export type Snapshot = {fixtures: Fixture[]; matches: Archive[]};
 export type CachedPage = {body: string; etag: string | null; modified: string | null; fetchedAt: string};

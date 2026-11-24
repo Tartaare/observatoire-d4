@@ -18,13 +18,13 @@ export function createHandler(store: Store, authenticate: (token: string) => Pro
       const route = url.pathname.replace(/^.*\/observatoire(?=\/|$)/, '') || '/';
       const now = new Date();
       const season = now.getUTCMonth() >= 6 ? now.getUTCFullYear() : now.getUTCFullYear() - 1;
-      const state = {...initialState(), ...await store.state(season)};
       if (request.method === 'POST' && ['/sync', '/sync/step'].includes(route)) {
         if (request.headers.get('X-Observatoire-Sync') !== '1' || (await request.text()).length) return reply({error: 'Requête de synchronisation invalide.'}, 400);
         const result = await advance(store, season, route === '/sync', url.searchParams.get('force') === '1', fetcher);
         return reply(publicStatus(result.state, season), result.busy ? 409 : 200);
       }
       if (request.method !== 'GET') return reply({error: 'Méthode non autorisée.'}, 405);
+      const state = {...initialState(), ...await store.state(season)};
       if (route === '/sync') return reply(publicStatus(state, season));
       if (route === '/season') return reply(projectSnapshot(season, await store.snapshot(season), state) ?? demo);
       if (route === '/sheet') {

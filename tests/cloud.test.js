@@ -100,6 +100,29 @@ test('le parcours par étapes termine les calendriers et les compositions avec u
   assert.equal(completed.state.coverage.players, 22); assert.equal(completed.state.coverage.published, 2);
   assert.ok(completed.state.lastSuccess);
   assert.equal(projectSnapshot(2026, await store.snapshot(), await store.state()).matches['a:0:0'].count, 0);
+
+  // Reprise depuis l’annuaire avec une archive et un calendrier fraîchement vérifiés.
+  const directory = `<li class="club-card" data-div="d4"><a class="club-card-lien" href="${origin}/club/test/">Club</a></li>`;
+  const directoryState = {...await store.state(), stage: 'directory', running: true};
+  store.page = async url => {
+    assert.equal(url, `${origin}/clubs/`);
+    return {body: directory, fetchedAt: new Date().toISOString()};
+  };
+  store.seed(directoryState);
+  const fresh = await advance(store, 2026, false, false, unexpectedNetwork);
+  assert.equal(fresh.state.running, false);
+  assert.equal(fresh.state.errors.length, 0);
+  assert.deepEqual(fresh.state.coverage, completed.state.coverage);
+  const snapshot = await store.snapshot();
+  snapshot.fixtures[0].round++;
+  store.seed(directoryState, snapshot);
+  const changed = await advance(store, 2026, false, false, unexpectedNetwork);
+  assert.deepEqual(changed.state.queue, [snapshot.fixtures[0].url]);
+  assert.equal(changed.state.stage, 'matches');
+  store.seed({...directoryState, force: true});
+  const forced = await advance(store, 2026, false, false, async () => new Response(directory, {headers: {'Content-Type': 'text/html'}}));
+  assert.equal(forced.state.stage, 'clubs');
+  assert.equal(forced.state.queue.length, 1);
 });
 
 test('l’API vérifie la session et les membres avant toute lecture ou écriture', async () => {
@@ -113,7 +136,7 @@ test('l’API vérifie la session et les membres avant toute lecture ou écritur
   assert.equal((await handler(request('/sheet?url=https://example.com/', 'valid'))).status, 400);
   assert.equal((await handler(request('/sync', 'valid', {method: 'POST', headers: {Authorization: 'Bearer valid'}}))).status, 400);
   const status = await (await handler(request('/sync', 'valid'))).json();
-  assert.equal('queue' in status, false); assert.equal('standings' in status, false);
+  assert.equal('queue' in status, false); assert.equal('standings' in status, false); assert.equal('verified' in status, false);
 });
 
 test('le proxy Pages borne les routes, les origines et les corps sans exposer de clé serveur', async t => {

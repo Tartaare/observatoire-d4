@@ -6,12 +6,12 @@ export class SourceFailure extends Error {
 }
 
 export async function readSource(store: Store, state: State, input: string, maxAge: number,
-  fetcher: typeof fetch = fetch): Promise<{body: string; page?: Commit['page']}> {
+  fetcher: typeof fetch = fetch): Promise<{body: string; fetchedAt: number; page?: Commit['page']}> {
   const url = sourceURL(input);
   const old = await store.page(url);
   if (old && Date.now() - Date.parse(old.fetchedAt) < maxAge) {
     state.cached++;
-    return {body: old.body};
+    return {body: old.body, fetchedAt: Date.parse(old.fetchedAt)};
   }
   await new Promise(resolve => setTimeout(resolve, Math.max(0, Math.min(1000, state.nextRequestAt - Date.now()))));
   state.nextRequestAt = Date.now() + 1000;
@@ -24,7 +24,8 @@ export async function readSource(store: Store, state: State, input: string, maxA
     if (response.status === 304 && old) {
       await response.body?.cancel();
       state.cached++;
-      return {body: old.body, page: {url, data: {...old, fetchedAt: new Date().toISOString()}}};
+      const fetchedAt = Date.now();
+      return {body: old.body, fetchedAt, page: {url, data: {...old, fetchedAt: new Date(fetchedAt).toISOString()}}};
     }
     if (!response.ok || !response.headers.get('Content-Type')?.includes('text/html')) {
       await response.body?.cancel();
@@ -43,7 +44,7 @@ export async function readSource(store: Store, state: State, input: string, maxA
     }
     body += decoder.decode();
     const data: CachedPage = {body, etag: response.headers.get('ETag'), modified: response.headers.get('Last-Modified'), fetchedAt: new Date().toISOString()};
-    return {body, page: {url, data}};
+    return {body, fetchedAt: Date.parse(data.fetchedAt), page: {url, data}};
   } catch (error) {
     if (error instanceof SourceFailure) throw error;
     throw new SourceFailure('Connexion source interrompue ; archives conservées.', true);
