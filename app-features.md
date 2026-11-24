@@ -142,6 +142,12 @@ Changer le tri arrête la lecture mais conserve la journée et le match sélecti
 
 La première colonne, **Équipe**, rassemble le rang, un logo ou des initiales, puis le nom de l’équipe. Elle reste fixe lors du défilement horizontal. Les écussons mesurent 28 × 28 px, gardent leurs proportions et réservent leur place même sur mobile.
 
+Le nom souligné ouvre **Statistiques des joueurs** sous la ligne et met la lecture en pause. La poule, le tri des équipes et la journée restent sélectionnés. Les statistiques suivent ensuite le curseur. Le tri initial porte sur les apparitions décroissantes, puis sur le nom en cas d’égalité. Chaque en-tête permet de changer de tri et d’en inverser le sens. Les valeurs entièrement inconnues restent en fin de tableau. Sur mobile, les colonnes défilent horizontalement et le nom du joueur reste visible. Échap ou le bouton de fermeture ramène le focus au nom de l’équipe.
+
+La fiche compte les matchs D4 terminés jusqu’à la journée incluse. Un match est documenté pour l’équipe dès qu’une composition ou un événement cite un joueur. Un nom normalisé compte au plus une apparition par match. Un but atteste une participation, y compris hors composition. Dans ce dernier cas, la titularisation et l’entrée restent inconnues. Un carton seul ne permet pas d’attester une entrée. Les noms abrégés peuvent désigner des homonymes.
+
+Les buts publiés à la fois dans la composition et dans la chronologie sont rapprochés par équipe et par nom. Les buts contre son camp servent à vérifier le score. Les jaunes et les rouges proviennent des événements nominatifs de la chronologie. **0** signifie zéro vérifié dans les sources, **?** une donnée inconnue et **≥** un total minimal. Une feuille manquante, un score dont les buts sont incomplètement attribués ou une chronologie indisponible peuvent limiter le cumul. La démonstration explique que les statistiques nécessitent les archives réelles.
+
 Chaque colonne de journée possède un bouton d’en-tête. Le sélectionner déplace le curseur temporel ; il n’ouvre pas directement une rencontre. La journée courante est soulignée par une surface d’accent dans l’en-tête et dans sa colonne. Le tableau défile automatiquement juste assez pour garder la journée demandée visible à côté des noms fixes.
 
 Une case représente **l’équipe de la ligne dans son match de cette journée**. Les deux équipes d’une même rencontre peuvent donc afficher des comptes et des compositions différents.

@@ -1,5 +1,17 @@
 # Avancement
 
+## Sprint 19 — Statistiques des joueurs par équipe
+
+Branche `feature/sprint-19-statistiques-joueurs`. Sprint validé localement le 24 novembre 2026.
+
+**US-034.** Le nom de chaque équipe ouvre sous sa ligne un tableau triable des apparitions, titularisations, entrées, buts, jaunes et rouges jusqu’à la journée choisie. La couverture des matchs, les minima attestés et les inconnues restent visibles. Le tri des joueurs est indépendant du classement.
+
+**Archives.** La migration SQLite additive a relu hors ligne 56 pages D4. Sur ces rencontres, 51 ont une composition et 54 contiennent au moins un nom exploitable. Les 1 395 lignes de composition et les huit mentions individuelles hors composition donnent 236 buts attribués, 62 jaunes et deux rouges. Les huit mentions hors composition comprennent sept buts et un jaune. Les archives hébergées utilisent le même collecteur et la même projection. Leur enrichissement distant accompagne le déploiement de l’Edge Function et la mise à jour de la saison.
+
+**Vérifications.** Build Pages, typage strict et 33 tests réussis. La comparaison sur la saison réelle donne des projections SQLite et Supabase identiques pour 808 rencontres du calendrier et 224 archives, toutes divisions confondues. Recette Edge sur les archives locales en 1 440 px clair et 320 px sombre, incluant les deux sens de tri, le changement de journée, le clavier, la fermeture et le changement de poule.
+
+**Prévention des régressions.** Conserver le multiplicateur de buts de la composition. Rapprocher les deux sources par côté et par nom avant de comparer au score. Tester le but contre son camp, le carton sans nom, les homonymes, la feuille absente et la reprise du cache. Un joueur cité uniquement dans la chronologie conserve un rôle inconnu.
+
 ## Sprint 18 — Publication Git et Cloudflare Pages
 
 Branche : `feature/sprint-18-publish-pages`.

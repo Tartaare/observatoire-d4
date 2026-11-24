@@ -4,6 +4,10 @@ Projet personnel non commercial pour explorer, par journée de D4, les apparitio
 
 L’interface affiche les données réelles archivées depuis [Le Onze Lotois](https://leonzelotois.fr/division/d4/). Avant la première synchronisation, la démonstration reste disponible et clairement identifiée.
 
+Dans le classement, cliquer sur le **nom d’une équipe** ouvre **Statistiques des joueurs** sous sa ligne. La fiche suit la journée du curseur. Elle affiche les matchs documentés, les apparitions, les titularisations, les entrées, les buts et les cartons jaunes et rouges. Cliquer sur un en-tête trie sa colonne. Un **0** indique un zéro vérifié dans les sources disponibles, **?** une valeur inconnue et **≥** un minimum attesté.
+
+Au premier démarrage avec le sprint 19, SQLite relit automatiquement les pages D4 en cache. Cette opération fonctionne hors ligne. Pour la version hébergée, publier également l’Edge Function actualisée puis lancer **Mettre à jour** pour enrichir les archives existantes. Le contrôle `npm run import:cloud -- --check` compare les projections locale et hébergée sans envoyer les données.
+
 Le [référentiel des fonctionnalités et de l’interface](app-features.md) décrit les parcours utilisateur, chaque zone et contrôle, les états de données, la synchronisation, les personnalisations, le responsive et l’accessibilité. Il distingue la version locale, la démonstration et la variante hébergée préparée, pour permettre une prise en main UI/UX sans avoir utilisé l’application.
 
 Les 20 clubs du classement D4 disposent de leur logo FFF à gauche du nom. Les JPEG sont intégrés localement : aucune connexion au CDN n’est nécessaire pendant la consultation. Les initiales restent le repli pour un club inconnu ou une image indisponible. Les réserves partagent le logo de leur club ; les correspondances explicites et leurs pages sources figurent dans `src/club-logos.js`. Pour une nouvelle saison, vérifier ce catalogue avant d’ajouter les nouveaux écussons à `assets/clubs/`.
