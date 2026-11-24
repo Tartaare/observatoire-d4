@@ -29,7 +29,9 @@ try {
       date: f.date, score: f.score, status: f.status,
       sheets: db.prepare('SELECT * FROM collected_sheets WHERE match_url=? ORDER BY side').all(f.url).map(s => ({
         name: s.name, clubURL: s.club_url, state: s.state, latestState: s.latest_state,
-        players: db.prepare('SELECT name,name_key AS key,shirt,status,entry,exit FROM collected_players WHERE match_url=? AND side=? ORDER BY ordinal').all(f.url, s.side),
+        players: db.prepare('SELECT * FROM collected_players WHERE match_url=? AND side=? ORDER BY ordinal').all(f.url, s.side)
+          .map(p => ({name: p.name, key: p.name_key, shirt: p.shirt, status: p.status, entry: p.entry,
+            exit: p.exit, events: p.events ? JSON.parse(String(p.events)) : null})),
       }))}))};
     const state = {...initialState(), ...getMeta(db, `sync:${season}`, {}), running: false, stage: 'finished', queue: [],
       standings: getMeta(db, `standings:${season}`, []), rounds: getMeta(db, `rounds:${season}`, 0)};

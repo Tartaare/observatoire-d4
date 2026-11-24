@@ -54,6 +54,7 @@ export function projectSeason(seasonStart, standings, fixtures, sheets, particip
         return {name: String(player.name), status: /** @type {import('../src/types.js').RosterPlayer['status']} */ (player.status),
           shirt: player.shirt === null ? null : Number(player.shirt), entry: player.entry ? String(player.entry) : null,
           exit: player.exit ? String(player.exit) : null,
+          events: player.events ? JSON.parse(String(player.events)) : null,
           history: unique.map(previous => ({date: String(previous.date), division: String(previous.division),
             team: String(sheetMap.get(`${previous.url}:${previous.side}`)?.name ?? ''), sourceURL: String(previous.url)}))};
       });

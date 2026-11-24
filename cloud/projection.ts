@@ -39,6 +39,7 @@ export function projectSnapshot(season: number, snapshot: Snapshot, state: State
       if (fixture?.status !== 'Terminé') return;
       sheet.players.forEach((p, ordinal) => participants.push({match_url: match.url, side, ordinal,
         name: p.name, name_key: p.key, shirt: p.shirt, status: p.status, entry: p.entry, exit: p.exit,
+        events: p.events ? JSON.stringify(p.events) : null,
         club_url: sheet.clubURL, division: fixture.division, date: fixture.date, url: match.url}));
     });
   }

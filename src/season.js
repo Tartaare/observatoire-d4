@@ -140,6 +140,9 @@ function validateLiveMatches(data) {
     if (match.count !== data.clubs[/** @type {import('./types.js').PoolId} */ (pool)][Number(team)][2][Number(day)]) return invalid();
     for (const player of match.roster) {
       if (!validText(player.name) || !['starter', 'entered', 'unverified'].includes(player.status) || !Array.isArray(player.history)) return invalid();
+      const e = player.events;
+      if (e != null && (![e.goals, e.yellows, e.reds].every(n => Number.isSafeInteger(n) && n >= 0) ||
+        ![e.goalsComplete, e.yellowsComplete, e.redsComplete].every(flag => typeof flag === 'boolean'))) return invalid();
       for (const history of player.history) {
         if (!validDate(history.date) || !['L1', 'L2', 'N1', 'N2', 'N3', 'R1', 'R2', 'R3', 'D1', 'D2', 'D3'].includes(history.division) ||
           !validText(history.team) || !validURL(history.sourceURL) ||

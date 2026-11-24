@@ -5,7 +5,8 @@
  * @typedef {[date: string, division: string, context: string]} HistoryEntry
  * @typedef {[name: string, status: string, history: HistoryEntry[]]} Player
  * @typedef {{name: string, status: 'starter' | 'entered' | 'unverified', shirt: number | null,
- *   entry: string | null, exit: string | null, history: {date: string, division: string,
+ *   entry: string | null, exit: string | null, events?: import('../server/collection-types.js').PlayerEvents | null,
+ *   history: {date: string, division: string,
  *   team: string, sourceURL: string}[]}} RosterPlayer
  * @typedef {{count: number | null, score: string, home: string, away: string, players: Player[],
  *   featured: boolean, realSheet: boolean, sourceURL: string, matchDate: string | null,
