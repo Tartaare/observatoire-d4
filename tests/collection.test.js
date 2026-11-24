@@ -74,9 +74,9 @@ test('le cache évite les téléchargements frais et utilise les validateurs HTT
     return headers.length === 1 ? response('archive') : new Response(null, {status: 304});
   }});
   try {
-    assert.equal(await reader.read(d4URL, 0), 'archive');
-    assert.equal(await reader.read(d4URL, 60000), 'archive');
-    assert.equal(await reader.read(d4URL, 0), 'archive');
+    assert.equal((await reader.read(d4URL, 0)).body, 'archive');
+    assert.equal((await reader.read(d4URL, 60000)).body, 'archive');
+    assert.equal((await reader.read(d4URL, 0)).body, 'archive');
     assert.deepEqual(headers, [null, 'test-v1']);
     assert.equal(reader.stats.requests, 2);
   } finally { db.close(); }
@@ -119,8 +119,12 @@ test('la synchronisation déduplique, reprend depuis le cache et reste lisible s
     assert.equal(live.matches['a:0:0'].roster.length, 13);
     assert.equal(live.matches['a:0:0'].count, 12);
     const previousCalls = calls.length;
+    const reads = db.prepare('SELECT url,read_at FROM collected_fixtures ORDER BY url').all();
     sync.start(); await sync.idle();
     assert.equal(calls.length, previousCalls);
+    assert.deepEqual(db.prepare('SELECT url,read_at FROM collected_fixtures ORDER BY url').all(), reads);
+    assert.equal(sync.status().total, 0);
+    assert.equal(sync.status().cached, previousCalls);
     await sync.close();
     db.close();
     db = openDatabase(filename);
@@ -133,6 +137,42 @@ test('la synchronisation déduplique, reprend depuis le cache et reste lisible s
     saveMatch(db, 2026, parseMatch(matchHTML('D1', '10/09/2026'), upperURL, 2026));
     assert.equal(readLiveSeason(db, 2026).matches['a:0:0'].count, 0);
   } finally { await sync.close(); db.close(); unlinkSync(filename); rmdirSync(directory); }
+});
+
+test('une actualisation cible les échéances, reprend un échec et respecte le contrôle forcé', async t => {
+  t.mock.timers.enable({apis: ['Date'], now: Date.parse('2026-09-11T12:00:00Z')});
+  const db = openDatabase(':memory:');
+  const calls = [];
+  let unavailable = false;
+  let published = false;
+  const fetcher = async url => {
+    if (url !== upperURL) return sourceFetch(calls)(url);
+    calls.push(url);
+    return unavailable ? new Response('', {status: 503}) : response(matchHTML('D1', '01/08/2026', published));
+  };
+  const sync = createSynchronizer(db, {seasonStart: 2026, interval: 0, fetcher});
+  const refresh = async (force = false) => {
+    calls.length = 0;
+    sync.start(force); await sync.idle();
+    return calls.filter(url => url.includes('/matchs/'));
+  };
+  try {
+    assert.deepEqual(await refresh(), [d4URL, upperURL]);
+    t.mock.timers.tick(3_600_000);
+    unavailable = true;
+    assert.deepEqual(await refresh(), [upperURL]);
+    assert.equal(sync.status().errors.length, 1);
+    unavailable = false;
+    published = true;
+    assert.deepEqual(await refresh(), [upperURL]);
+    assert.equal(sync.status().errors.length, 0);
+    t.mock.timers.tick(23 * 3_600_000);
+    assert.deepEqual(await refresh(), [d4URL]);
+    assert.deepEqual(await refresh(), []);
+    assert.deepEqual(await refresh(true), [d4URL, upperURL]);
+    t.mock.timers.tick(7 * 24 * 3_600_000);
+    assert.deepEqual(await refresh(), [d4URL, upperURL]);
+  } finally { await sync.close(); db.close(); }
 });
 
 test('les rapprochements exigent le même club identifié sur les deux feuilles', () => {

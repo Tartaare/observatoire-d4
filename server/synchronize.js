@@ -1,6 +1,7 @@
 import {parseClub, parseDirectory, parseMatch, parseStandings, parseRoundCount, ORIGIN} from './source.js';
 import {getMeta, putMeta, saveFixtures, saveMatch, collectionCoverage} from './collection-store.js';
 import {createReader, SourceError} from './source-reader.js';
+import {calendarAge, matchAge, fixtureKey, isFresh} from './refresh-policy.js';
 import {randomUUID} from 'node:crypto';
 
 /** @param {number} pid */
@@ -58,11 +59,16 @@ export function createSynchronizer(db, {seasonStart = currentSeason(), fetcher, 
   /** @param {boolean} force */
   async function run(force) {
     const reader = createReader(db, {fetcher, interval, signal: abort.signal});
-    const indexAge = force ? 0 : 15 * 60_000;
+    const indexAge = force ? 0 : calendarAge;
+    /** @param {string} url */
+    const metaKey = url => `verified:${seasonStart}:${url}`;
+    /** @param {string} url @returns {import('./refresh-policy.js').Verification | null | undefined} */
+    const verified = url => getMeta(db, metaKey(url), undefined);
     /** @param {string} url @param {() => Promise<void>} action */
     async function attempt(url, action) {
       try { await action(); }
       catch (error) {
+        putMeta(db, metaKey(url), null);
         state.errors.push({url, message: error instanceof Error ? error.message : 'Erreur de collecte.'});
         if (error instanceof SourceError && error.fatal || abort.signal.aborted) throw error;
       } finally {
@@ -73,30 +79,46 @@ export function createSynchronizer(db, {seasonStart = currentSeason(), fetcher, 
     }
     try {
       const d4URL = `${ORIGIN}/division/d4/`;
-      const d4Page = await reader.read(d4URL, indexAge);
+      const {body: d4Page} = await reader.read(d4URL, indexAge);
       const standings = parseStandings(d4Page);
       putMeta(db, `standings:${seasonStart}`, standings);
       const rounds = parseRoundCount(d4Page);
       if (rounds) putMeta(db, `rounds:${seasonStart}`, rounds);
-      const clubs = new Set([...parseDirectory(await reader.read(`${ORIGIN}/clubs/`, indexAge)), ...standings.map(team => team.clubURL)]);
-      state.total = clubs.size;
-      for (const club of clubs) await attempt(club, async () => {
-        const fixtures = parseClub(await reader.read(club, indexAge), seasonStart);
+      const directory = await reader.read(`${ORIGIN}/clubs/`, indexAge);
+      const clubs = [...new Set([...parseDirectory(directory.body), ...standings.map(team => team.clubURL)])];
+      state.total = clubs.length;
+      // Deux clubs peuvent publier le même match. Rejouer leur ordre si un calendrier a expiré.
+      const calendars = !force && clubs.every(url => isFresh(verified(url))) ? [] : clubs;
+      reader.stats.cached += clubs.length - calendars.length;
+      for (const club of calendars) await attempt(club, async () => {
+        const page = await reader.read(club, verified(club) === null ? 0 : indexAge);
+        const fixtures = parseClub(page.body, seasonStart);
         saveFixtures(db, seasonStart, fixtures);
+        putMeta(db, metaKey(club), {key: '', until: page.fetchedAt + calendarAge});
       });
-      const matches = db.prepare("SELECT url,division,round,home,away FROM collected_fixtures WHERE season=? AND status='Terminé' ORDER BY division='D4' DESC,round,url").all(seasonStart);
+      const finished = /** @type {import('./collection-types.js').Fixture[]} */ (db.prepare("SELECT * FROM collected_fixtures WHERE season=? AND status='Terminé' ORDER BY division='D4' DESC,round,url").all(seasonStart));
+      const matches = force ? finished : finished.filter(f => !isFresh(verified(f.url), fixtureKey(f)));
+      reader.stats.cached += finished.length - matches.length;
       state.phase = 'Archivage des compositions';
       state.done = 0;
       state.total = matches.length;
       persist();
-      for (const fixture of matches) await attempt(String(fixture.url), async () => {
-        const sheets = db.prepare('SELECT state,latest_state FROM collected_sheets WHERE match_url=?').all(fixture.url);
-        const complete = sheets.length === 2 && sheets.every(sheet => sheet.state === 'published' && sheet.latest_state === 'published');
-        const html = await reader.read(String(fixture.url), force ? 0 : complete ? 24 * 60 * 60_000 : 60 * 60_000);
-        const match = parseMatch(html, String(fixture.url), seasonStart);
+      for (const fixture of matches) await attempt(fixture.url, async () => {
+        const previous = verified(fixture.url);
+        const key = fixtureKey(fixture);
+        let maxAge = 0;
+        if (!force && previous === undefined) {
+          const sheets = db.prepare('SELECT state,latest_state FROM collected_sheets WHERE match_url=?').all(fixture.url);
+          const complete = sheets.length === 2 && sheets.every(s => s.state === 'published' && s.latest_state === 'published');
+          maxAge = matchAge(fixture.date, complete);
+        }
+        const page = await reader.read(fixture.url, maxAge);
+        const match = parseMatch(page.body, fixture.url, seasonStart);
         if (match.division !== fixture.division || match.round !== fixture.round ||
           match.sheets[0].name !== fixture.home || match.sheets[1].name !== fixture.away) throw new Error('La feuille ne correspond pas au calendrier découvert.');
         saveMatch(db, seasonStart, match);
+        const age = matchAge(match.date, match.sheets.every(s => s.state === 'published'));
+        putMeta(db, metaKey(fixture.url), {key, until: page.fetchedAt + age});
       });
       state.phase = state.errors.length ? 'Mise à jour partielle ; erreurs à reprendre' : 'Archives à jour';
       if (!state.errors.length) state.lastSuccess = new Date().toISOString();

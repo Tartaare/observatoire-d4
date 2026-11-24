@@ -16,7 +16,7 @@ export function createReader(db, {fetcher = fetch, interval = 1000, signal} = {}
     const old = db.prepare('SELECT * FROM source_pages WHERE url=?').get(url);
     if (old && Date.now() - Date.parse(String(old.fetched_at)) < maxAge) {
       stats.cached++;
-      return String(old.body);
+      return {body: String(old.body), fetchedAt: Date.parse(String(old.fetched_at))};
     }
     await wait(Math.max(0, lastRequest + interval - Date.now()), undefined, {signal});
     lastRequest = Date.now();
@@ -30,9 +30,10 @@ export function createReader(db, {fetcher = fetch, interval = 1000, signal} = {}
         ? AbortSignal.any([signal, AbortSignal.timeout(20000)]) : AbortSignal.timeout(20000)});
     } catch { throw new SourceError('Connexion à la source impossible. Les archives locales sont conservées.', true); }
     if (response.status === 304 && old) {
-      db.prepare('UPDATE source_pages SET fetched_at=? WHERE url=?').run(new Date().toISOString(), url);
+      const fetchedAt = Date.now();
+      db.prepare('UPDATE source_pages SET fetched_at=? WHERE url=?').run(new Date(fetchedAt).toISOString(), url);
       stats.cached++;
-      return String(old.body);
+      return {body: String(old.body), fetchedAt};
     }
     if (!response.ok) {
       await response.body?.cancel();
@@ -59,10 +60,11 @@ export function createReader(db, {fetcher = fetch, interval = 1000, signal} = {}
       throw new SourceError('Lecture source interrompue. Les archives locales sont conservées.', true);
     }
     const body = Buffer.concat(chunks).toString('utf8');
+    const fetchedAt = Date.now();
     db.prepare(`INSERT INTO source_pages VALUES(?,?,?,?,?) ON CONFLICT(url) DO UPDATE SET
       body=excluded.body,etag=excluded.etag,modified=excluded.modified,fetched_at=excluded.fetched_at`)
-      .run(url, body, response.headers.get('ETag'), response.headers.get('Last-Modified'), new Date().toISOString());
-    return body;
+      .run(url, body, response.headers.get('ETag'), response.headers.get('Last-Modified'), new Date(fetchedAt).toISOString());
+    return {body, fetchedAt};
   }
   return {read, stats};
 }
