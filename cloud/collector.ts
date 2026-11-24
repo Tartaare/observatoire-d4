@@ -1,6 +1,7 @@
 import {ORIGIN, parseStandings, parseRoundCount, parseDirectory, parseClub, parseMatch} from '../server/source.js';
 import {coverageOf, preserveMatch} from './projection.ts';
 import {readSource, SourceFailure} from './reader.ts';
+import {logSync} from '../server/sync-log.js';
 import {calendarAge, fixtureKey, isFresh, matchAge} from '../server/refresh-policy.js';
 import type {Store, State, Commit, Snapshot, Fixture} from './types.ts';
 
@@ -28,6 +29,8 @@ export async function advance(store: Store, season: number, start: boolean, forc
   const snapshot = await store.snapshot(season);
   const change: Commit = {state};
   const stage = state.stage;
+  const errorsBefore = state.errors.length;
+  if (start) logSync(season, state, force ? 'start-forced' : 'start');
   const url = stage === 'standings' ? `${ORIGIN}/division/d4/` : stage === 'directory' ? `${ORIGIN}/clubs/` : state.queue[0];
   try {
     if (url) {
@@ -93,5 +96,7 @@ export async function advance(store: Store, season: number, start: boolean, forc
   if (!state.running) state.finishedAt = new Date().toISOString();
   state.coverage = coverageOf(snapshot, state);
   await store.commit(season, lease.owner, change);
+  logSync(season, state, stage, url, state.errors[errorsBefore]?.message);
+  if (!state.running) logSync(season, state, 'finish');
   return {busy: false, state};
 }

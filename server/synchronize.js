@@ -3,6 +3,7 @@ import {getMeta, putMeta, saveFixtures, saveMatch, collectionCoverage} from './c
 import {createReader, SourceError} from './source-reader.js';
 import {calendarAge, matchAge, fixtureKey, isFresh} from './refresh-policy.js';
 import {randomUUID} from 'node:crypto';
+import {logSync} from './sync-log.js';
 
 /** @param {number} pid */
 function processExists(pid) {
@@ -52,6 +53,7 @@ export function createSynchronizer(db, {seasonStart = currentSeason(), fetcher, 
     state = {...state, running: true, phase: 'Lecture des calendriers', done: 0, total: 0,
       startedAt: new Date().toISOString(), finishedAt: null, errors: [], requests: 0, cached: 0};
     persist();
+    logSync(seasonStart, state, force ? 'start-forced' : 'start');
     job = run(force).finally(() => { job = null; });
     return true;
   }
@@ -66,6 +68,7 @@ export function createSynchronizer(db, {seasonStart = currentSeason(), fetcher, 
     const verified = url => getMeta(db, metaKey(url), undefined);
     /** @param {string} url @param {() => Promise<void>} action */
     async function attempt(url, action) {
+      const errorsBefore = state.errors.length;
       try { await action(); }
       catch (error) {
         putMeta(db, metaKey(url), null);
@@ -75,6 +78,7 @@ export function createSynchronizer(db, {seasonStart = currentSeason(), fetcher, 
         state.done++;
         Object.assign(state, reader.stats);
         persist();
+        logSync(seasonStart, state, 'page', url, state.errors[errorsBefore]?.message);
       }
     }
     try {
@@ -132,6 +136,7 @@ export function createSynchronizer(db, {seasonStart = currentSeason(), fetcher, 
       state.running = false;
       state.finishedAt = new Date().toISOString();
       persist();
+      logSync(seasonStart, state, 'finish', undefined, state.errors.at(-1)?.message);
       db.prepare('DELETE FROM collection_locks WHERE season=? AND owner=?').run(seasonStart, owner);
     }
   }
