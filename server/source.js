@@ -153,9 +153,9 @@ export function parseMatch(html, url, seasonStart) {
       });
     });
     const duplicate = new Set(players.map(player => player.key)).size !== players.length;
-    attachPlayerEvents($, side, Number(score.split(/[–—-]/)[side]), players, goals, normalizeName);
+    const eventOnly = attachPlayerEvents($, side, Number(score.split(/[–—-]/)[side]), players, goals, normalizeName);
     const state = players.length === 0 ? 'missing' : incomplete || duplicate || players.filter(player => player.status === 'starter').length !== 11 ? 'partial' : 'published';
-    sheets.push({name, clubURL, state, players});
+    sheets.push({name, clubURL, state, players, eventOnly});
   });
   if (sheets.length !== 2 || sheets[0].name === sheets[1].name) throw new Error('Deux équipes distinctes attendues.');
   return {url: sourceURL(url), division, round, date, score, status: 'Terminé', sheets};

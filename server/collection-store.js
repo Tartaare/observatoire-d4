@@ -72,9 +72,10 @@ export function saveMatch(db, season, match) {
         db.prepare('UPDATE collected_sheets SET latest_state=? WHERE match_url=? AND side=?').run(sheet.state, match.url, side);
         return;
       }
-      db.prepare(`INSERT INTO collected_sheets VALUES(?,?,?,?,?,?,?) ON CONFLICT(match_url,side) DO UPDATE SET
-        name=excluded.name,club_url=excluded.club_url,state=excluded.state,latest_state=excluded.latest_state,updated_at=excluded.updated_at`)
-        .run(match.url, side, sheet.name, sheet.clubURL, sheet.state, sheet.state, now);
+      db.prepare(`INSERT INTO collected_sheets(match_url,side,name,club_url,state,latest_state,updated_at,event_only)
+        VALUES(?,?,?,?,?,?,?,?) ON CONFLICT(match_url,side) DO UPDATE SET name=excluded.name,club_url=excluded.club_url,
+        state=excluded.state,latest_state=excluded.latest_state,updated_at=excluded.updated_at,event_only=excluded.event_only`)
+        .run(match.url, side, sheet.name, sheet.clubURL, sheet.state, sheet.state, now, JSON.stringify(sheet.eventOnly ?? []));
       db.prepare('DELETE FROM collected_players WHERE match_url=? AND side=?').run(match.url, side);
       const insert = db.prepare('INSERT INTO collected_players(match_url,side,ordinal,name,name_key,shirt,status,entry,exit,events) VALUES(?,?,?,?,?,?,?,?,?,?)');
       sheet.players.forEach((player, ordinal) => insert.run(match.url, side, ordinal, player.name, player.key,
