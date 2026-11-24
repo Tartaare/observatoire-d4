@@ -2,6 +2,8 @@
 
 Projet personnel non commercial pour explorer, par journée de D4, les apparitions de joueurs déjà vus en division supérieure.
 
+L’[audit UI/UX en portrait](docs/audit-mobile-portrait.md) documente les parcours tactiles et clavier, les mesures sur sept formats et les défauts à corriger en priorité.
+
 L’interface affiche les données réelles archivées depuis [Le Onze Lotois](https://leonzelotois.fr/division/d4/). Avant la première synchronisation, la démonstration reste disponible et clairement identifiée.
 
 Dans le classement, cliquer sur le **nom d’une équipe** ouvre **Statistiques des joueurs** sous sa ligne. La fiche suit la journée du curseur. Elle affiche les matchs documentés, les apparitions, les titularisations, les entrées, les buts et les cartons jaunes et rouges. Cliquer sur un en-tête trie sa colonne. Un **0** indique un zéro vérifié dans les sources disponibles, **?** une valeur inconnue et **≥** un minimum attesté.

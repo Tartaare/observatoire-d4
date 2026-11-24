@@ -1,5 +1,13 @@
 # Avancement
 
+## Sprint 22 — Audit UI/UX en portrait
+
+**US-037.** Audit de la saison archivée sur cinq formats téléphone, une tablette portrait et un témoin ordinateur. Edge et WebKit reproduisent un recouvrement tactile entre la flèche et le curseur, un focus caché par la colonne Équipe et une fiche de match ouverte sous le bord de l’écran. Une réponse vide après collecte laisse également apparaître les anciennes équipes. Le rapport précise les reproductions, les priorités et les critères de correction. [Audit mobile en portrait](docs/audit-mobile-portrait.md)
+
+**Vérifications.** Build Pages, typage et 35 tests natifs réussis. Recette des réglages et des logos réussie avec un échec intermittent au contrôle immédiat du focus après Échap. Trois mesures de chargement mobile à débit limité. Les essais sur appareils physiques et avec lecteurs d’écran restent ouverts.
+
+**Prévention des régressions.** Tester les bords des cibles tactiles, la visibilité réelle du contrôle focalisé et les transitions après actualisation. Vérifier aussi le contenu intérieur des modales et la position du retour visuel par rapport au bouton déclencheur.
+
 ## Sprint 21 — Durée restante et suivi de collecte
 
 **US-036.** Estimation par phase à partir de la cadence observée dans l’onglet. Présentation près du bouton avec une ligne dédiée en portrait. Journal JSON côté Node et Supabase pour suivre une collecte par saison et heure de lancement.
