@@ -130,7 +130,9 @@ npm run sync -- --season=2026
 
 La saison courante est déduite de l’année sportive commençant en juillet. `--season=2026` désigne juillet 2026 à juin 2027 ; cette option ne permet pas d’obtenir des archives que le site ne publie plus.
 
-Les calendriers restent frais 15 minutes, les feuilles complètes 24 heures et les feuilles incomplètes 1 heure. Une requête réseau au maximum par seconde, téléchargement limité à 3 Mo et délai de réponse de 20 secondes. Les refus HTTP 403/429 ou une coupure interrompent le parcours ; une nouvelle mise à jour reprend avec les données déjà acquises. Un verrou SQLite empêche deux synchronisations simultanées de la même saison, y compris entre le serveur et la commande terminal.
+**Mettre à jour** réutilise les calendriers de clubs et les compositions déjà vérifiés. La première actualisation après installation du sprint 20 enregistre leurs échéances. Les calendriers restent frais 15 minutes. Une composition absente ou incomplète est à vérifier après 1 heure. Une feuille complète est à vérifier après 24 heures, ou après 7 jours si le match avait déjà au moins 14 jours lors de la vérification. **Revérifier toutes les feuilles** permet de rechercher immédiatement une correction sur un ancien match.
+
+La collecte respecte une requête source au maximum par seconde, une limite de 3 Mo par page et un délai de réponse de 20 secondes. Les refus HTTP 403/429 ou une coupure interrompent le parcours. Une nouvelle mise à jour reprend avec les données déjà acquises. Un verrou SQLite empêche deux synchronisations simultanées de la même saison, y compris entre le serveur et la commande terminal.
 
 ## Périmètre et fiabilité
 

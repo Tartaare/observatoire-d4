@@ -1,5 +1,17 @@
 # Avancement
 
+## Sprint 20 — Actualisation incrémentale des archives
+
+Branche `feature/sprint-20-actualisation-rapide`. Validé localement le 24 novembre 2026.
+
+**US-035.** « Mettre à jour » écarte les compositions dont la vérification reste valable et réutilise les calendriers de clubs quand ils sont tous frais. SQLite et Supabase enregistrent l’échéance issue de la lecture source. Les feuilles complètes de matchs vieux d’au moins deux semaines passent à une vérification hebdomadaire. En ligne, le navigateur enchaîne les étapes au rythme des réponses. Les erreurs restent à reprendre et le contrôle forcé parcourt tous les calendriers et toutes les rencontres terminées.
+
+**Mesure locale.** Essai hors réseau sur deux copies de la même base, avec les dates du cache HTML rafraîchies dans chaque copie. Pour 249 rencontres terminées et 291 pages, le collecteur précédent prenait 3,4 à 3,8 secondes par actualisation. Le premier passage de la nouvelle version a pris 4,6 secondes pour établir les échéances, puis les deux suivants ont pris 40 ms chacun. Ces durées couvrent le collecteur local jusqu’à la lecture du statut.
+
+**Vérifications.** Compilation Pages et Edge Function, typage strict et 34 tests réussis. Les projections locale et hébergée donnent les mêmes résultats sur 808 rencontres et 249 archives. Recette du bouton dans Edge sur base en mémoire, en modes local et hébergé simulé, avec et sans contrôle forcé. La version hébergée nécessite la publication des ressources Pages et de l’Edge Function.
+
+**Prévention des régressions.** Compter les requêtes et les réécritures sur cache frais. Tester l’échéance des compositions récentes, anciennes ou incomplètes, le changement de journée, la reprise après erreur et le contrôle forcé. Une consultation du cache conserve son échéance d’origine. Une évolution du parseur devra invalider les vérifications concernées pour retraiter les anciennes archives.
+
 ## Sprint 19 — Statistiques des joueurs par équipe
 
 Branche `feature/sprint-19-statistiques-joueurs`. Sprint validé localement le 24 novembre 2026.

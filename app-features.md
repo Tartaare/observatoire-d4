@@ -308,7 +308,7 @@ Avant les premières archives, le footer invite à lancer une mise à jour. En l
 | Erreur d’une page source | Détail dans les erreurs ; les données déjà acquises restent conservées. Une mise à jour ultérieure reprend avec le cache et les archives. |
 | Nouvelle lecture moins complète | L’ancienne composition plus complète reste utilisée ; mention dans le bilan et dans le match. |
 
-L’état est relu environ toutes les 2 secondes pendant le travail, 30 secondes au repos et 10 secondes après une panne, avec des délais de requête supplémentaires éventuels. En hébergement, ce suivi pilote aussi des étapes courtes de collecte. Il n’y a pas de bouton d’annulation ou de barre de progression du téléchargement d’un fichier individuel.
+En local, le bouton vérifie rapidement si la collecte est déjà terminée, puis relit son état environ toutes les 2 secondes pendant le travail. En hébergement, la réponse de chaque étape déclenche la suivante. Si un autre onglet détient le verrou, le suivi attend 2 secondes. Le contrôle au repos a lieu toutes les 30 secondes et la nouvelle tentative après une panne intervient après 10 secondes.
 
 ### 8.5 Méthode et limites
 
@@ -528,7 +528,7 @@ Pas de sélecteur de saison ni de bascule manuelle démo/réel. Pas d’inscript
 | Préparation hébergée | Build Pages, migration de stockage et import initial d’archives documentés dans [docs/cloud-deployment.md](docs/cloud-deployment.md). L’import refuse l’écrasement d’une saison distante déjà utilisée ; les bases locale et distante deviennent indépendantes. |
 | Collecteur Python historique | Outil indépendant, non nécessaire à l’utilisation de l’application Node.js et sans écran dédié. |
 
-La collecte conserve un cache : calendriers frais 15 minutes, feuilles complètes 24 heures, incomplètes 1 heure ; au maximum une requête source par seconde, 3 Mo par réponse et 20 secondes de délai réseau. Les refus 403/429 et coupures peuvent interrompre le parcours. Ces limites expliquent l’attente et la reprise ; elles ne constituent pas des réglages utilisateur.
+Une mise à jour ordinaire réutilise les calendriers de clubs vérifiés depuis moins de 15 minutes. La progression de l’archivage compte uniquement les rencontres terminées à examiner. Une composition manquante ou partielle redevient à vérifier après 1 heure. Une feuille complète reste fraîche 24 heures, ou 7 jours si le match avait déjà au moins 14 jours lors du contrôle. Une nouvelle rencontre, un changement d’équipe, de division ou de journée, ou une erreur sur une feuille déclenche son examen à la prochaine collecte. L’option **Revérifier toutes les feuilles** ignore ces échéances. La source reçoit au maximum une requête par seconde, avec 3 Mo par réponse et 20 secondes de délai réseau. Les refus 403/429 et coupures peuvent interrompre le parcours.
 
 Les archives sont enregistrées transactionnellement, les compositions plus complètes préservées et les données reçues validées. Les ressources de l’interface sont locales, les liens sources externes s’ouvrent dans un nouvel onglet avec protections de navigation ; les fichiers serveur, bases et secrets ne font pas partie des ressources publiques.
 
