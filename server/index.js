@@ -18,7 +18,7 @@ const assets = new Map([
   ['/assets/css/auth.css', ['assets/css/auth.css', 'text/css']],
   ...['theme.js', 'appearance.js', 'appearance.css'].map(name =>
     [`/assets/generated/${name}`, [`assets/generated/${name}`, name.endsWith('.css') ? 'text/css' : 'text/javascript']]),
-  ...['app', 'controller', 'view', 'club-logos', 'custom-logos', 'season', 'dom', 'types', 'detail', 'sync-panel', 'navigation', 'runtime', 'session', 'auth'].map(name =>
+  ...['app', 'controller', 'view', 'player-stats', 'club-logos', 'custom-logos', 'season', 'dom', 'types', 'detail', 'sync-panel', 'navigation', 'runtime', 'session', 'auth'].map(name =>
     [`/src/${name}.js`, [`src/${name}.js`, 'text/javascript']]),
 ]);
 
