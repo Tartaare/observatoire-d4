@@ -1,5 +1,11 @@
 # Avancement
 
+## Sprint 21 — Durée restante et suivi de collecte
+
+**US-036.** Estimation par phase à partir de la cadence observée dans l’onglet. Présentation près du bouton avec une ligne dédiée en portrait. Journal JSON côté Node et Supabase pour suivre une collecte par saison et heure de lancement.
+
+**Contrôles.** Build Pages, typage strict, tests de changement de phase et de fin de collecte. Parcours Edge sur collecte simulée à 320 et 390 px avec contrôle du débordement et de la disparition de l’estimation.
+
 ## Sprint 20 — Actualisation incrémentale des archives
 
 Branche `feature/sprint-20-actualisation-rapide`. Validé localement le 24 novembre 2026.

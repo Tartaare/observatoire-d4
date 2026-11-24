@@ -1,5 +1,7 @@
 # Observatoire D4 — Fonctionnalités et fonctionnement de l’interface
 
+Pendant une actualisation, une estimation apparaît près du bouton dès que deux relevés montrent une progression. Elle porte sur la lecture des calendriers, puis sur la durée restante jusqu’à la fin de l’archivage. En portrait, elle occupe une ligne sous les commandes et disparaît à la fin.
+
 Référentiel fonctionnel destiné au design UI/UX, établi le **11 novembre 2026**, au sprint 15. Il décrit l’implémentation présente dans le dépôt, y compris les fonctionnalités des sprints 11 à 14. Il ne constitue pas une liste de fonctionnalités futures.
 
 L’inventaire résulte d’une lecture croisée du HTML, des composants, des styles, des contrôleurs, des règles de calcul et de la documentation. Les comportements décrits sont ceux du code ; cette rédaction ne constitue pas une nouvelle recette visuelle dans le navigateur. Le [langage visuel](design_language.md) reste la référence de conception ; [app-progress.md](app-progress.md) précise les validations et les limites de chaque livraison.

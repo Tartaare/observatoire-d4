@@ -20,6 +20,8 @@ Vérification de l’import : `node --preserve-symlinks --preserve-symlinks-main
 
 ## Suivi du développement
 
+Pour suivre la collecte en local, consulter la sortie du serveur ou de la commande `npm run sync`. Dans Supabase, ouvrir les logs de l’Edge Function `observatoire`. Filtrer sur `observatoire-sync` et regrouper les entrées JSON par `season` et `startedAt`. Les événements indiquent le lancement normal ou forcé, les pages traitées, la progression, les compteurs de requêtes et de cache, les erreurs et la fin.
+
 Le code et son historique sont hébergés dans le dépôt privé [Tartaare/observatoire-d4](https://github.com/Tartaare/observatoire-d4). L'accès nécessite une autorisation sur ce dépôt.
 
 `main` contient la version validée. Chaque nouveau sprint part d'une branche `feature/sprint-N-nom-court` et conserve des commits ciblés ; la fusion dans `main` intervient après revue, compilation et tests réussis. Les branches des sprints précédents restent disponibles pour consulter les étapes du développement. Le détail des livraisons et vérifications se trouve dans [app-progress.md](app-progress.md).
