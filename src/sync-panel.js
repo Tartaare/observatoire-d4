@@ -13,6 +13,7 @@ export function setupSync(root, onUpdated) {
   const errorList = query(root, '[data-sync-error-list]', HTMLUListElement);
   const dateFormat = new Intl.DateTimeFormat('fr-FR', {dateStyle: 'short', timeStyle: 'short'});
   let wasRunning = false;
+  let generation = 0;
   /** @type {ReturnType<typeof setTimeout> | null} */
   let timer = null;
 
@@ -43,21 +44,23 @@ export function setupSync(root, onUpdated) {
   }
 
   async function refresh() {
+    const current = generation;
     try {
-      const response = await apiFetch('/api/sync', {signal: AbortSignal.timeout(hosted ? 30000 : 8000)});
-      if (!response.ok) throw new Error('État des archives indisponible.');
-      let state = await response.json();
-      const observedRunning = state.running;
-      if (hosted && state.running) {
-        const step = await apiFetch('/api/sync/step', {method: 'POST', headers: {'X-Observatoire-Sync': '1'}, signal: AbortSignal.timeout(65000)});
-        if (!step.ok && step.status !== 409) throw new Error('Collecte interrompue.');
-        state = await step.json();
-      }
+      const step = hosted && wasRunning;
+      const response = step
+        ? await apiFetch('/api/sync/step', {method: 'POST', headers: {'X-Observatoire-Sync': '1'}, signal: AbortSignal.timeout(65000)})
+        : await apiFetch('/api/sync', {signal: AbortSignal.timeout(hosted ? 30000 : 8000)});
+      if (!response.ok && !(step && response.status === 409)) throw new Error('État des archives indisponible.');
+      const state = await response.json();
+      if (current !== generation) return;
       render(state);
-      if ((wasRunning || observedRunning) && !state.running) await onUpdated();
+      if (wasRunning && !state.running) await onUpdated();
+      if (current !== generation) return;
       wasRunning = state.running;
-      timer = setTimeout(refresh, state.running ? 2000 : 30000);
+      const delay = hosted && response.status !== 409 ? 0 : 2000;
+      timer = setTimeout(refresh, state.running ? delay : 30000);
     } catch {
+      if (current !== generation) return;
       message.textContent = hosted ? 'Connexion aux archives interrompue. Nouvelle tentative automatique ; les archives sont conservées.'
         : 'Le serveur local est indisponible. Relancez-le pour accéder aux archives et à la synchronisation.';
       button.disabled = false;
@@ -69,6 +72,7 @@ export function setupSync(root, onUpdated) {
   }
 
   button.addEventListener('click', async () => {
+    generation++;
     if (timer !== null) clearTimeout(timer);
     button.disabled = true;
     force.disabled = true;
@@ -81,7 +85,7 @@ export function setupSync(root, onUpdated) {
       const state = await response.json();
       render(state);
       wasRunning = state.running;
-      timer = setTimeout(refresh, 1000);
+      timer = setTimeout(refresh, response.status === 409 ? 2000 : hosted ? 0 : 150);
     } catch {
       message.textContent = 'Impossible de démarrer la mise à jour. Les données affichées sont conservées.';
       button.disabled = false;
