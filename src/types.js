@@ -19,7 +19,7 @@
  *   examplePlayers: Player[], exampleURL: string, exampleSources: Record<string, string>,
  *   mockNames: string[], mode?: 'live', seasonStart?: number,
  *   matches?: Record<string, LiveMatch>, coverage?: Coverage}} SeasonData
- * @typedef {{pool: PoolId, sort: SortMode, day: number,
+ * @typedef {{pool: PoolId, sort: SortMode, day: number, view: 'matrix' | 'chart',
  *   stats?: import('./player-stats.js').StatsSelection,
  *   selected: {day: number, team: number} | null,
  *   timer: ReturnType<typeof setInterval> | null}} AppState
