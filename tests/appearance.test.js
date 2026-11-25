@@ -42,6 +42,9 @@ test('les textes et commandes gardent leur contraste en clair et sombre, y compr
       assert.equal(paletteError(palette), '');
       for (const theme of ['light', 'dark']) {
         const tokens = buildTokens(palette, theme);
+        for (const result of ['--score-win', '--score-draw', '--score-loss']) {
+          assert.ok(contrast(tokens['--surface'], tokens[result]) >= 4.5);
+        }
         for (const bg of ['--surface', '--paper', '--quiet', '--selected']) {
           for (const ink of ['--ink', '--sub', '--accent-ink']) {
             assert.ok(contrast(tokens[bg], tokens[ink]) >= 4.5, `${theme}: ${bg}/${ink}`);
