@@ -24,7 +24,11 @@
 [data-rank-plot]{flex:1;min-height:250px;position:relative}
 [data-rank-plot] svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .od-rank-grid{stroke:var(--line)}
-.od-rank-cursor{stroke:var(--control-line);stroke-dasharray:3 4}
+.od-tip-label{display:flex;align-items:center;gap:4px;height:28px}
+.od-tip-score{pointer-events:auto;background:var(--surface);color:var(--score-draw);font:650 12px/1.4 ui-monospace,monospace;white-space:nowrap;font-variant-numeric:tabular-nums}
+.od-tip-score[data-result="V"]{color:var(--score-win)}
+.od-tip-score:is([data-result="D"],[data-result="F"]){color:var(--score-loss)}
+#observatoire-d4 .od-metric-switch button{font-size:12px;padding-inline:10px}
 .od-rank-axis{fill:var(--sub);font:11px ui-monospace,monospace}
 .od-rank-line{fill:none;stroke:currentColor;stroke-linejoin:round;stroke-linecap:round;stroke-width:1.6}
 .od-rank-series{color:var(--control-line)}

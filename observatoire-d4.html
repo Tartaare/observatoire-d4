@@ -68,10 +68,14 @@
           <div class="od-chart-heading">
             <div><p class="od-chart-kicker" data-chart-round></p><h2 data-chart-name></h2></div>
             <div><p class="od-chart-value" data-chart-value></p><p data-published-rank hidden></p></div>
+            <div class="od-view-switch od-metric-switch" role="group" aria-label="Mesure du graphique">
+              <button type="button" data-metric="rank" aria-pressed="true">Classement</button>
+              <button type="button" data-metric="points" aria-pressed="false">Points cumulés</button>
+            </div>
           </div>
           <div class="od-chart-main"><div data-rank-plot></div></div>
         </div>
-        <details class="od-chart-method"><summary>Calcul des positions</summary><p>Le classement cumule les résultats archivés par numéro de journée. Une victoire vaut 3 points, un nul 1, une défaite 0 et un forfait −1. Les égalités sont départagées par les points puis la différence de buts en confrontation directe, puis par la différence de buts générale et les buts marqués. Une égalité persistante donne un rang partagé. Seuls les scores publiés contribuent aux buts. Les résultats manquants, les départages ou les décisions administratives peuvent expliquer un écart avec le dernier rang publié dans la matrice.</p></details>
+        <details class="od-chart-method"><summary>Calcul des positions</summary><p>Le score à droite de l’écusson indique d’abord les buts du club. « Forf. » signale un forfait sans score publié. Un tiret indique un résultat indisponible pour la journée choisie.</p><p>Le classement cumule les résultats archivés par numéro de journée. Une victoire vaut 3 points, un nul 1, une défaite 0 et un forfait −1. Les égalités sont départagées par les points puis la différence de buts en confrontation directe, puis par la différence de buts générale et les buts marqués. Une égalité persistante donne un rang partagé. Seuls les scores publiés contribuent aux buts. Les résultats manquants, les départages ou les décisions administratives peuvent expliquer un écart avec le dernier rang publié dans la matrice.</p></details>
       </div>
     </section>
     <section class="od-replay" aria-label="Lecture de la saison">

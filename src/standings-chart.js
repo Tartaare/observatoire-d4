@@ -10,26 +10,39 @@ const place = rank => rank === 1 ? '1er' : rank + 'e';
 const mix = (a, b, t) => a + (b - a) * t;
 
 /** @param {HTMLElement} plot @param {import('./types.js').Club[]} teams
- * @param {import('./standings.js').RoundStanding[]} rounds @param {number} selected */
-function mountPlot(plot, teams, rounds, selected) {
+ * @param {import('./standings.js').RoundStanding[]} rounds @param {number} selected @param {import('./types.js').ChartMetric} metric */
+function mountPlot(plot, teams, rounds, selected, metric) {
   const width = plot.clientWidth, height = plot.clientHeight;
-  const left = width < 350 ? 21 : 32, right = width - 45, top = 19, bottom = height - 36;
+  const scoreChars = Math.max(4, ...rounds.map(round => Math.max(...round.scores.map(score => score?.text.length ?? 0))));
+  const labelWidth = 34 + scoreChars * 8;
+  const left = width < 350 ? 26 : 36, right = width - 17 - labelWidth, top = 19, bottom = height - 36;
   const end = rounds[rounds.length - 1].day;
   /** @param {number} day */
   const x = day => left + (right - left) * day / Math.max(1, end);
-  /** @param {number} rank */
-  const y = rank => top + (bottom - top) * (rank - 1) / Math.max(1, teams.length - 1);
+  // Une échelle fixe pour la poule garde les journées comparables pendant la lecture.
+  let first = 1, last = teams.length, interval = 1;
+  if (metric === 'points') {
+    const max = Math.max(1, ...rounds.map(round => round.positions[0].points));
+    const min = Math.min(0, ...rounds.map(round => round.positions[round.positions.length - 1].points));
+    const step = Math.max(1, Math.ceil((max - min) / 6));
+    first = Math.ceil(max / step) * step;
+    last = Math.floor(min / step) * step;
+    interval = -step;
+  }
+  /** @param {number} value */
+  const y = value => top + (bottom - top) * (value - first) / (last - first || 1);
 
   // Les écussons occupent chacun 28 px. Seuls leurs centres sont décalés en cas d’égalité.
   const frames = rounds.map(round => {
-    const centers = round.positions.map(row => y(row.rank));
+    const centers = round.positions.map(row => y(row[metric]));
     for (let i = 1; i < centers.length; i++) centers[i] = Math.max(centers[i], centers[i - 1] + 30);
     centers[centers.length - 1] = Math.min(centers[centers.length - 1], bottom);
     for (let i = centers.length - 2; i >= 0; i--) centers[i] = Math.min(centers[i], centers[i + 1] - 30);
-    const points = round.positions.map((row, i) => ({team:row.team, y:y(row.rank), label:centers[i]})).sort((a,b) => a.team - b.team);
+    const points = round.positions.map((row, i) => ({team:row.team, y:y(row[metric]), label:centers[i]})).sort((a,b) => a.team - b.team);
     return {day:round.day, points};
   });
-  const grid = teams.map((_, i) => `<line class="od-rank-grid" x1="${left}" x2="${right}" y1="${y(i + 1)}" y2="${y(i + 1)}"/><text class="od-rank-axis" x="${left - 8}" y="${y(i + 1) + 4}" text-anchor="end">${i + 1}</text>`).join('');
+  const values = Array.from({length:1 + (last - first) / interval}, (_, i) => first + i * interval);
+  const grid = values.map(value => `<line class="od-rank-grid" x1="${left}" x2="${right}" y1="${y(value)}" y2="${y(value)}"/><text class="od-rank-axis" x="${left - 8}" y="${y(value) + 4}" text-anchor="end">${value}</text>`).join('');
   const step = Math.max(1, Math.ceil(36 * end / Math.max(1, right - left)));
   const ticks = Array.from({length:end + 1}, (_, day) => {
     if (day !== end && (day % step || day > end - step && day !== 0)) return '';
@@ -52,20 +65,29 @@ function mountPlot(plot, teams, rounds, selected) {
   }).join('');
   const tips = order.map(team => {
     const [name, initials] = teams[team];
-    return `<g class="od-rank-series od-rank-tip${team === selected ? ' od-followed' : ''}" data-tip="${team}"><title>${escapeHTML(name)}</title><path class="od-rank-link"/><circle r="${team === selected ? 5 : 3}"/><foreignObject x="13" width="28" height="28"><div xmlns="http://www.w3.org/1999/xhtml">${clubBadge(name, initials)}</div></foreignObject></g>`;
+    return `<g class="od-rank-series od-rank-tip${team === selected ? ' od-followed' : ''}" data-tip="${team}"><path class="od-rank-link"/><circle r="${team === selected ? 5 : 3}"/><foreignObject x="13" width="${labelWidth}" height="28"><div xmlns="http://www.w3.org/1999/xhtml" class="od-tip-label">${clubBadge(name, initials)}<span class="od-tip-score"></span></div></foreignObject></g>`;
   }).join('');
-  plot.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="od-plot-title od-plot-desc"><title id="od-plot-title">Évolution du classement de ${escapeHTML(teams[selected][0])}</title><desc id="od-plot-desc"></desc><defs><clipPath id="od-rank-reveal"><rect height="${height}"/></clipPath></defs>${grid}${ticks}<g clip-path="url(#od-rank-reveal)">${trails}</g><line class="od-rank-cursor" x1="0" x2="0" y1="${top}" y2="${bottom}"/>${tips}</svg>`;
+  const measure = metric === 'points' ? 'des points cumulés' : 'du classement';
+  plot.innerHTML = `<svg viewBox="0 0 ${width} ${height}" role="img" aria-labelledby="od-plot-title od-plot-desc"><title id="od-plot-title">Évolution ${measure} de ${escapeHTML(teams[selected][0])}</title><desc id="od-plot-desc"></desc><defs><clipPath id="od-rank-reveal"><rect height="${height}"/></clipPath></defs>${grid}${ticks}<g clip-path="url(#od-rank-reveal)">${trails}</g>${tips}</svg>`;
   bindClubLogoFallbacks(plot);
   const clip = query(plot, 'clipPath rect', SVGRectElement);
-  const cursor = query(plot, '.od-rank-cursor', SVGLineElement);
   const heads = Array.from(plot.querySelectorAll('[data-tip]'), group => ({
     team:Number(group.getAttribute('data-tip')), group, link:query(group, 'path', SVGPathElement),
-    badge:query(group, 'foreignObject', SVGForeignObjectElement)
+    badge:query(group, 'foreignObject', SVGForeignObjectElement), score:query(group, '.od-tip-score', HTMLElement)
   }));
   return {
-    describe(/** @type {number} */ day) {
-      query(plot, 'desc', SVGDescElement).textContent = rounds.filter(round => round.day <= day)
-        .map(round => `${dayLabel(round.day)}, rang ${round.positions.find(row => row.team === selected)?.rank}`).join('. ');
+    describe(/** @type {number} */ day, /** @type {import('./standings.js').RoundStanding} */ round) {
+      for (const {team, score} of heads) {
+        const result = round.day === day ? round.scores[team] : null;
+        score.textContent = result?.text ?? '—';
+        score.dataset.result = result?.code ?? '';
+        score.title = `${teams[team][0]}, ${dayLabel(day)} · ${result?.label ?? 'Score indisponible'}`;
+      }
+      query(plot, 'desc', SVGDescElement).textContent = rounds.filter(item => item.day <= day)
+        .map(item => {
+          const value = item.positions.find(row => row.team === selected)?.[metric];
+          return dayLabel(item.day) + (metric === 'points' ? `, ${value} points` : `, rang ${value}`);
+        }).join('. ') + '. ' + dayLabel(day) + ', ' + (day === round.day && round.scores[selected]?.label || 'score indisponible');
     },
     paint(/** @type {number} */ day) {
       let i = 0;
@@ -75,7 +97,6 @@ function mountPlot(plot, teams, rounds, selected) {
       const blend = fraction * fraction * (3 - 2 * fraction);
       const cx = x(from.day + fraction);
       clip.setAttribute('width', String(cx));
-      cursor.setAttribute('transform', `translate(${cx} 0)`);
       for (const {team, group, link, badge} of heads) {
         const cy = mix(from.points[team].y, to.points[team].y, blend);
         const offset = mix(from.points[team].label, to.points[team].label, blend) - cy;
@@ -106,6 +127,7 @@ export function createStandingsChart(root, data, state, signal) {
   /** @type {ReturnType<typeof mountPlot> | undefined} */
   let scene;
   let geometry = '', listPool = '', frame = 0, displayed = 0, destination = -1;
+  const geometryKey = () => [state.pool, state.metric, followed[state.pool], plot.clientWidth, plot.clientHeight].join(':');
 
   function stopMotion() { cancelAnimationFrame(frame); frame = 0; }
   /** @param {boolean} animate */
@@ -113,19 +135,18 @@ export function createStandingsChart(root, data, state, signal) {
     const round = history().filter(item => item.day <= state.day).at(-1);
     const selected = followed[state.pool];
     if (panel.hidden || !round || selected === undefined || !plot.clientWidth || !plot.clientHeight) return;
-    const key = [state.pool, selected, plot.clientWidth, plot.clientHeight].join(':');
+    const key = geometryKey();
     if (key !== geometry || !scene) {
-      scene = mountPlot(plot, data.clubs[state.pool], history(), selected);
+      scene = mountPlot(plot, data.clubs[state.pool], history(), selected, state.metric);
       geometry = key;
-      if (animate && frame && destination === round.day) {
-        scene.describe(destination);
-        scene.paint(displayed);
-        return;
-      }
-    } else if (animate && destination === round.day) return;
+    }
+    scene.describe(state.day, round);
+    if (animate && destination === round.day) {
+      scene.paint(displayed);
+      return;
+    }
     stopMotion();
     destination = round.day;
-    scene.describe(destination);
     if (!animate || motion.matches || displayed === destination) {
       displayed = destination;
       scene.paint(displayed);
@@ -166,7 +187,9 @@ export function createStandingsChart(root, data, state, signal) {
     const selected = followed[state.pool] ??= round.positions[0].team;
     const current = round.positions.find(row => row.team === selected);
     if (!current) return;
-    query(panel, '[data-chart-round]', HTMLElement).textContent = 'Classement reconstitué · ' + dayLabel(round.day);
+    panel.querySelectorAll('[data-metric]').forEach(button =>
+      button.setAttribute('aria-pressed', String(button.getAttribute('data-metric') === state.metric)));
+    query(panel, '[data-chart-round]', HTMLElement).textContent = (state.metric === 'points' ? 'Points cumulés · ' : 'Classement reconstitué · ') + dayLabel(round.day);
     query(panel, '[data-chart-name]', HTMLElement).textContent = teams[selected][0];
     const tied = round.positions.some(row => row.team !== selected && row.rank === current.rank);
     query(panel, '[data-chart-value]', HTMLElement).textContent = `${place(current.rank)}${tied ? ' ex æquo' : ''} · ${current.points} pt${Math.abs(current.points) > 1 ? 's' : ''}`;
@@ -184,7 +207,8 @@ export function createStandingsChart(root, data, state, signal) {
     for (const [index, {team, rank, points}] of round.positions.entries()) {
       const row = query(list, `[data-follow="${team}"]`, HTMLButtonElement);
       row.setAttribute('aria-pressed', String(team === selected));
-      row.setAttribute('aria-label', `${teams[team][0]}, rang ${rank}, ${points} points`);
+      const result = round.day === state.day ? round.scores[team] : null;
+      row.setAttribute('aria-label', `${teams[team][0]}, rang ${rank}, ${points} points. ${dayLabel(state.day)}, ${result?.label ?? 'score indisponible'}`);
       query(row, '.od-rank', HTMLElement).textContent = String(rank);
       query(row, 'small', HTMLElement).textContent = points + ' pts';
       if (list.children[index] !== row) list.insertBefore(row, list.children[index]);
@@ -209,7 +233,7 @@ export function createStandingsChart(root, data, state, signal) {
     }
   }, {signal});
   const resize = new ResizeObserver(() => {
-    if (geometry !== [state.pool, followed[state.pool], plot.clientWidth, plot.clientHeight].join(':')) draw(!!frame);
+    if (geometry !== geometryKey()) draw(!!frame);
   });
   resize.observe(plot);
   motion.addEventListener('change', () => draw(false), {signal});
