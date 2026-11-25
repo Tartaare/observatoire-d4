@@ -2,7 +2,10 @@ import {createSeason, matchResult, scoreGoals, teamKey} from './season.js';
 
 /** @typedef {{opponent: number, points: number, difference: number, goals: number}} TeamResult */
 /** @typedef {{team: number, rank: number, points: number}} Position */
-/** @typedef {{day: number, positions: Position[]}} RoundStanding */
+/** @typedef {{text: string, code: 'V' | 'N' | 'D' | 'F', label: string}} TeamScore */
+/** @typedef {{day: number, positions: Position[], scores: (TeamScore | null)[]}} RoundStanding */
+
+const matchPoints = {V: 3, N: 1, D: 0, F: -1};
 
 /** @param {TeamResult[][]} results @returns {Position[]} */
 function rankTeams(results) {
@@ -36,26 +39,26 @@ export function standingsHistory(data, pool) {
   /** @type {RoundStanding[]} */
   const history = [];
   for (let day = 0; day < data.dates.length; day++) {
-    const seen = new Set();
+    /** @type {(TeamScore | null)[]} */
+    const scores = teams.map(() => null);
     for (let team = 0; team < teams.length; team++) {
-      if (seen.has(team)) continue;
+      if (scores[team]) continue;
       const archive = data.matches?.[`${pool}:${team}:${day}`];
       const match = demo && day <= data.lastPlayed ? demo.matchAt(day, team, pool) : archive;
       if (!match) continue;
       const home = indices.get(teamKey(match.home)), away = indices.get(teamKey(match.away));
       if (home === undefined || away === undefined || home === away || team !== home && team !== away) continue;
-      const outcome = matchResult(match, match.home);
-      if (!outcome) continue;
-      const [homeGoals, awayGoals] = scoreGoals(match.score) ?? [0, 0];
-      const forfeited = /^Forfait\b/i.test(archive?.statusLabel ?? '');
-      const homePoints = outcome.code === 'V' ? 3 : outcome.code === 'N' ? 1 : outcome.code === 'F' ? -1 : 0;
-      const awayPoints = outcome.code === 'V' ? (forfeited ? -1 : 0) : outcome.code === 'N' ? 1 : 3;
-      results[home].push({opponent: away, points: homePoints, difference: homeGoals - awayGoals, goals: homeGoals});
-      results[away].push({opponent: home, points: awayPoints, difference: awayGoals - homeGoals, goals: awayGoals});
-      seen.add(home);
-      seen.add(away);
+      const goals = scoreGoals(match.score);
+      for (const [side, index, opponent] of [[0, home, away], [1, away, home]]) {
+        const outcome = matchResult(match, teams[index][0]);
+        if (!outcome) continue;
+        const scored = goals?.[side] ?? 0, conceded = goals?.[1 - side] ?? 0;
+        const text = goals ? `${scored}–${conceded}` : 'Forf.';
+        scores[index] = {text, code: outcome.code, label: `${outcome.label} contre ${teams[opponent][0]}${goals ? ', ' + text : ', score non publié'}`};
+        results[index].push({opponent, points: matchPoints[outcome.code], difference: scored - conceded, goals: scored});
+      }
     }
-    if (seen.size) history.push({day, positions: rankTeams(results)});
+    if (scores.some(Boolean)) history.push({day, positions: rankTeams(results), scores});
   }
   return history;
 }
