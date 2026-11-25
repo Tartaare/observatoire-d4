@@ -5,6 +5,8 @@
 
 Référence initiale : interface de `observatoire-d4.html`, conservée pendant le sprint 1.
 
+- Le contrôle « Classement / Points cumulés » se trouve dans l’en-tête du graphique. La première place et les totaux de points les plus élevés se lisent en haut. L’échelle de points est fixe pendant la lecture de la poule et inclut les totaux négatifs. Le point de tête et son écusson repèrent la journée sur la courbe. Le score suit l’écusson avec des chiffres tabulaires, en vert pour une victoire, en gris pour un nul et en rouge pour une défaite. La couleur tient compte du thème et de la surface personnalisée.
+
 - Palette neutre et orange : sombre `#18181B`, clair `#FAFAFA`, accent `#F97316`. Ces trois bases sont personnalisables dans « Paramètres → Apparence ». Les fonds, bordures, textes et six niveaux de la matrice sont dérivés de ces bases ; les volumes utilisent des nuances d’accent, le zéro reste neutre.
 - Thèmes clair, sombre et système : bascule directe dans l’en-tête, choix explicite dans la modale, mémorisation locale indépendante de la saison. Restaurer le thème avant les styles, sans transition de couleur. Seul le mode système suit les changements du système.
 - Les couleurs sombre et claire restent ordonnées et présentent au moins 7:1 de contraste pour permettre la dérivation des surfaces. Les textes dérivés atteignent 4,5:1, les contours des nouveaux contrôles et le focus 3:1. Une palette invalide reste en saisie avec explication ; la dernière palette valide continue de s’afficher. L’accent de remplissage conserve la couleur choisie, son texte et sa variante pour les liens sont ajustés.

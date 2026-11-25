@@ -140,6 +140,8 @@ Changer le tri arrête la lecture mais conserve la journée et le match sélecti
 
 ## 5. Matrice des équipes par journée
 
+Dans l’en-tête du graphique, **Classement / Points cumulés** change l’axe vertical. Le cumul reprend les points acquis après chaque journée et conserve une échelle commune pendant la lecture de la poule. Le choix de mesure est mémorisé par saison. Le score situé à droite de chaque écusson se lit du point de vue du club, avec ses buts en premier. Le survol et les libellés accessibles précisent l’adversaire et le résultat. Les forfaits sans score publié portent « Forf. ». Un tiret signale que la journée demandée ne fournit aucun résultat pour cette équipe, même si un classement antérieur reste disponible.
+
 Le sélecteur de vue au-dessus des données conserve la poule, la journée et le tri de la matrice. La vue choisie est mémorisée pour la saison.
 
 Dans **Évolution du classement**, la première place se lit en haut. La liste de gauche reprend les rangs, les écussons et les noms soulignés de la matrice. Sur téléphone, le bouton **Noms** permet de déplier la liste ou de la réduire aux rangs et écussons. Choisir une équipe souligne sa courbe et affiche son rang et ses points. Une description du graphique donne son rang à chaque journée visible. Chaque point de tête porte sur sa droite l’écusson du club ou ses initiales. Avancer ou reculer déplace ensemble le point et l’écusson. Les préférences de mouvement réduit affichent immédiatement la position choisie. Sur la dernière journée comportant un résultat dans la poule, un écart avec la matrice fait apparaître le dernier rang publié.

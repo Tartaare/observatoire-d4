@@ -1,5 +1,13 @@
 # Avancement
 
+## Sprint 26 — Scores des rencontres et points cumulés
+
+**US-041.** La bascule « Classement / Points cumulés » partage la sélection et la lecture du graphique. L’axe des points garde une échelle fixe par poule. Le point de chaque équipe est suivi de son écusson et de son score du jour, buts du club en premier. Le repère vertical en pointillés a été retiré.
+
+**Vérifications.** Build Pages, typage strict et 37 tests natifs réussis. Test Edge du cumul et de la position de chaque équipe, des scores domicile et extérieur, de la lecture dans les deux sens et du passage à une journée future. Contrôle sur les archives réelles dans les deux poules à 1 440 px en clair et 320 px en sombre. Un scénario de forfait en première journée vérifie l’affichage de −1 et 3 points.
+
+**Prévention des régressions.** Vérifier le contraste des trois couleurs pour chaque palette, conserver la différence entre un nul 0–0 et un score absent, et effacer le score précédent lorsque le curseur dépasse la dernière journée avec un résultat.
+
 ## Sprint 25 — Trajectoires animées et écussons du classement
 
 **US-040.** La liste de gauche reprend les rangs, écussons et noms soulignés de la matrice. En portrait étroit, « Noms » déplie la colonne. Chaque équipe porte aussi son écusson à droite de son point courant. Les écussons des équipes à égalité restent séparés et reliés au rang commun.
