@@ -10,6 +10,7 @@
 <meta name="description" content="Archives locales des compositions seniors masculines de D4 et repérages en division supérieure, avec synchronisation à la demande.">
 <script src="./assets/generated/theme.js"></script>
 <link rel="stylesheet" href="./assets/css/observatoire.css">
+<link rel="stylesheet" href="./assets/css/standings.css">
 <link rel="stylesheet" href="./assets/css/auth.css">
 <link rel="stylesheet" href="./assets/generated/appearance.css">
 <script defer src="./assets/generated/appearance.js"></script>
@@ -43,13 +44,32 @@
         <label>Trier les équipes<select data-sort><option value="rank">Classement</option><option value="name">Nom (A–Z)</option><option value="total">Apparitions cumulées</option></select></label>
       </div>
     </div>
-    <section class="od-board" aria-labelledby="od-matrix-title">
+    <section class="od-board" aria-label="Vues de la poule">
       <div class="od-board-head">
-        <div class="od-board-title"><h2 id="od-matrix-title">Équipes par journée</h2><span data-team-count></span></div>
+        <div class="od-view-switch" role="group" aria-label="Vue de la poule">
+          <button type="button" data-view="matrix" aria-pressed="true" aria-controls="od-matrix">Équipes par journée</button>
+          <button type="button" data-view="chart" aria-pressed="false" aria-controls="od-chart">Évolution du classement</button>
+        </div>
+        <span data-team-count></span>
         <div class="od-legend" aria-label="Nombre de repérages connus, de 0 à 5 et plus"><span data-legend-label>Repérages</span><span class="od-scale"><b data-tone="0">0</b><b data-tone="1">1</b><b data-tone="2">2</b><b data-tone="3">3</b><b data-tone="4">4</b><b data-tone="5">5+</b></span></div>
       </div>
-      <div class="od-scroll"><table><caption class="od-sr">Repérages de noms en division supérieure à confirmer, par équipe et par journée de D4</caption><thead></thead><tbody></tbody></table></div>
+      <div class="od-scroll" id="od-matrix"><table><caption class="od-sr">Repérages de noms en division supérieure à confirmer, par équipe et par journée de D4</caption><thead></thead><tbody></tbody></table></div>
       <div class="od-board-foot"><span><b class="od-missing">?</b> Feuille absente ou incomplète</span><span><b>—</b> À venir / non joué</span><span><b>·</b> Après le curseur</span><span>V · Victoire / N · Nul / D · Défaite / F · Forfait</span></div>
+      <div id="od-chart" hidden>
+        <p data-chart-empty hidden></p>
+        <div class="od-chart-layout" data-chart-layout>
+          <div class="od-chart-main">
+            <div class="od-chart-heading">
+              <div><p class="od-chart-kicker" data-chart-round></p><h2 data-chart-name></h2></div>
+              <div><p class="od-chart-value" data-chart-value></p><p data-published-rank hidden></p></div>
+            </div>
+            <label class="od-chart-picker">Suivre une équipe<select data-chart-team></select></label>
+            <div data-rank-plot></div>
+          </div>
+          <div class="od-chart-list"><h3>Suivre une équipe</h3><div data-chart-teams></div></div>
+        </div>
+        <details class="od-chart-method"><summary>Calcul des positions</summary><p>Le classement cumule les résultats archivés par numéro de journée. Une victoire vaut 3 points, un nul 1, une défaite 0 et un forfait −1. Les égalités sont départagées par les points puis la différence de buts en confrontation directe, puis par la différence de buts générale et les buts marqués. Une égalité persistante donne un rang partagé. Seuls les scores publiés contribuent aux buts. Les résultats manquants, les départages ou les décisions administratives peuvent expliquer un écart avec le dernier rang publié dans la matrice.</p></details>
+      </div>
     </section>
     <section class="od-replay" aria-label="Lecture de la saison">
       <div class="od-replay-top">
