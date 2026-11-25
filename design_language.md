@@ -1,5 +1,7 @@
 # Langage visuel — Observatoire D4
 
+- Vues de la poule. Les deux boutons « Équipes par journée » et « Évolution du classement » partagent le même emplacement au-dessus des données. La vue active porte un soulignement d’accent. Dans le graphique, la première place est en haut. La trajectoire suivie se distingue par sa couleur, son épaisseur et ses marqueurs. Le nom, le rang et les points restent visibles au-dessus du tracé. En portrait, une sélection native remplace la liste latérale. L’avance d’une journée anime le nouveau segment et respecte la réduction des mouvements.
+
 Référence initiale : interface de `observatoire-d4.html`, conservée pendant le sprint 1.
 
 - Palette neutre et orange : sombre `#18181B`, clair `#FAFAFA`, accent `#F97316`. Ces trois bases sont personnalisables dans « Paramètres → Apparence ». Les fonds, bordures, textes et six niveaux de la matrice sont dérivés de ces bases ; les volumes utilisent des nuances d’accent, le zéro reste neutre.

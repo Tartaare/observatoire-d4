@@ -1,5 +1,13 @@
 # Avancement
 
+## Sprint 24 — Évolution du classement
+
+**US-039.** La matrice et le graphique partagent la poule, la journée et la lecture. La vue choisie est restaurée par saison. L’utilisateur peut suivre une équipe sur les deux écrans, lire sa position et ses points et consulter la méthode. Les rangs sont reconstitués à partir des résultats de chaque poule. À la dernière journée disponible, le graphique indique aussi le dernier rang publié de l’équipe sélectionnée en cas d’écart.
+
+**Vérifications.** Build Pages et typage strict réussis, 37 tests natifs réussis. Parcours Edge sur les archives locales en J06, à 1 440 px en clair et 320 px en sombre, incluant les deux poules, la sélection, la lecture, le retour à la matrice, le rechargement, les journées futures et une poule sans résultat. Le segment animé respecte la préférence de réduction des mouvements. Sur les archives comparées, 14 des 20 rangs reconstitués à la J06 concordent avec le dernier classement publié.
+
+**Prévention des régressions.** Le test de classement couvre les rencontres projetées pour les deux équipes, les confrontations directes, les rangs partagés, un forfait sans score, les résultats inconnus et l’isolation des poules. La navigation couvre les préférences enregistrées avant l’ajout de la vue.
+
 ## Sprint 23 — Numéros de maillot des joueurs
 
 **US-038.** La fiche d’équipe affiche les numéros portés en D4 jusqu’à la journée sélectionnée. Le détail du match et les compositions historiques affichent le numéro inscrit sur la feuille. Les archives locales et hébergées fournissent déjà cette donnée.

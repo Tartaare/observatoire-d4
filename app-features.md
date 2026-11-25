@@ -140,6 +140,12 @@ Changer le tri arrête la lecture mais conserve la journée et le match sélecti
 
 ## 5. Matrice des équipes par journée
 
+Le sélecteur de vue au-dessus des données conserve la poule, la journée et le tri de la matrice. La vue choisie est mémorisée pour la saison.
+
+Dans **Évolution du classement**, la première place se lit en haut. Choisir une équipe dans la liste latérale ou dans le sélecteur en portrait souligne sa courbe et affiche son rang et ses points. Une description du graphique donne son rang à chaque journée visible. Sur la dernière journée comportant un résultat dans la poule, un écart avec la matrice fait apparaître le dernier rang publié.
+
+Le calcul cumule les rencontres par numéro de journée. Un forfait identifié compte même lorsque sa feuille ou son score manque. Seuls les buts archivés contribuent aux différences de buts. Le départage utilise les points et la différence de buts entre équipes à égalité, puis la différence générale et les buts marqués. Une égalité restante donne une place partagée. Le barème retenu s’appuie sur le [règlement seniors du District du Lot 2025–2026](https://district-foot-lot.fff.fr/wp-content/uploads/sites/71/bsk-pdf-manager/6caf942dbbd450ee944b0658e2e5038c.pdf).
+
 ### 5.1 Anatomie
 
 La première colonne, **Équipe**, rassemble le rang, un logo ou des initiales, puis le nom de l’équipe. Elle reste fixe lors du défilement horizontal. Les écussons mesurent 28 × 28 px, gardent leurs proportions et réservent leur place même sur mobile.
@@ -238,7 +244,7 @@ Le détail principal ne change pas de page. Sa largeur suit la fenêtre visible 
 
 ## 7. Navigation temporelle et lecture automatique
 
-La zone **Lecture de la saison** se situe sous la matrice. Le curseur est une limite de révélation des journées, pas un filtre supprimant les colonnes et pas un recalcul historique du classement.
+La zone **Lecture de la saison** se situe sous la vue active. Dans la matrice, le curseur révèle les colonnes jusqu’à la journée sélectionnée. Dans le graphique, il révèle les positions reconstituées jusqu’à cette journée. La lecture du graphique s’arrête au dernier résultat de la poule, forfaits compris. Une journée sans résultat conserve le dernier classement daté. Avant le premier résultat, la vue affiche un message d’attente.
 
 | Contrôle | Comportement |
 | --- | --- |

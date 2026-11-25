@@ -6,6 +6,8 @@ L’[audit UI/UX en portrait](docs/audit-mobile-portrait.md) documente les parco
 
 L’interface affiche les données réelles archivées depuis [Le Onze Lotois](https://leonzelotois.fr/division/d4/). Avant la première synchronisation, la démonstration reste disponible et clairement identifiée.
 
+Pour suivre une équipe, choisir **Évolution du classement** à côté d’**Équipes par journée**, puis sélectionner son nom. **Lecture** déroule sa trajectoire et celles des autres équipes. Les flèches et le curseur permettent de revoir une journée précise. La bascule conserve la poule et la journée. Le graphique reconstitue les rangs à partir des résultats archivés et signale un écart avec le dernier rang publié lorsqu’il en existe un à la dernière journée disponible. Le volet **Calcul des positions** précise le barème et les départages.
+
 Dans le classement, cliquer sur le **nom d’une équipe** ouvre **Statistiques des joueurs** sous sa ligne. La fiche suit la journée du curseur. Elle affiche les matchs documentés, les apparitions, les titularisations, les entrées, les buts et les cartons jaunes et rouges. Cliquer sur un en-tête trie sa colonne. Un **0** indique un zéro vérifié dans les sources disponibles, **?** une valeur inconnue et **≥** un minimum attesté.
 
 À côté du nom du joueur, **n° 8 / n° 10** indique qu’il a porté ces deux numéros lors de participations attestées avec cette équipe jusqu’à la journée affichée. Ouvrir une rencontre permet de retrouver le numéro inscrit sur sa feuille. Les archives existantes suffisent pour consulter les maillots hors ligne.
