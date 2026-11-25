@@ -58,15 +58,18 @@
       <div id="od-chart" hidden>
         <p data-chart-empty hidden></p>
         <div class="od-chart-layout" data-chart-layout>
-          <div class="od-chart-main">
-            <div class="od-chart-heading">
-              <div><p class="od-chart-kicker" data-chart-round></p><h2 data-chart-name></h2></div>
-              <div><p class="od-chart-value" data-chart-value></p><p data-published-rank hidden></p></div>
+          <div class="od-chart-list">
+            <div class="od-chart-rail">
+              <h3>Équipe</h3>
+              <button type="button" class="od-team-toggle" aria-expanded="false" aria-controls="od-chart-teams" aria-label="Afficher les noms des équipes">Noms <span aria-hidden="true">›</span></button>
+              <div id="od-chart-teams" data-chart-teams></div>
             </div>
-            <label class="od-chart-picker">Suivre une équipe<select data-chart-team></select></label>
-            <div data-rank-plot></div>
           </div>
-          <div class="od-chart-list"><h3>Suivre une équipe</h3><div data-chart-teams></div></div>
+          <div class="od-chart-heading">
+            <div><p class="od-chart-kicker" data-chart-round></p><h2 data-chart-name></h2></div>
+            <div><p class="od-chart-value" data-chart-value></p><p data-published-rank hidden></p></div>
+          </div>
+          <div class="od-chart-main"><div data-rank-plot></div></div>
         </div>
         <details class="od-chart-method"><summary>Calcul des positions</summary><p>Le classement cumule les résultats archivés par numéro de journée. Une victoire vaut 3 points, un nul 1, une défaite 0 et un forfait −1. Les égalités sont départagées par les points puis la différence de buts en confrontation directe, puis par la différence de buts générale et les buts marqués. Une égalité persistante donne un rang partagé. Seuls les scores publiés contribuent aux buts. Les résultats manquants, les départages ou les décisions administratives peuvent expliquer un écart avec le dernier rang publié dans la matrice.</p></details>
       </div>

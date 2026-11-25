@@ -48,7 +48,9 @@ export function startObservatory(root, data) {
       if (state.view === 'matrix') renderDetail();
     }
     updateDay();
-    if (state.view === 'chart') chart.render(state.day === previous + 1);
+    if (state.view === 'chart') {
+      if (state.day !== previous) chart.render(true);
+    }
     else {
       if (state.stats) renderDetail();
       keepDayVisible(state.day);

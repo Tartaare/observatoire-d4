@@ -4,18 +4,23 @@
 #observatoire-d4 [data-team-count]{margin-inline-end:auto}
 #od-chart{border-top:1px solid var(--line);overflow:auto;flex:1;min-height:0}
 #od-chart [data-chart-empty]{padding:24px}
-.od-chart-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(190px,25%);min-height:100%}
-.od-chart-main{min-width:0;padding:clamp(12px,2vw,32px);display:flex;flex-direction:column;gap:12px}
-.od-chart-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
-#od-chart .od-chart-kicker,.od-chart-list h3{margin:0 0 5px;color:var(--sub);font:600 11px/1.4 ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase}
+.od-chart-layout{display:grid;grid-template-columns:clamp(195px,23%,330px) minmax(0,1fr);grid-template-rows:auto 1fr;grid-template-areas:"teams heading" "teams plot";min-height:100%}
+.od-chart-main{grid-area:plot;min-width:0;display:flex;padding:0 clamp(10px,2vw,32px) 12px}
+.od-chart-heading{grid-area:heading;display:flex;align-items:center;justify-content:space-between;gap:8px 16px;flex-wrap:wrap;padding:clamp(12px,2vw,32px) clamp(10px,2vw,32px) 8px}
+#od-chart .od-chart-kicker{margin:0 0 5px;color:var(--sub);font:600 11px/1.4 ui-monospace,monospace;letter-spacing:.04em;text-transform:uppercase}
 #od-chart [data-chart-name]{font-size:clamp(18px,2vw,30px);line-height:1.15}
 #od-chart .od-chart-value{color:var(--accent-ink);font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}
-.od-chart-list{padding:16px 10px;border-inline-start:1px solid var(--line)}
-.od-chart-list h3{padding-inline:8px}
-#od-chart .od-chart-list button{width:100%;min-height:44px;display:grid;grid-template-columns:2ch 1fr auto;align-items:center;gap:8px;padding:6px 8px;text-align:left;background:transparent;border:1px solid transparent;border-bottom-color:var(--line);cursor:pointer;font-size:12px}
-#od-chart .od-chart-list button[aria-pressed=true]{border-color:var(--focus);background:var(--selected);border-radius:7px;font-weight:700}
-.od-chart-list button span:first-child,.od-chart-list button small{font:600 11px ui-monospace,monospace;color:var(--sub)}
-.od-chart-picker{display:none}
+.od-chart-list{grid-area:teams;position:relative;z-index:1;min-width:0}
+.od-chart-rail{display:flex;flex-direction:column;height:100%;background:var(--surface);border-inline-end:1px solid var(--line)}
+#od-chart .od-chart-list h3,#observatoire-d4 .od-team-toggle{margin:0;padding:0 11px;height:40px;align-content:center;background:var(--paper);color:var(--sub);border:0;border-bottom:1px solid var(--line);font-size:11px;font-weight:650;letter-spacing:normal}
+#observatoire-d4 .od-team-toggle{display:none;cursor:pointer}
+[data-chart-teams]{flex:1;display:flex;flex-direction:column}
+#observatoire-d4 .od-chart-row{width:100%;flex:1;min-height:44px;padding:2px 11px;background:var(--surface);border:0;border-bottom:1px solid var(--line);cursor:pointer;text-align:left}
+#observatoire-d4 .od-chart-row .od-team-name{align-content:center;white-space:normal;overflow-wrap:anywhere}
+#observatoire-d4 .od-chart-row small{margin-inline-start:auto;font-size:11px;white-space:nowrap;color:var(--sub);font-variant-numeric:tabular-nums}
+#observatoire-d4 .od-chart-row[aria-pressed=true]{background:var(--selected);box-shadow:inset 3px 0 var(--focus)}
+#observatoire-d4 .od-chart-row:is(:hover,[aria-pressed=true]) .od-team-name{text-decoration-thickness:2px}
+#observatoire-d4 .od-chart-row:focus-visible{outline-offset:-3px}
 [data-rank-plot]{flex:1;min-height:250px;position:relative}
 [data-rank-plot] svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
 .od-rank-grid{stroke:var(--line)}
@@ -27,19 +32,25 @@
 .od-rank-series.od-followed{color:var(--accent-ink)}
 .od-followed .od-rank-line{stroke-width:3.5}
 .od-followed circle{fill:currentColor;stroke:var(--surface);stroke-width:2}
-.od-rank-enter{stroke-dasharray:1;animation:od-draw-rank .42s ease-out}
-@keyframes od-draw-rank{from{stroke-dashoffset:1}to{stroke-dashoffset:0}}
+.od-rank-link{stroke:currentColor;fill:none;stroke-width:1}
+.od-rank-tip{pointer-events:none}
+.od-rank-tip.od-followed .od-rank-link{stroke-width:1.7}
 .od-chart-method{border-top:1px solid var(--line);padding:0 14px;color:var(--sub);font-size:12px}
 .od-chart-method summary{cursor:pointer;min-height:44px;align-content:center;width:fit-content}
 #od-chart .od-chart-method p{max-width:85ch;margin:0 0 12px}
 @media(min-width:900px) and (min-height:700px){
   .od-chart-layout{min-height:calc(100% - 45px)}
 }
-@media(max-width:740px){
-  .od-chart-layout{display:block}
-  .od-chart-list{display:none}
-  .od-chart-picker{display:grid;gap:4px;color:var(--sub);font-size:12px;font-weight:600}
-  #od-chart .od-chart-picker select{width:100%;min-height:44px;font-size:16px}
-  [data-rank-plot]{min-height:260px}
+@media(max-width:640px){
+  .od-chart-layout{grid-template-columns:64px minmax(0,1fr);grid-template-areas:"heading heading" "teams plot"}
+  .od-chart-heading{border-bottom:1px solid var(--line)}
+  .od-chart-main{padding:0 4px 4px}
+  .od-chart-list h3{display:none}
+  #observatoire-d4 .od-team-toggle{display:block;width:100%;text-align:left;min-height:44px}
+  #observatoire-d4 .od-chart-row{padding-inline:6px;gap:4px}
+  #observatoire-d4 .od-chart-row .od-team-name,#observatoire-d4 .od-chart-row small{display:none}
+  .od-chart-rail:has([aria-expanded=true]){width:min(260px,calc(100vw - 64px));box-shadow:5px 0 12px color-mix(in srgb,var(--ink) 12%,transparent)}
+  #observatoire-d4 .od-chart-rail:has([aria-expanded=true]) .od-chart-row :is(.od-team-name,small){display:block}
+  .od-team-toggle[aria-expanded=true] span{display:inline-block;transform:rotate(180deg)}
   #observatoire-d4 .od-view-switch button{padding-inline:8px}
 }
