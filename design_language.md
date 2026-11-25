@@ -1,6 +1,7 @@
 # Langage visuel — Observatoire D4
 
-- Vues de la poule. Les deux boutons « Équipes par journée » et « Évolution du classement » partagent le même emplacement au-dessus des données. La vue active porte un soulignement d’accent. Dans le graphique, la première place est en haut. La trajectoire suivie se distingue par sa couleur, son épaisseur et ses marqueurs. Le nom, le rang et les points restent visibles au-dessus du tracé. En portrait, une sélection native remplace la liste latérale. L’avance d’une journée anime le nouveau segment et respecte la réduction des mouvements.
+- Vues de la poule. Les deux boutons « Équipes par journée » et « Évolution du classement » partagent le même emplacement au-dessus des données. La vue active porte un soulignement d’accent. Le graphique reprend à gauche le rang, l’écusson et le nom souligné de la matrice. En portrait étroit, la colonne conserve les rangs et les écussons. Le bouton « Noms » déplie les libellés.
+- Dans le graphique, la première place est en haut. La trajectoire suivie se distingue par sa couleur, son épaisseur et ses marqueurs. Son rang et ses points accompagnent le nom au-dessus du tracé. Un écusson de 28 px suit le point de chaque équipe sur sa droite. Les écussons des équipes à égalité sont espacés et reliés au point partagé. En avançant ou en reculant, le tracé et les écussons accélèrent puis ralentissent ensemble. Le mode de réduction des mouvements affiche directement la journée demandée.
 
 Référence initiale : interface de `observatoire-d4.html`, conservée pendant le sprint 1.
 

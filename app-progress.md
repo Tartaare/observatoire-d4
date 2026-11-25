@@ -1,5 +1,13 @@
 # Avancement
 
+## Sprint 25 — Trajectoires animées et écussons du classement
+
+**US-040.** La liste de gauche reprend les rangs, écussons et noms soulignés de la matrice. En portrait étroit, « Noms » déplie la colonne. Chaque équipe porte aussi son écusson à droite de son point courant. Les écussons des équipes à égalité restent séparés et reliés au rang commun.
+
+**Animation.** Les courbes se dessinent ou se rétractent avec le déplacement des points. Un changement de sens reprend à la position visible. Les journées sans résultat conservent le dernier point connu. La préférence de mouvement réduit déclenche une mise à jour immédiate.
+
+**Vérifications.** Build Pages et typage strict réussis, 37 tests natifs réussis. Inspection du graphique dans Edge sur archives réelles à 1 440 et 320 px. Le contrôle reproductible `node --preserve-symlinks --preserve-symlinks-main scripts/check-standings-browser.js` utilise une base de démonstration et une horloge de navigateur contrôlée. Il vérifie un recul, une inversion en cours de déplacement, le suivi du point par le tracé, la réduction des mouvements et la sélection en portrait. Il vérifie aussi que les écussons restent visibles à droite du point et séparés en J01.
+
 ## Sprint 24 — Évolution du classement
 
 **US-039.** La matrice et le graphique partagent la poule, la journée et la lecture. La vue choisie est restaurée par saison. L’utilisateur peut suivre une équipe sur les deux écrans, lire sa position et ses points et consulter la méthode. Les rangs sont reconstitués à partir des résultats de chaque poule. À la dernière journée disponible, le graphique indique aussi le dernier rang publié de l’équipe sélectionnée en cas d’écart.
