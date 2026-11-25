@@ -25,6 +25,10 @@ async function loadSeason() {
     if (!response.ok) throw new Error(`Lecture impossible (${response.status}).`);
     const data = validateSeason(await response.json());
     if (Object.values(data.clubs).every(teams => teams.length === 0)) {
+      dispose?.();
+      dispose = null;
+      content.hidden = true;
+      status.hidden = false;
       message.textContent = 'Aucune équipe disponible pour cette saison.';
       return;
     }

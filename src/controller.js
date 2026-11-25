@@ -1,4 +1,5 @@
 import {createView} from "./view.js";
+import {createStandingsChart} from './standings-chart.js';
 import {query} from './dom.js';
 import {bindArchives} from './detail.js';
 import {restoreNavigation, saveNavigation} from './navigation.js';
@@ -25,16 +26,33 @@ export function startObservatory(root, data) {
   pool.value = state.pool;
   sort.value = state.sort;
   const {renderBoard, updateDay, renderDetail, keepDayVisible} = createView(root, data, state);
+  const chart = createStandingsChart(root, data, state, lifecycle.signal);
+  const playbackEnd = () => state.view === 'chart' ? chart.lastDay() : lastPlayed;
+  function renderView() {
+    const chartVisible = state.view === 'chart';
+    for (const selector of ['.od-scroll', '.od-board-foot', '.od-legend', 'label:has([data-sort])']) find(selector).hidden = chartVisible;
+    find('#od-chart').hidden = !chartVisible;
+    root.querySelectorAll('[data-view]').forEach(button =>
+      button.setAttribute('aria-pressed', String(button.getAttribute('data-view') === state.view)));
+    find('[data-team-count]').textContent = clubs[state.pool].length + ' équipes';
+    play.disabled = playbackEnd() < 1;
+    if (chartVisible) { updateDay(); chart.render(); }
+    else { renderBoard(); keepDayVisible(state.day); }
+  }
   /** @param {number} day @param {boolean} announce */
   function setDay(day, announce = false) {
+    const previous = state.day;
     state.day = Math.max(0,Math.min(day,dates.length - 1));
     if (state.selected && state.selected.day > state.day) {
       state.selected = null;
-      renderDetail();
+      if (state.view === 'matrix') renderDetail();
     }
     updateDay();
-    if (state.stats) renderDetail();
-    keepDayVisible(state.day);
+    if (state.view === 'chart') chart.render(state.day === previous + 1);
+    else {
+      if (state.stats) renderDetail();
+      keepDayVisible(state.day);
+    }
     persist();
     if (announce) find("[data-announcement]").textContent = range.getAttribute("aria-valuetext");
   }
@@ -48,15 +66,16 @@ export function startObservatory(root, data) {
   }
   on(play, "click", () => {
     if (state.timer !== null) { stop(); return; }
-    if (state.day >= lastPlayed) setDay(0);
+    const end = playbackEnd();
+    if (state.day >= end) setDay(0);
     find("[data-play-icon]").textContent = "Ⅱ";
     find("[data-play-label]").textContent = "Pause";
     play.setAttribute('aria-pressed', 'true');
     state.timer = setInterval(() => {
       setDay(state.day + 1);
-      if (state.day >= lastPlayed) {
+      if (state.day >= end) {
         stop();
-        find("[data-announcement]").textContent = "Lecture terminée à la journée " + (lastPlayed + 1);
+        find("[data-announcement]").textContent = "Lecture terminée à la journée " + (end + 1);
       }
     }, 780);
   });
@@ -68,11 +87,10 @@ export function startObservatory(root, data) {
     if (pool.value !== 'a' && pool.value !== 'b') return;
     state.pool = pool.value;
     delete state.stats;
-    state.day = Math.max(0,lastPlayed);
+    state.day = Math.max(0,playbackEnd());
     state.selected = null;
     persist();
-    renderBoard();
-    keepDayVisible(state.day);
+    renderView();
     find("[data-announcement]").textContent = pool.selectedOptions[0].textContent + ", " + clubs[state.pool].length + " équipes.";
   });
   on(sort, "change", () => {
@@ -108,6 +126,17 @@ export function startObservatory(root, data) {
   on(root, "click", (event) => {
     const button = event.target instanceof Element ? event.target.closest('button') : null;
     if (!button || button.disabled) return;
+    const view = button.dataset.view;
+    if (view === 'matrix' || view === 'chart') {
+      if (state.view !== view) {
+        stop();
+        state.view = view;
+        renderView();
+        persist();
+        find('[data-announcement]').textContent = button.textContent + ', journée ' + (state.day + 1);
+      }
+      return;
+    }
     if (button.dataset.statsTeam !== undefined) {
       stop();
       const team = Number(button.dataset.statsTeam);
@@ -144,7 +173,7 @@ export function startObservatory(root, data) {
     if (button.hasAttribute("data-close")) closeDetail();
   });
   on(root, "keydown", (event) => {
-    if (event.key === "Escape" && (state.selected || state.stats)) closeDetail();
+    if (state.view === 'matrix' && event.key === "Escape" && (state.selected || state.stats)) closeDetail();
   });
   document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); }, {signal: lifecycle.signal});
   bindArchives(root, lifecycle.signal);
@@ -155,8 +184,7 @@ export function startObservatory(root, data) {
 
   const resize = new ResizeObserver(() => root.style.setProperty("--od-view", scroll.clientWidth + "px"));
   resize.observe(scroll);
-  renderBoard();
-  play.disabled = lastPlayed < 1;
-  const frame = requestAnimationFrame(() => keepDayVisible(state.day));
+  renderView();
+  const frame = requestAnimationFrame(() => { if (state.view === 'matrix') keepDayVisible(state.day); });
   return () => { stop(); lifecycle.abort(); resize.disconnect(); cancelAnimationFrame(frame); };
 }

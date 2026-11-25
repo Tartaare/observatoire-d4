@@ -36,7 +36,6 @@ export function createView(root, data, state) {
     const total = (index) => teams[index][2].reduce((sum, value) => (sum ?? 0) + (value ?? 0), 0) ?? 0;
     if (state.sort === "name") order.sort((a,b) => teams[a][0].localeCompare(teams[b][0],"fr"));
     if (state.sort === "total") order.sort((a,b) => total(b) - total(a));
-    find("[data-team-count]").textContent = teams.length + " équipes";
     head.innerHTML = '<tr><th scope="col" class="od-team">Équipe</th>' + dates.map((_, day) =>
       '<th scope="col" class="od-day" data-column="' + day + '"><button type="button" class="cursor-interaction" data-jump="' + day + '">' + dayLabel(day) + '<span>' + formatDate(day,shortDate) + '</span></button></th>'
     ).join("") + '</tr>';
@@ -61,6 +60,7 @@ export function createView(root, data, state) {
     Array.from(track.children).forEach((segment,day) => {
       segment.className = day === state.day ? "od-now" : day < state.day && day <= lastPlayed ? "od-reached" : day <= lastPlayed ? "od-past" : "";
     });
+    if (state.view === 'chart') return;
     table.querySelectorAll("[data-column]").forEach((cell) => {
       const active = Number(cell.getAttribute('data-column')) === state.day;
       cell.classList.toggle("od-active", active);
