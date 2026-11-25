@@ -128,6 +128,15 @@ export function startObservatory(root, data) {
   on(root, "click", (event) => {
     const button = event.target instanceof Element ? event.target.closest('button') : null;
     if (!button || button.disabled) return;
+    const metric = button.dataset.metric;
+    if (metric === 'rank' || metric === 'points') {
+      if (state.metric !== metric) {
+        state.metric = metric;
+        chart.render();
+        persist();
+      }
+      return;
+    }
     const view = button.dataset.view;
     if (view === 'matrix' || view === 'chart') {
       if (state.view !== view) {

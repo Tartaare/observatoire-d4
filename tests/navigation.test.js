@@ -12,8 +12,8 @@ test('la navigation survit au rechargement et résiste aux changements de donné
   }});
   try {
     const defaults = restoreNavigation(demo);
-    assert.deepEqual(defaults, {pool: 'a', sort: 'rank', view: 'matrix', day: demo.lastPlayed, selected: null, timer: null});
-    const state = {...defaults, pool: 'b', sort: 'total', view: 'chart', day: 3, selected: {team: 1, day: 2}, timer: 42};
+    assert.deepEqual(defaults, {pool: 'a', sort: 'rank', view: 'matrix', metric:'rank', day: demo.lastPlayed, selected: null, timer: null});
+    const state = {...defaults, pool: 'b', sort: 'total', view: 'chart', metric:'points', day: 3, selected: {team: 1, day: 2}, timer: 42};
     saveNavigation(demo, state);
     assert.deepEqual(restoreNavigation(demo), {...state, timer: null});
     const key = [...entries.keys()][0];

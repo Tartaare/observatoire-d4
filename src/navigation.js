@@ -6,13 +6,14 @@ function storageKey(data) {
 /** @param {import('./types.js').SeasonData} data @returns {import('./types.js').AppState} */
 export function restoreNavigation(data) {
   /** @type {import('./types.js').AppState} */
-  const state = {pool: 'a', sort: 'rank', view: 'matrix', day: Math.max(0, data.lastPlayed), selected: null, timer: null};
+  const state = {pool: 'a', sort: 'rank', view: 'matrix', metric: 'rank', day: Math.max(0, data.lastPlayed), selected: null, timer: null};
   try {
     const saved = JSON.parse(localStorage.getItem(storageKey(data)) ?? 'null');
     if (!saved || typeof saved !== 'object' || Array.isArray(saved)) return state;
     if (saved.pool === 'a' || saved.pool === 'b') state.pool = saved.pool;
     if (['rank', 'name', 'total'].includes(saved.sort)) state.sort = saved.sort;
     if (saved.view === 'chart') state.view = 'chart';
+    if (saved.metric === 'points') state.metric = 'points';
     if (Number.isInteger(saved.day)) state.day = Math.max(0, Math.min(saved.day, data.dates.length - 1));
     const selection = saved.selected;
     if (selection && typeof selection.teamName === 'string' && Number.isInteger(selection.day)
@@ -33,8 +34,8 @@ export function restoreNavigation(data) {
 /** @param {import('./types.js').SeasonData} data @param {import('./types.js').AppState} state */
 export function saveNavigation(data, state) {
   try {
-    const {pool, sort, day, view, selected} = state;
-    localStorage.setItem(storageKey(data), JSON.stringify({pool, sort, day, view, selected: selected
+    const {pool, sort, day, view, metric, selected} = state;
+    localStorage.setItem(storageKey(data), JSON.stringify({pool, sort, day, view, metric, selected: selected
       ? {day: selected.day, teamName: data.clubs[pool][selected.team][0]} : null}));
   } catch {
     // La navigation reste utilisable si le navigateur refuse la persistance.
