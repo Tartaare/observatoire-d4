@@ -1,23 +1,31 @@
+/** @param {string} name */
+export const teamKey = name => name.normalize('NFKC').toLocaleLowerCase('fr').replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
+
+/** @param {string} score @returns {[number, number] | null} */
+export function scoreGoals(score) {
+  const goals = score.match(/^(\d+)\s*[–—-]\s*(\d+)$/);
+  return goals ? [Number(goals[1]), Number(goals[2])] : null;
+}
+
 /**
  * @param {{home: string, away: string, score: string, statusLabel?: string}} match
  * @param {string} team
  * @returns {{code: 'V' | 'N' | 'D' | 'F', label: string} | null}
  */
 export function matchResult(match, team) {
-  const normalize = (/** @type {string} */ name) => name.normalize('NFKC').toLocaleLowerCase('fr').replace(/[’']/g, "'").replace(/\s+/g, ' ').trim();
-  const name = normalize(team);
-  const home = name === normalize(match.home);
-  if (!home && name !== normalize(match.away)) return null;
+  const name = teamKey(team);
+  const home = name === teamKey(match.home);
+  if (!home && name !== teamKey(match.away)) return null;
   const forfeiting = match.statusLabel?.match(/^Forfait\s+(.+)$/i)?.[1];
   if (forfeiting) {
-    const loser = normalize(forfeiting);
-    if (![normalize(match.home), normalize(match.away)].includes(loser)) return null;
+    const loser = teamKey(forfeiting);
+    if (![teamKey(match.home), teamKey(match.away)].includes(loser)) return null;
     return loser === name ? {code: 'F', label: 'Forfait'} : {code: 'V', label: 'Victoire par forfait'};
   }
   if (match.statusLabel && match.statusLabel !== 'Terminé') return null;
-  const score = match.score.match(/^(\d+)\s*[–—-]\s*(\d+)$/);
+  const score = scoreGoals(match.score);
   if (!score) return null;
-  const difference = (Number(score[1]) - Number(score[2])) * (home ? 1 : -1);
+  const difference = (score[0] - score[1]) * (home ? 1 : -1);
   return difference === 0 ? {code: 'N', label: 'Match nul'} : difference > 0
     ? {code: 'V', label: 'Victoire'} : {code: 'D', label: 'Défaite'};
 }
